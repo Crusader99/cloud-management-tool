@@ -13,8 +13,22 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# Ignore Gradle project-specific cache directory
-.gradle
+# Ignore IDE-Files
+/.settings/
+/.idea/
+/.gradle/
+.classpath
+.project
+*.iml
+*.versionsBackup
+*.ipr
+*.iws
 
-# Ignore Gradle build output directory
+# Ignore build output directory
 build
+/target/
+/bin/
+/out/
+
+# The local.properties files contains the installation path of the sdk wich can be different
+local.properties
