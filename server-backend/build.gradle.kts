@@ -19,6 +19,15 @@ kotlin.target {
 dependencies {
     implementation(project(":common"))
 
+    // Network framework
+    implementation("io.ktor:ktor-server-core:1.5.3")
+    implementation("io.ktor:ktor-server-cio:1.5.3") {
+        because("Known issues with netty & jetty")
+    }
+
+    // Logging framework
+    implementation("ch.qos.logback:logback-classic:1.2.3")
+
     // JUnit test framework
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit"))
