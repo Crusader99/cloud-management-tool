@@ -1,10 +1,19 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("multiplatform")
+    id("com.android.library")
     kotlin("plugin.serialization")
 }
 
+val attr = Attribute.of("de.crusader.targetAttribute", String::class.java)
+
 kotlin {
+    android {
+        attributes.attribute(attr, "android")
+    }
     jvm {
+        attributes.attribute(attr, "jvm")
         compilations.all {
             kotlinOptions.jvmTarget = "1.8"
         }
@@ -14,6 +23,9 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                api("de.crusader:kotlin-extensions:1.0.17")
+                api("de.crusader:library-objects:1.0.16")
+                api("de.crusader:library-painter:1.0.27")
             }
         }
         val commonTest by getting {
@@ -42,4 +54,24 @@ kotlin {
             }
         }
     }
+}
+
+android {
+    compileSdkVersion(30)
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    defaultConfig {
+        minSdkVersion(23)
+        targetSdkVersion(30)
+        versionCode = 1
+        versionName = rootProject.version.toString()
+    }
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = false
+        }
+    }
+}
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "1.8"
 }
