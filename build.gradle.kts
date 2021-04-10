@@ -18,7 +18,7 @@ plugins {
     kotlin("plugin.serialization") version "1.4.32" apply false
 
     // Gradle plugin for android development
-    id("com.android.application") version "4.0.2" apply false
+    id("com.android.application") version "4.1.3" apply false
 
     // Both plugins required to update versions via "gradle useLatestVersions"
     id("se.patrikerdes.use-latest-versions") version "0.2.15"

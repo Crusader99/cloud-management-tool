@@ -32,3 +32,6 @@ build
 
 # The local.properties files contains the installation path of the sdk wich can be different
 local.properties
+
+# Ignore sepcific settings for different developer pc's
+gradle.properties
