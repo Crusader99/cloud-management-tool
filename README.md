@@ -31,8 +31,10 @@ Frontend possibilities:
 
 Roadmap:
 * [x] Make backend technology decisions
-* [ ] Create running project for backend
+* [x] Create running project for backend
+* [x] Configure Dockerfile for backend
 * [ ] Make frontend GUI design decisions
 * [ ] Create running projects for frontend: android, web/pc
 * [ ] Experiment with compose and painter-library and react
-
+* [ ] ...
+* [ ] Select all repository link references for documentation
