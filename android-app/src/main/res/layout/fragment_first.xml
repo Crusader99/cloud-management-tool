@@ -26,7 +26,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textview_first" />
 
-    <de.hsaalen.cmt.views.AndroidViewAdapter
+    <de.hsaalen.cmt.views.adapter.AndroidViewAdapter
         android:id="@+id/androidViewAdapter"
         android:layout_width="220dp"
         android:layout_height="294dp"

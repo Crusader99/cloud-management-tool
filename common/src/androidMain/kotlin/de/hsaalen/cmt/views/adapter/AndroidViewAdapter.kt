@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.views
+package de.hsaalen.cmt.views.adapter
 
 import android.content.Context
 import android.graphics.Canvas
@@ -11,6 +11,7 @@ import de.crusader.extensions.toFullString
 import de.crusader.objects.Point
 import de.crusader.objects.color.Color
 import de.crusader.painter.impl.AndroidCanvasPainter
+import de.hsaalen.cmt.views.TestView
 import de.hsaalen.cmt.views.api.MPView
 import de.hsaalen.cmt.views.events.MPKeyboardEvent
 import de.hsaalen.cmt.views.events.MPMouseButton

@@ -22,6 +22,9 @@ val publish by tasks.registering {
         val outputFolder = File(buildDir, "artifact-js")
         val jsFile = File(outputFolder, project.name + ".js")
         val htmlFile = File(buildDir, "index.html")
+        if (htmlFile.exists()) {
+            return@doLast // Skip
+        }
         val text = StringBuilder()
         text.append("<!DOCTYPE HTML><html lang=\"de\">")
         text.append("<head>")
