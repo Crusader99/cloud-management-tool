@@ -17,7 +17,7 @@ kotlin.js {
 }
 
 // Create index.html file for testing
-tasks.register("publish") {
+val publish by tasks.registering {
     doLast {
         val outputFolder = File(buildDir, "artifact-js")
         val jsFile = File(outputFolder, project.name + ".js")
@@ -34,4 +34,8 @@ tasks.register("publish") {
         htmlFile.writeText(text.toString(), Charsets.UTF_8)
         println("Created html file at $htmlFile")
     }
+}
+
+tasks.build {
+    finalizedBy(publish)
 }
