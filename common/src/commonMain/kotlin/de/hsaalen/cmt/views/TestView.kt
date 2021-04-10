@@ -21,9 +21,15 @@ class TestView : MPView() {
             .size(p.size)
             .draw()
         p.createRectangle()
-            .color(Color.RED)
+            .color(Color.BLACK)
             .filled(true)
             .rectangle(rec.reduce(12))
+            .draw()
+
+        p.createString()
+            .color(Color.WHITE)
+            .text("Hello World ;) This is indented to become a text editor")
+            .position(0, 0)
             .draw()
     }
 

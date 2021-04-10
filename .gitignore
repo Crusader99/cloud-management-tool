@@ -35,3 +35,6 @@ local.properties
 
 # Ignore sepcific settings for different developer pc's
 gradle.properties
+
+# Ignore experimental library
+/library-painter/

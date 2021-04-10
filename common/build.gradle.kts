@@ -25,7 +25,13 @@ kotlin {
             dependencies { // Use api instead implementation to allow transitive access from modules
                 api("de.crusader:kotlin-extensions:1.0.17")
                 api("de.crusader:library-objects:1.0.16")
-                api("de.crusader:library-painter:1.0.27")
+
+                if (file("$rootDir/library-painter").exists()) {
+                    // Allows easier debugging without publishing changes
+                    api(project(":library-painter"))
+                } else {
+                    api("de.crusader:library-painter:1.0.27")
+                }
 
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
             }

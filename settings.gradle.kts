@@ -28,3 +28,9 @@ if (file("local.properties").exists()) {
 } else {
     println("Disabled android build because local.properties file not found!")
 }
+
+// Only include when library project found
+// Allows easier debugging without publishing changes
+if (file("library-painter").exists()) {
+    include(":library-painter")
+}
