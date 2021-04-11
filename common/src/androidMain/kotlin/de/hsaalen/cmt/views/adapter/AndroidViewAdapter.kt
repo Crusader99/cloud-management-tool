@@ -41,7 +41,7 @@ constructor(
         isFocusableInTouchMode = true
         GlobalScope.launch {
             while (isActive) {
-                delay(200)
+                delay(60) // Reduce delay to get higher fps
                 invalidate()
             }
         }
@@ -50,7 +50,7 @@ constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         try {
-            val p = AndroidCanvasPainter(canvas, x.toInt(), y.toInt(), width, height)
+            val p = AndroidCanvasPainter(canvas, 0, 0, width, height)
             p.createRectangle()
                 .color(Color.BLACK)
                 .size(p.size)
