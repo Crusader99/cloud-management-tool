@@ -4,16 +4,29 @@ plugins {
 
 dependencies {
     implementation(project(":common"))
+
+    // React components
+    implementation("org.jetbrains:kotlin-react:17.0.1-pre.148-kotlin-1.4.30")
+    implementation("org.jetbrains:kotlin-react-dom:17.0.1-pre.148-kotlin-1.4.30")
+    implementation("org.jetbrains:kotlin-styled:5.2.1-pre.148-kotlin-1.4.30")
+
+    // Test framework on javascript platform
     testImplementation(kotlin("test-js"))
 }
 
-kotlin.js {
-    browser {
-        distribution {
-            directory = File("$buildDir/artifact-js/")
+kotlin {
+    js {
+        binaries.executable()
+        browser {
+            // For continuous integration: gradle browserDevelopmentRun --continuous
+            distribution {
+                directory = File("$buildDir/artifact-js/")
+            }
+            commonWebpackConfig {
+                cssSupport.enabled = true
+            }
         }
     }
-    binaries.executable()
 }
 
 // Create index.html file for testing
