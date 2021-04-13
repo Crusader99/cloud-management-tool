@@ -21,7 +21,7 @@ plugins {
     id("com.android.application") version "4.1.3" apply false
 
     // Both plugins required to update versions via "gradle useLatestVersions"
-    id("se.patrikerdes.use-latest-versions") version "0.2.15"
+    id("se.patrikerdes.use-latest-versions") version "0.2.16"
     id("com.github.ben-manes.versions") version "0.38.0"
 
     // Register plugins for better IDE support
