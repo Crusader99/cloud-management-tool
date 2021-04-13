@@ -4,7 +4,7 @@ plugins {
     application
 }
 
-application.mainClass.set("de.hsaalen.cmt.MainKt")
+application.mainClass.set("de.hsaalen.cmt.ServerBackendKt")
 
 val attr = Attribute.of("de.crusader.targetAttribute", String::class.java)
 
@@ -13,6 +13,7 @@ kotlin.target {
     attributes.attribute(attr, "jvm")
     compilations.all {
         kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.languageVersion = "1.5"
     }
 }
 
@@ -25,8 +26,16 @@ dependencies {
         because("Known issues with netty & jetty")
     }
 
-    // Logging framework
-    implementation("ch.qos.logback:logback-classic:1.2.3")
+    // Statistics & logging frameworks
+    implementation("io.github.microutils:kotlin-logging-jvm:2.0.6") {
+        // See https://github.com/MicroUtils/kotlin-logging
+    }
+    implementation("ch.qos.logback:logback-classic:1.2.3") {
+        because("Ktor depends on this library and has issues when missing")
+    }
+    implementation("org.influxdb:influxdb-java:2.21") {
+        because("Writing statistics to influxdb for grafana")
+    }
 
     // JUnit test framework
     testImplementation(kotlin("test"))
