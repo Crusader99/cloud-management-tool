@@ -25,6 +25,7 @@ dependencies {
     implementation("io.ktor:ktor-server-cio:1.5.3") {
         because("Known issues with netty & jetty")
     }
+    implementation("io.ktor:ktor-serialization:1.5.3")
 
     // Statistics & logging frameworks
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.6") {

@@ -1,17 +1,11 @@
 package de.hsaalen.cmt
 
+import de.hsaalen.cmt.rest.RestServer
 import de.hsaalen.cmt.statistics.InfluxWrapper
 import de.hsaalen.cmt.statistics.Stats
-import de.hsaalen.cmt.statistics.StatsBasic
-import io.ktor.application.*
-import io.ktor.features.*
 import io.ktor.http.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import mu.KotlinLogging
-import org.slf4j.event.Level
 
 /**
  * Local logger instance
@@ -50,16 +44,5 @@ fun configureInfluxWrapper(): InfluxWrapper {
 
 fun configureEmbeddedServer(): ApplicationEngine {
     val port = System.getenv("REST_PORT")?.toInt() ?: 8080
-    return embeddedServer(CIO, port) {
-        install(CallLogging) {
-            // Configure default logging level
-            level = Level.INFO
-        }
-        routing {
-            get("/") {
-                call.respondText("Hello world from backend! :-)")
-                StatsBasic.connects.incrementAndGet()
-            }
-        }
-    }
+    return RestServer.start(port)
 }
