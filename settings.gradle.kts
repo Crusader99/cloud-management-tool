@@ -3,7 +3,6 @@ rootProject.name = "se-project"
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        jcenter()
         google()
     }
 
