@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("multiplatform")
-    id("com.android.library")
     kotlin("plugin.serialization")
+    id("com.android.library")
 }
 
 val attr = Attribute.of("de.crusader.targetAttribute", String::class.java)
@@ -34,6 +34,8 @@ kotlin {
                 }
 
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
+                implementation("io.ktor:ktor-client-core:1.5.4")
+                implementation("io.ktor:ktor-client-serialization:1.5.4")
             }
         }
         val commonTest by getting {

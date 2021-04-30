@@ -13,7 +13,6 @@ kotlin.target {
     attributes.attribute(attr, "jvm")
     compilations.all {
         kotlinOptions.jvmTarget = "1.8"
-        kotlinOptions.languageVersion = "1.5"
     }
 }
 
@@ -21,11 +20,11 @@ dependencies {
     implementation(project(":common"))
 
     // Network framework
-    implementation("io.ktor:ktor-server-core:1.5.3")
-    implementation("io.ktor:ktor-server-cio:1.5.3") {
+    implementation("io.ktor:ktor-server-core:1.5.4")
+    implementation("io.ktor:ktor-server-cio:1.5.4") {
         because("Known issues with netty & jetty")
     }
-    implementation("io.ktor:ktor-serialization:1.5.3")
+    implementation("io.ktor:ktor-serialization:1.5.4")
 
     // Statistics & logging frameworks
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.6") {

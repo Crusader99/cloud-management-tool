@@ -19,7 +19,7 @@ dependencies {
     implementation(npm("react-toolbox", "2.0.0-beta.13"))
     implementation(npm("react-youtube-lite", "1.0.1"))
 
-    implementation("com.ccfraser.muirwik:muirwik-components:0.6.3")
+    implementation("com.ccfraser.muirwik:muirwik-components:0.6.7")
 
     implementation("net.subroh0508.kotlinmaterialui:core:0.5.6")
     implementation("net.subroh0508.kotlinmaterialui:lab:0.5.6")
