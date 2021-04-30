@@ -2,6 +2,7 @@ package de.hsaalen.cmt.statistics
 
 import kotlinx.coroutines.*
 import mu.KotlinLogging
+import java.io.IOException
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.reflect.KProperty
@@ -33,7 +34,7 @@ sealed class Stats {
     /**
      * Report the data fields of the current stats to the given target wrapper
      */
-    private fun report(target: InfluxWrapper) {
+    private suspend fun report(target: InfluxWrapper) = try {
         val statsName = this::class.simpleName
             ?.toLowerCase(Locale.ROOT)
             ?.removePrefix("stats")
@@ -41,7 +42,12 @@ sealed class Stats {
         val statsFields = fields.mapValues { (_, counter) ->
             counter.getAndSet(0)
         }
-        target.report(statsName, statsFields)
+
+        withTimeout(5 * 1000) {
+            target.report(statsName, statsFields)
+        }
+    } catch (ex: Exception) {
+        throw IOException("Failed reporting stats to influx-db", ex)
     }
 
     companion object {
@@ -59,7 +65,7 @@ sealed class Stats {
                 try {
                     while (isActive) {
                         performReport(target)
-                        delay(5 * 60 * 1000L) // Report every 5 min
+                        delay(10_000) // Report every 1 min 5 * 60 * 1000L
                     }
                 } catch (t: Throwable) {
                     logger.error("Report routine failed", t)
@@ -70,7 +76,7 @@ sealed class Stats {
         /**
          * Report data fields of all subclasses to the given influx target
          */
-        private fun performReport(target: InfluxWrapper) {
+        private suspend fun performReport(target: InfluxWrapper) {
             logger.info("Reporting stats to influx-db...")
             for (cls in Stats::class.sealedSubclasses) {
                 try {

@@ -7,4 +7,8 @@ object StatsBasic : Stats() {
      */
     val connects by this
 
+
+    init { // Init default statistic values
+        connects.set(0)
+    }
 }

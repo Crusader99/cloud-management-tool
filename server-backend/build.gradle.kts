@@ -33,7 +33,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.3") {
         because("Ktor depends on this library and has issues when missing")
     }
-    implementation("org.influxdb:influxdb-java:2.21") {
+    implementation("com.influxdb:influxdb-client-kotlin:2.2.0") {
         because("Writing statistics to influxdb for grafana")
     }
 
