@@ -1,8 +1,5 @@
 package de.hsaalen.cmt.components
 
-import demo.components.appsearch.appSearch
-import demo.components.header.HeaderProps
-import demo.components.header.rootStyle
 import kotlinx.css.Display
 import kotlinx.css.FlexBasis
 import kotlinx.css.display
@@ -23,16 +20,20 @@ import materialui.components.toolbar.toolbar
 import materialui.components.typography.enums.TypographyVariant
 import materialui.components.typography.typography
 import materialui.styles.withStyles
-import react.RBuilder
-import react.RComponent
-import react.RState
+import react.*
 import react.dom.a
 import react.dom.div
-import react.setState
 
 interface ViewHeaderState : RState {
     var isDrawerVisible: Boolean
 }
+
+external interface HeaderProps : RProps {
+    val classes: dynamic
+}
+
+val HeaderProps.rootStyle: String
+    get() = classes["root"] as String
 
 /**
  * Defines the header of the app which also includes a search box and a button with menu options.
@@ -84,7 +85,6 @@ class ViewHeader : RComponent<HeaderProps, ViewHeaderState>() {
                         }
                     }
                     div(props.classes["grow"] as String) {}
-                    appSearch { }
                 }
                 drawer {
                     attrs {
