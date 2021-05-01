@@ -1,7 +1,7 @@
 package de.hsaalen.cmt.rest
 
-import de.hsaalen.cmt.network.dto.PacketListDto
 import de.hsaalen.cmt.network.Paths
+import de.hsaalen.cmt.network.dto.PacketListDto
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -24,7 +24,8 @@ fun Application.registerRoutes() = routing {
             call.respondText("Download")
         }
     }
-    get("/metrics") {
-        call.respond(RestServer.appMicrometerRegistry.scrape())
+    get("/metrics") { // Provide metrics for prometheus and grafana
+        // More details on https://ktor.io/docs/micrometer-metrics.html#prometheus_endpoint
+        call.respond(RestServer.micrometerRegistry.scrape())
     }
 }

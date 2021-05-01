@@ -12,7 +12,8 @@ import kotlinx.serialization.json.Json
 import org.slf4j.event.Level
 
 object RestServer {
-    val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+    // Registry to provide metrics for prometheus and grafana
+    val micrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
     /**
      * Configure an embedded HTTP server for providing a REST API.
@@ -23,13 +24,16 @@ object RestServer {
             level = Level.INFO
         }
         install(ContentNegotiation) {
+            // Configure the JSON serializer
             json(Json {
                 prettyPrint = true
                 isLenient = true
             })
         }
         install(MicrometerMetrics) {
-            registry = appMicrometerRegistry
+            // Required to provide metrics for prometheus and grafana
+            // More details on https://ktor.io/docs/micrometer-metrics.html#prometheus_endpoint
+            registry = micrometerRegistry
         }
         registerRoutes()
     }
