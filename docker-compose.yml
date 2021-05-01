@@ -8,35 +8,29 @@ services:
     build: web-app
     ports:
       - "8081:8081"
-  influxdb:
-    image: influxdb:1.8
-    ports:
-      - 8086:8086
+  prometheus:
+    image: prom/prometheus:v2.26.0
     volumes:
-      - influxdb:/var/lib/influxdb
-    environment:
-      - INFLUXDB_DB=db0
-      - INFLUXDB_ADMIN_ENABLED=true
-      - INFLUXDB_ADMIN_USER=admin
-      - INFLUXDB_ADMIN_PASSWORD=admin
-      - INFLUXDB_USERNAME=admin
-      - INFLUXDB_PASSWORD=admin
-    networks:
-      - influxdb
+      - ./prometheus/:/etc/prometheus/:z # Config files
+      - prometheus:/prometheus # Database volume
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - 9090:9090
+    depends_on:
+      - server-backend
   grafana:
     image: grafana/grafana:7.5.3
     ports:
       - '3000:3000'
-    volumes: # Use http://influxdb:8086 as connect url for data source
-      - ./grafana:/var/lib/grafana:z # :z is required in SELinux using podman
+    volumes: # Use http://prometheus:9090 as connect url for data source
+      - ./grafana:/var/lib/grafana:Z # :z is required in SELinux using podman
     depends_on:
-      - influxdb
+      - prometheus
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    networks:
-      - influxdb
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USERNAME}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
 volumes:
-  influxdb:
-networks:
-  influxdb:
+  prometheus:
+  grafana:

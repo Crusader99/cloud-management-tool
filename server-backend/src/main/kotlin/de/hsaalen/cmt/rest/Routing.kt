@@ -1,6 +1,5 @@
 package de.hsaalen.cmt.rest
 
-import de.hsaalen.cmt.statistics.StatsBasic
 import de.hsaalen.cmt.network.dto.PacketListDto
 import de.hsaalen.cmt.network.Paths
 import io.ktor.application.*
@@ -14,7 +13,6 @@ fun Application.registerRoutes() = routing {
     route(Paths.base) {
         get("/") {
             call.respondText("Hello world from backend! :-)")
-            StatsBasic.connects.incrementAndGet()
         }
         get("/list") {
             call.respond(PacketListDto(listOf("abc")))
@@ -25,5 +23,8 @@ fun Application.registerRoutes() = routing {
         get("/download") {
             call.respondText("Download")
         }
+    }
+    get("/metrics") {
+        call.respond(RestServer.appMicrometerRegistry.scrape())
     }
 }

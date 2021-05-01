@@ -25,6 +25,7 @@ dependencies {
         because("Known issues with netty & jetty")
     }
     implementation("io.ktor:ktor-serialization:1.5.4")
+    implementation("io.ktor:ktor-metrics-micrometer:1.5.4")
 
     // Statistics & logging frameworks
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.6") {
@@ -33,11 +34,8 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.3") {
         because("Ktor depends on this library and has issues when missing")
     }
-    implementation("com.influxdb:influxdb-client-kotlin:2.2.0") {
-        because("Writing statistics to influxdb for grafana")
-    }
+    implementation("io.micrometer:micrometer-registry-prometheus:1.6.6")
 
     // JUnit test framework
     testImplementation(kotlin("test"))
-    testImplementation(kotlin("test-junit"))
 }
