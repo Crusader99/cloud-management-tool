@@ -3,7 +3,6 @@ rootProject.name = "se-project"
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        jcenter()
         google()
     }
 
@@ -20,10 +19,17 @@ pluginManagement {
 
 include(":common")
 include(":server-backend")
+include(":web-app")
 
 // File local.properties with "sdk.dir" required
 if (file("local.properties").exists()) {
     include(":android-app")
 } else {
     println("Disabled android build because local.properties file not found!")
+}
+
+// Only include when library project found
+// Allows easier debugging without publishing changes
+if (file("library-painter").exists()) {
+    include(":library-painter")
 }

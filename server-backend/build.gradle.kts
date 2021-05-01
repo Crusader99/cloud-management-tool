@@ -4,7 +4,7 @@ plugins {
     application
 }
 
-application.mainClass.set("de.hsaalen.cmt.MainKt")
+application.mainClass.set("de.hsaalen.cmt.ServerBackendKt")
 
 val attr = Attribute.of("de.crusader.targetAttribute", String::class.java)
 
@@ -20,15 +20,26 @@ dependencies {
     implementation(project(":common"))
 
     // Network framework
-    implementation("io.ktor:ktor-server-core:1.5.3")
-    implementation("io.ktor:ktor-server-cio:1.5.3") {
+    implementation("io.ktor:ktor-server-core:1.5.4")
+    implementation("io.ktor:ktor-server-cio:1.5.4") {
         because("Known issues with netty & jetty")
     }
+    implementation("io.ktor:ktor-serialization:1.5.4")
+    implementation("io.ktor:ktor-metrics-micrometer:1.5.4")
 
-    // Logging framework
-    implementation("ch.qos.logback:logback-classic:1.2.3")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.0") {
+        because("To override deprecated version form ktor")
+    }
+
+    // Statistics & logging frameworks
+    implementation("io.github.microutils:kotlin-logging-jvm:2.0.6") {
+        // See https://github.com/MicroUtils/kotlin-logging
+    }
+    implementation("ch.qos.logback:logback-classic:1.2.3") {
+        because("Ktor depends on this library and has issues when missing")
+    }
+    implementation("io.micrometer:micrometer-registry-prometheus:1.6.6")
 
     // JUnit test framework
     testImplementation(kotlin("test"))
-    testImplementation(kotlin("test-junit"))
 }
