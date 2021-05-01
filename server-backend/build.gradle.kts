@@ -27,6 +27,10 @@ dependencies {
     implementation("io.ktor:ktor-serialization:1.5.4")
     implementation("io.ktor:ktor-metrics-micrometer:1.5.4")
 
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.0") {
+        because("To override deprecated version form ktor")
+    }
+
     // Statistics & logging frameworks
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.6") {
         // See https://github.com/MicroUtils/kotlin-logging
