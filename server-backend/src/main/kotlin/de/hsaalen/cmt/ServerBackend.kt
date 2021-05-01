@@ -16,7 +16,7 @@ fun main() {
 
     // Find configured port
     val portKey = "REST_PORT"
-    println("Reading $portKey environment variable...")
+    logger.info("Reading $portKey environment variable...")
     val port = System.getenv(portKey)?.toInt() ?: 8080
 
     // Start REST API server
