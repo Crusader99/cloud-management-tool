@@ -1,40 +1,32 @@
 package de.hsaalen.cmt
 
-import de.crusader.objects.color.Color
-import de.hsaalen.cmt.views.adapter.CanvasViewAdapter
-import kotlinx.browser.document
-import org.w3c.dom.HTMLCanvasElement
-import react.dom.h1
-import react.dom.render
-import styled.css
-import styled.styledDiv
-import kotlinx.css.*
-import react.dom.h3
-import styled.*
+import de.hsaalen.cmt.components.ViewHeader
+import de.hsaalen.cmt.components.ViewResultList
+import materialui.styles.themeprovider.themeProvider
+import react.RBuilder
+import react.RComponent
+import react.RProps
+import react.RState
+import react.dom.br
+import react.dom.div
+import react.dom.h2
+import react.dom.header
 
-fun main() {
-    println("Hello world from web-app :-)")
+/**
+ * The main app component.
+ */
+class WebApp : RComponent<RProps, RState>() {
 
-    render(document.getElementById("root")) {
-        h1 {
-            +"Hello from frontend (React+Kotlin/JS)!"
-        }
-        styledDiv {
-            css {
-                position = Position.absolute
-                top = 12.px
-                right = 12.px
+    override fun RBuilder.render() {
+        themeProvider(Themes.LIGHT) {
+            header {
+                ViewHeader.render(this)
             }
-            h3 {
-                +"Test"
+            div {
+                h2 { br { } }
+                ViewResultList.render(this)
             }
         }
     }
 
-
-    document.bgColor = Color.BLUE.argbString
-
-    val canvas = document.createElement("canvas") as HTMLCanvasElement
-    document.body?.append(canvas)
-    CanvasViewAdapter(canvas)
 }
