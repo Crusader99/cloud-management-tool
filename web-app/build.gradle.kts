@@ -12,9 +12,9 @@ dependencies {
     implementation(project(":common"))
 
     // React components
-    implementation("org.jetbrains:kotlin-react:17.0.2-pre.153-kotlin-1.4.32")
-    implementation("org.jetbrains:kotlin-react-dom:17.0.2-pre.153-kotlin-1.4.32")
-    implementation("org.jetbrains:kotlin-styled:5.2.1-pre.148-kotlin-1.4.30")
+    implementation("org.jetbrains:kotlin-react:17.0.2-pre.154-kotlin-1.5.0")
+    implementation("org.jetbrains:kotlin-react-dom:17.0.2-pre.154-kotlin-1.5.0")
+    implementation("org.jetbrains:kotlin-styled:5.2.3-pre.154-kotlin-1.5.0")
 
     implementation(npm("react-toolbox", "2.0.0-beta.13"))
     implementation(npm("react-youtube-lite", "1.0.1"))
