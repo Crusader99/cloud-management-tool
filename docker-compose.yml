@@ -1,13 +1,9 @@
 version: "3.9"
 services:
-  server-backend:
+  server-backend: # Internal port is 8080
     build: server-backend
-    ports:
-      - "8080:8080"
-  web-app:
+  web-app: # Internal port is 8081
     build: web-app
-    ports:
-      - "8081:8081"
   prometheus:
     image: prom/prometheus:v2.26.0
     volumes:
@@ -31,6 +27,16 @@ services:
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_USERNAME}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+  traefik: # https://hub.docker.com/_/traefik/
+    image: traefik:v2.4.8
+    volumes:
+      - ./traefik:/etc/traefik
+    privileged: true
+    depends_on:
+      - server-backend
+      - web-app
+    ports:
+    - 80:80
+    - 8082:8080 # Dashboard: http://localhost:8082
 volumes:
   prometheus:
-  grafana:

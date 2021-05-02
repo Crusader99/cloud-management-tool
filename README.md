@@ -43,6 +43,7 @@ Online management tool for files and documents
 * [x] Experiment with compose and painter-library and react
 * [x] Implement frontend login app with react
 * [ ] Basic server implementation for user registration & login
+* [x] Configure reverse proxy for micro services: [nginx](https://www.nginx.com/) or [traefik](https://traefik.io/)
 * [ ] ...
 * [x] Configure Grafana & Prometheus
 * [x] Provide statistics with Ktor: /metrics
