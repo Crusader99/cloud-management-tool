@@ -24,11 +24,7 @@ import react.*
 import react.dom.a
 import react.dom.div
 
-interface ViewHeaderState : RState {
-    var isDrawerVisible: Boolean
-}
-
-external interface HeaderProps : RProps {
+interface HeaderProps : RProps {
     val classes: dynamic
 }
 
@@ -38,9 +34,13 @@ val HeaderProps.rootStyle: String
 /**
  * Defines the header of the app which also includes a search box and a button with menu options.
  */
-class ViewHeader : RComponent<HeaderProps, ViewHeaderState>() {
+class ViewHeader : RComponent<HeaderProps, ViewHeader.State>() {
 
-    override fun ViewHeaderState.init() {
+    interface State : RState {
+        var isDrawerVisible: Boolean
+    }
+
+    override fun State.init() {
         isDrawerVisible = false
     }
 
@@ -120,7 +120,7 @@ class ViewHeader : RComponent<HeaderProps, ViewHeaderState>() {
     }
 
     companion object {
-        fun render(rBuilder: RBuilder) = with(rBuilder) { styledComponent {} }
+        fun render(rBuilder: RBuilder) = rBuilder.run { styledComponent {} }
 
         private val styledComponent = withStyles(ViewHeader::class, {
             "root" {

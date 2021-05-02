@@ -26,7 +26,7 @@ class ViewResultList : RComponent<RProps, ViewResultListState>() {
     }
 
     companion object {
-        fun render(rBuilder: RBuilder) = with(rBuilder) { styledComponent {} }
+        fun render(rBuilder: RBuilder) = rBuilder.run { styledComponent {} }
 
         private val styledComponent = withStyles(ViewResultList::class, {
         })

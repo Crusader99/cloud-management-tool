@@ -1,30 +1,37 @@
 package de.hsaalen.cmt
 
-import de.hsaalen.cmt.components.ViewHeader
-import de.hsaalen.cmt.components.ViewResultList
+import de.hsaalen.cmt.pages.LoginPage
+import de.hsaalen.cmt.pages.MainPage
 import materialui.styles.themeprovider.themeProvider
-import react.RBuilder
-import react.RComponent
-import react.RProps
-import react.RState
-import react.dom.br
-import react.dom.div
-import react.dom.h2
-import react.dom.header
+import react.*
+
+external interface WebAppState : RState {
+    var isLoggedIn: Boolean
+}
 
 /**
  * The main app component.
  */
-class WebApp : RComponent<RProps, RState>() {
+class WebApp : RComponent<RProps, WebAppState>() {
+
+    override fun WebAppState.init() {
+        isLoggedIn = false
+    }
 
     override fun RBuilder.render() {
         themeProvider(Themes.LIGHT) {
-            header {
-                ViewHeader.render(this)
-            }
-            div {
-                h2 { br { } }
-                ViewResultList.render(this)
+            if (state.isLoggedIn) {
+                child(MainPage::class) {}
+            } else {
+                child(LoginPage::class) {
+                    attrs {
+                        onLogin = {
+                            setState {
+                                state.isLoggedIn = true
+                            }
+                        }
+                    }
+                }
             }
         }
     }
