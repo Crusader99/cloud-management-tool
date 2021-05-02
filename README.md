@@ -28,8 +28,8 @@ Online management tool for files and documents
 
 ## Platforms:
 
-* Android
-* Browser / Java-App?
+* Browser: React-App
+* Smartphone: Android native app or React-Native
 
 ## Roadmap:
 
