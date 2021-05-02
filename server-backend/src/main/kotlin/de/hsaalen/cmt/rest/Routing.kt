@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.rest
 
-import de.hsaalen.cmt.network.Paths
+import de.hsaalen.cmt.network.RestPaths
+import de.hsaalen.cmt.network.dto.AuthResultDto
 import de.hsaalen.cmt.network.dto.PacketListDto
 import io.ktor.application.*
 import io.ktor.response.*
@@ -10,9 +11,12 @@ import io.ktor.routing.*
  * Register and handle REST API routes from clients.
  */
 fun Application.registerRoutes() = routing {
-    route(Paths.base) {
+    route("/" + RestPaths.base) {
         get("/") {
             call.respondText("Hello world from backend! :-)")
+        }
+        post("/login") {
+            call.respond(AuthResultDto("Test", true))
         }
         get("/list") {
             call.respond(PacketListDto(listOf("abc")))

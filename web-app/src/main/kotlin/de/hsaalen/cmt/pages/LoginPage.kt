@@ -1,7 +1,6 @@
 package de.hsaalen.cmt.pages
 
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.css.*
 import kotlinx.html.ButtonType
@@ -144,7 +143,6 @@ class LoginPage : RComponent<LoginPage.Props, LoginPage.State>() {
             isLoading = true
         }
         GlobalScope.launch {
-            delay(2000)
             props.onLogin(Credentials(state.username, state.password))
         }
     }

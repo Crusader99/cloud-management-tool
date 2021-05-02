@@ -35,6 +35,9 @@ object RestServer {
             // More details on https://ktor.io/docs/micrometer-metrics.html#prometheus_endpoint
             registry = micrometerRegistry
         }
+        install(CORS) {
+            anyHost() // Allow this api to be provided on another port than the frontend
+        }
         registerRoutes()
     }
 
