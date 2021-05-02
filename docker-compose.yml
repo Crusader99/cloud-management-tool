@@ -7,7 +7,7 @@ services:
   prometheus:
     image: prom/prometheus:v2.26.0
     volumes:
-      - ./prometheus/:/etc/prometheus/:z # Config files
+      - ./docker-compose/prometheus/:/etc/prometheus/:z # Config files
       - prometheus:/prometheus # Database volume
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -21,7 +21,7 @@ services:
     ports:
       - '3000:3000'
     volumes: # Use http://prometheus:9090 as connect url for data source
-      - ./grafana:/var/lib/grafana:Z # :z is required in SELinux using podman
+      - ./docker-compose/grafana:/var/lib/grafana:Z # :z is required in SELinux using podman
     depends_on:
       - prometheus
     environment:
@@ -30,13 +30,13 @@ services:
   traefik: # https://hub.docker.com/_/traefik/
     image: traefik:v2.4.8
     volumes:
-      - ./traefik:/etc/traefik
+      - ./docker-compose/traefik:/etc/traefik
     privileged: true
     depends_on:
       - server-backend
       - web-app
     ports:
-    - 80:80
-    - 8082:8080 # Dashboard: http://localhost:8082
+      - 80:80
+      - 8082:8080 # Dashboard: http://localhost:8082
 volumes:
   prometheus:
