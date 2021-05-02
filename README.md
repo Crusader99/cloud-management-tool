@@ -62,7 +62,7 @@ Start backend using docker:
 Cleanup data and volumes:
 > sudo docker-compose down -v
 
-### Executing without docker-compose:
+### Execute without docker-compose:
 
 Debug web-app:
 > gradle :web-app:browserDevelopmentRun --continuous
