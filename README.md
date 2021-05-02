@@ -41,7 +41,7 @@ Online management tool for files and documents
 * [x] Make frontend GUI design decisions
 * [x] Create running projects for frontend: android, web/pc
 * [x] Experiment with compose and painter-library and react
-* [ ] Implement frontend login app with react
+* [x] Implement frontend login app with react
 * [ ] Basic server implementation for user registration & login
 * [ ] ...
 * [x] Configure Grafana & Prometheus
