@@ -42,8 +42,10 @@ Online management tool for files and documents
 * [x] Create running projects for frontend: android, web/pc
 * [x] Experiment with compose and painter-library and react
 * [x] Implement frontend login app with react
+* [x] Configure reverse proxy: [nginx](https://www.nginx.com/) or [traefik](https://traefik.io/)
+* [ ] Call REST-API from frontend on login event
+* [ ] Decide which database to use for user management, file management, notes.
 * [ ] Basic server implementation for user registration & login
-* [x] Configure reverse proxy for micro services: [nginx](https://www.nginx.com/) or [traefik](https://traefik.io/)
 * [ ] ...
 * [x] Configure Grafana & Prometheus
 * [x] Provide statistics with Ktor: /metrics
