@@ -5,19 +5,26 @@ import de.hsaalen.cmt.pages.MainPage
 import materialui.styles.themeprovider.themeProvider
 import react.*
 
-external interface WebAppState : RState {
-    var isLoggedIn: Boolean
-}
 
 /**
  * The main app component.
  */
-class WebApp : RComponent<RProps, WebAppState>() {
+class WebApp : RComponent<RProps, WebApp.State>() {
 
-    override fun WebAppState.init() {
+    interface State : RState {
+        var isLoggedIn: Boolean
+    }
+
+    /**
+     * Called when this component is loaded.
+     */
+    override fun State.init() {
         isLoggedIn = false
     }
 
+    /**
+     * Called whenever an update is required.
+     */
     override fun RBuilder.render() {
         themeProvider(Themes.LIGHT) {
             if (state.isLoggedIn) {
@@ -25,14 +32,19 @@ class WebApp : RComponent<RProps, WebAppState>() {
             } else {
                 child(LoginPage::class) {
                     attrs {
-                        onLogin = {
-                            setState {
-                                state.isLoggedIn = true
-                            }
-                        }
+                        onLogin = ::onLogin
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Called when user had entered the username and password.
+     */
+    private fun onLogin(credentials: LoginPage.Credentials) {
+        setState {
+            isLoggedIn = true
         }
     }
 
