@@ -28,11 +28,3 @@ plugins {
     eclipse
     idea
 }
-
-// Important gradle commands
-//
-//  Debug web-app:
-//  > gradle :web-app:browserDevelopmentRun --continuous
-//
-//  Run server-backend:
-//  > gradle :server-backend:run

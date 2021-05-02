@@ -28,8 +28,8 @@ Online management tool for files and documents
 
 ## Platforms:
 
-* Android
-* Browser / Java-App?
+* Browser: React-App
+* Smartphone: Android native app or React-Native
 
 ## Roadmap:
 
@@ -41,7 +41,10 @@ Online management tool for files and documents
 * [x] Make frontend GUI design decisions
 * [x] Create running projects for frontend: android, web/pc
 * [x] Experiment with compose and painter-library and react
-* [ ] Implement frontend login app with react
+* [x] Implement frontend login app with react
+* [x] Configure reverse proxy: [nginx](https://www.nginx.com/) or [traefik](https://traefik.io/)
+* [ ] Call REST-API from frontend on login event
+* [ ] Decide which database to use for user management, file management, notes.
 * [ ] Basic server implementation for user registration & login
 * [ ] ...
 * [x] Configure Grafana & Prometheus
@@ -62,7 +65,7 @@ Start backend using docker:
 Cleanup data and volumes:
 > sudo docker-compose down -v
 
-### Executing without docker-compose:
+### Execute without docker-compose:
 
 Debug web-app:
 > gradle :web-app:browserDevelopmentRun --continuous

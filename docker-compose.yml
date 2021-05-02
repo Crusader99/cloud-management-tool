@@ -1,17 +1,13 @@
 version: "3.9"
 services:
-  server-backend:
+  server-backend: # Internal port is 8080
     build: server-backend
-    ports:
-      - "8080:8080"
-  web-app:
+  web-app: # Internal port is 8081
     build: web-app
-    ports:
-      - "8081:8081"
   prometheus:
     image: prom/prometheus:v2.26.0
     volumes:
-      - ./prometheus/:/etc/prometheus/:z # Config files
+      - ./docker-compose/prometheus/:/etc/prometheus/:z # Config files
       - prometheus:/prometheus # Database volume
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -25,12 +21,22 @@ services:
     ports:
       - '3000:3000'
     volumes: # Use http://prometheus:9090 as connect url for data source
-      - ./grafana:/var/lib/grafana:Z # :z is required in SELinux using podman
+      - ./docker-compose/grafana:/var/lib/grafana:Z # :z is required in SELinux using podman
     depends_on:
       - prometheus
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_USERNAME}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+  traefik: # https://hub.docker.com/_/traefik/
+    image: traefik:v2.4.8
+    volumes:
+      - ./docker-compose/traefik:/etc/traefik
+    privileged: true
+    depends_on:
+      - server-backend
+      - web-app
+    ports:
+      - 80:80
+      - 8082:8080 # Dashboard: http://localhost:8082
 volumes:
   prometheus:
-  grafana:
