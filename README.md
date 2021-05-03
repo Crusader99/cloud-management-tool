@@ -43,7 +43,8 @@ Online management tool for files and documents
 * [x] Experiment with compose and painter-library and react
 * [x] Implement frontend login app with react
 * [x] Configure reverse proxy: [nginx](https://www.nginx.com/) or [traefik](https://traefik.io/)
-* [ ] Call REST-API from frontend on login event
+* [x] Call REST-API from frontend on login event
+* [ ] Implement logout button in frontend with REST-API call
 * [ ] Decide which database to use for user management, file management, notes.
 * [ ] Basic server implementation for user registration & login
 * [ ] ...
