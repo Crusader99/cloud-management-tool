@@ -45,11 +45,11 @@ Online management tool for files and documents
 * [x] Configure reverse proxy: [nginx](https://www.nginx.com/) or [traefik](https://traefik.io/)
 * [x] Call REST-API from frontend on login event
 * [x] Implement logout button in frontend
-* [ ] Decide which database to use for user management, file management, notes.
+* [ ] Decide which database to use for user management, file management.
 * [ ] Basic server implementation for user registration & login
 * [ ] Implement text editor in frontend
-* [ ] Connect websocket with server
-* [ ] Implement live sync for notes
+* [x] Connect websocket to backend server
+* [ ] Implement live sync for file edit
 * [ ] ...
 * [x] Configure Grafana & Prometheus
 * [x] Provide statistics with Ktor: /metrics
