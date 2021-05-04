@@ -6,10 +6,7 @@ import de.hsaalen.cmt.components.ViewSnackbar
 import de.hsaalen.cmt.network.Client
 import de.hsaalen.cmt.pages.LoginPage
 import de.hsaalen.cmt.pages.MainPage
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.*
 import materialui.styles.themeprovider.themeProvider
 import react.*
 import react.dom.header
@@ -21,15 +18,18 @@ import react.dom.header
 class WebApp : RComponent<RProps, WebApp.State>() {
 
     interface State : RState {
-        var isLoggedIn: Boolean
+        var client: Client?
         var snackbar: ViewSnackbar.SnackbarInfo?
     }
+
+    val State.isLoggedIn: Boolean
+        get() = client != null
 
     /**
      * Called when this component is loaded.
      */
     override fun State.init() {
-        isLoggedIn = false
+        client = null
         snackbar = null
     }
 
@@ -42,12 +42,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                 ViewHeader.styledComponent {
                     attrs {
                         isLoggedIn = state.isLoggedIn
-                        onLogout = {
-                            setState {
-                                isLoggedIn = false
-                            }
-                            showSnackbar("Logged out", MAlertSeverity.success)
-                        }
+                        onLogout = ::onLogout
                     }
                 }
             }
@@ -80,18 +75,32 @@ class WebApp : RComponent<RProps, WebApp.State>() {
     private fun onLogin(credentials: LoginPage.Credentials) {
         GlobalScope.launch {
             try {
+                val serverConnection: Client
                 withTimeout(5_000) { // Timeout after 5 seconds
                     println("Execute login...")
                     setState {
                         snackbar = ViewSnackbar.SnackbarInfo("Checking...", MAlertSeverity.info)
                     }
                     delay(2000)
-                    Client.login(credentials.username, credentials.password)
+                    serverConnection = Client.login(credentials.username, credentials.password)
                 }
                 setState {
-                    isLoggedIn = true
+                    client = serverConnection // Equivalent to isLoggedIn = true
                     snackbar =
                         ViewSnackbar.SnackbarInfo("Successfully logged in!", MAlertSeverity.success)
+                }
+                GlobalScope.launch {
+                    try {
+                        while (isActive) {
+                            val client = state.client ?: break
+                            check(client.isConnected) { "Disconnect from server" }
+                            delay(1000)
+                        }
+                    } catch (t: Throwable) {
+                        if (state.client != null) {
+                            onLogout(t.message)
+                        }
+                    }
                 }
             } catch (ex: Throwable) {
                 val failMessage = "Login failed: " + ex.message
@@ -99,6 +108,21 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                 showSnackbar(failMessage, MAlertSeverity.error)
             }
         }
+    }
+
+    private fun onLogout() = onLogout(null)
+
+    private fun onLogout(reason: String?) {
+        state.client?.disconnect()
+        setState {
+            client = null // Equivalent to logout
+        }
+        var message = "Logged out"
+        if (reason != null) {
+            message += ": "
+            message += reason
+        }
+        showSnackbar(message, MAlertSeverity.success)
     }
 
     /**

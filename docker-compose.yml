@@ -37,6 +37,6 @@ services:
       - web-app
     ports:
       - 80:80
-      - 8082:8080 # Dashboard: http://localhost:8082
+      - 8092:8080 # Dashboard: http://localhost:8082
 volumes:
   prometheus:

@@ -16,6 +16,7 @@ object Preferences {
     init {
         isDebugMode = window.location.port != "80" // Default HTTP port
                 && window.location.port != "443" // Default HTTPS port
+                && window.location.port.isNotBlank() // No port configured
     }
 
 }

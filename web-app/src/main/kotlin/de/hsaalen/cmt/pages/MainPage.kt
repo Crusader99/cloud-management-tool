@@ -9,7 +9,15 @@ import react.RState
 /**
  * The main app component.
  */
-class MainPage : RComponent<RProps, RState>() {
+class MainPage : RComponent<MainPage.Props, RState>() {
+
+    interface Props : RProps {
+//        val client: Client
+    }
+
+    override fun RState.init() {
+
+    }
 
     override fun RBuilder.render() {
         ViewResultList.render(this)
