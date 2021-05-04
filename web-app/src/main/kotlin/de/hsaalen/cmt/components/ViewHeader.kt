@@ -22,19 +22,23 @@ import materialui.components.typography.typography
 import materialui.styles.withStyles
 import react.*
 import react.dom.a
+import react.dom.br
 import react.dom.div
-
-interface HeaderProps : RProps {
-    val classes: dynamic
-}
-
-val HeaderProps.rootStyle: String
-    get() = classes["root"] as String
+import react.dom.h2
 
 /**
  * Defines the header of the app which also includes a search box and a button with menu options.
  */
-class ViewHeader : RComponent<HeaderProps, ViewHeader.State>() {
+class ViewHeader : RComponent<ViewHeader.Props, ViewHeader.State>() {
+
+    interface Props : RProps {
+        var onLogout: () -> Unit
+        var isLoggedIn: Boolean
+        val classes: dynamic
+    }
+
+    private val Props.rootStyle: String
+        get() = classes["root"] as String
 
     interface State : RState {
         var isDrawerVisible: Boolean
@@ -67,24 +71,35 @@ class ViewHeader : RComponent<HeaderProps, ViewHeader.State>() {
                         }
                         +"Cloud Management Tool"
                     }
-                    tabs {
-                        tab {
-                            attrs {
-                                label = a { +"Search results" }
+                    if (props.isLoggedIn) {
+                        tabs {
+                            tab {
+                                attrs {
+                                    label = a { +"Search results" }
+                                }
+                            }
+                            tab {
+                                attrs {
+                                    label = a { +"File info" }
+                                }
+                            }
+                            tab {
+                                attrs {
+                                    label = a { +"File content" }
+                                }
                             }
                         }
-                        tab {
+                        div(props.classes["grow"] as String) {}
+                        iconButton {
                             attrs {
-                                label = a { +"File info" }
+                                color = ButtonColor.inherit
+                                onClickFunction = { props.onLogout() }
                             }
-                        }
-                        tab {
-                            attrs {
-                                label = a { +"File content" }
+                            icon {
+                                +"logout_icon"
                             }
                         }
                     }
-                    div(props.classes["grow"] as String) {}
                 }
                 drawer {
                     attrs {
@@ -117,12 +132,11 @@ class ViewHeader : RComponent<HeaderProps, ViewHeader.State>() {
                 }
             }
         }
+        h2 { br { } }
     }
 
     companion object {
-        fun render(rBuilder: RBuilder) = rBuilder.run { styledComponent {} }
-
-        private val styledComponent = withStyles(ViewHeader::class, {
+        val styledComponent = withStyles(ViewHeader::class, {
             "root" {
                 display = Display.flex
             }

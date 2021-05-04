@@ -52,6 +52,7 @@ Online management tool for files and documents
 * [x] Provide statistics with Ktor: /metrics
 * [ ] ...
 * [ ] Select all repository link references for documentation
+* [ ] Submit latex documentation until 15.08.2021
 
 ## Build & execute project
 

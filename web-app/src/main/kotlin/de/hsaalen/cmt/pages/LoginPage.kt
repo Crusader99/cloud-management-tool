@@ -8,15 +8,12 @@ import kotlinx.html.CommonAttributeGroupFacade
 import kotlinx.html.InputType
 import kotlinx.html.js.onChangeFunction
 import kotlinx.html.js.onSubmitFunction
-import materialui.components.appbar.appBar
 import materialui.components.backdrop.backdrop
 import materialui.components.button.button
 import materialui.components.button.enums.ButtonColor
 import materialui.components.button.enums.ButtonVariant
 import materialui.components.circularprogress.circularProgress
 import materialui.components.textfield.textField
-import materialui.components.typography.enums.TypographyVariant
-import materialui.components.typography.typography
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
 import react.*
@@ -60,15 +57,6 @@ class LoginPage : RComponent<LoginPage.Props, LoginPage.State>() {
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        appBar {
-            typography {
-                attrs {
-                    variant = TypographyVariant.h6
-                }
-                +"Cloud Management Tool"
-            }
-        }
-        h2 { br { } }
         styledDiv {
             attrs {
                 css {
@@ -83,47 +71,7 @@ class LoginPage : RComponent<LoginPage.Props, LoginPage.State>() {
             h2 {
                 +"Authentication"
             }
-            form {
-                attrs {
-                    onSubmitFunction = ::onSubmit
-                }
-                textField {
-                    attrs {
-                        label = a { +"Username" }
-                        required = true
-                        disabled = state.isLoading
-                        onTextChange { text ->
-                            setState {
-                                username = text
-                            }
-                        }
-                    }
-                }
-                br {}
-                textField {
-                    attrs {
-                        type = InputType.password
-                        label = a { +"Password" }
-                        required = true
-                        disabled = state.isLoading
-                        onTextChange { text ->
-                            setState {
-                                password = text
-                            }
-                        }
-                    }
-                }
-                br {}
-                button {
-                    +"Login"
-                    attrs {
-                        variant = ButtonVariant.contained
-                        color = ButtonColor.primary
-                        disabled = state.isLoading
-                        type = ButtonType.submit
-                    }
-                }
-            }
+            renderLoginForm()
         }
         backdrop {
             attrs {
@@ -131,6 +79,53 @@ class LoginPage : RComponent<LoginPage.Props, LoginPage.State>() {
                 invisible = true
             }
             circularProgress {}
+        }
+    }
+
+    /**
+     * Called by the render function to add the login components.
+     */
+    private fun RBuilder.renderLoginForm() {
+        form {
+            attrs {
+                onSubmitFunction = ::onSubmit
+            }
+            textField {
+                attrs {
+                    label = a { +"Username" }
+                    required = true
+                    disabled = state.isLoading
+                    onTextChange { text ->
+                        setState {
+                            username = text
+                        }
+                    }
+                }
+            }
+            br {}
+            textField {
+                attrs {
+                    type = InputType.password
+                    label = a { +"Password" }
+                    required = true
+                    disabled = state.isLoading
+                    onTextChange { text ->
+                        setState {
+                            password = text
+                        }
+                    }
+                }
+            }
+            br {}
+            button {
+                +"Login"
+                attrs {
+                    variant = ButtonVariant.contained
+                    color = ButtonColor.primary
+                    disabled = state.isLoading
+                    type = ButtonType.submit
+                }
+            }
         }
     }
 
