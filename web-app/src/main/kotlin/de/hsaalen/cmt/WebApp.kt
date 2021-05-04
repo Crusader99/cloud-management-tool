@@ -118,11 +118,13 @@ class WebApp : RComponent<RProps, WebApp.State>() {
             client = null // Equivalent to logout
         }
         var message = "Logged out"
+        var severity = MAlertSeverity.success
         if (reason != null) {
             message += ": "
             message += reason
+            severity = MAlertSeverity.warning
         }
-        showSnackbar(message, MAlertSeverity.success)
+        showSnackbar(message, severity)
     }
 
     /**

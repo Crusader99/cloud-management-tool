@@ -9,6 +9,10 @@ import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 /**
  * Client library for web-app and android-app.
@@ -17,6 +21,9 @@ class Client {
 
     // True while the websocket is connected to the server
     var isConnected = true
+
+    var webSocketSendingQueue = Channel<Frame>()
+    var webSocketReceiveHandlers = mutableListOf<(Frame) -> Unit>()
 
     /**
      * Disconnect the websocket from server
@@ -35,17 +42,45 @@ class Client {
             // Should also work with tls encryption
             url = "ws" + url.removePrefix("http")
         }
-        instance.ws(urlString = url) {
-            println("Connected websocket")
-            send("test with text frame")
-            send(Frame.Text("custom fame"))
+        GlobalScope.launch {
+            try {
+                instance.ws(urlString = url) {
+                    println("Connected websocket")
+                    send("test with text frame")
+                    send(Frame.Text("custom fame"))
 
-            when (val frame = incoming.receive()) {
-                is Frame.Text -> println(frame.readText())
-                is Frame.Binary -> println(frame.readBytes())
-                else -> println("Unknown frame: " + frame.frameType.name)
+                    GlobalScope.launch {
+                        try {
+                            for (frame in webSocketSendingQueue) {
+                                if (isActive && isConnected) {
+                                    send(frame)
+                                } else {
+                                    throw IllegalStateException("No connected")
+                                }
+                            }
+                        } catch (ex: Throwable) {
+                            disconnect()
+                        }
+                    }
+
+                    while (isActive && isConnected) {
+                        println("Waiting for websocket receive")
+                        val frame = incoming.receive()
+                        for (handler in webSocketReceiveHandlers) {
+                            handler(frame)
+                        }
+//                        when (val frame = incoming.receive()) {
+//                            is Frame.Text -> println(frame.readText())
+//                            is Frame.Binary -> println(frame.readBytes())
+//                            else -> println("Unknown frame: " + frame.frameType.name)
+//                        }
+                    }
+                    println("Finished websocket")
+                }
+
+            } finally {
+                disconnect()
             }
-            println("Finished websocket")
         }
     }
 
