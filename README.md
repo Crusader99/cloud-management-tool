@@ -47,6 +47,9 @@ Online management tool for files and documents
 * [x] Implement logout button in frontend
 * [ ] Decide which database to use for user management, file management, notes.
 * [ ] Basic server implementation for user registration & login
+* [ ] Implement text editor in frontend
+* [ ] Connect websocket with server
+* [ ] Implement live sync for noted
 * [ ] ...
 * [x] Configure Grafana & Prometheus
 * [x] Provide statistics with Ktor: /metrics
