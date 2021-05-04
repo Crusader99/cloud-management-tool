@@ -49,7 +49,7 @@ Online management tool for files and documents
 * [ ] Basic server implementation for user registration & login
 * [ ] Implement text editor in frontend
 * [ ] Connect websocket with server
-* [ ] Implement live sync for noted
+* [ ] Implement live sync for notes
 * [ ] ...
 * [x] Configure Grafana & Prometheus
 * [x] Provide statistics with Ktor: /metrics

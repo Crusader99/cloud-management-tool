@@ -3,6 +3,7 @@ package de.hsaalen.cmt.rest
 import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.dto.AuthResultDto
 import de.hsaalen.cmt.network.dto.PacketListDto
+import de.hsaalen.cmt.websocket.handleWebSocket
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -27,6 +28,7 @@ fun Application.registerRoutes() = routing {
         get("/download") {
             call.respondText("Download")
         }
+        handleWebSocket()
     }
     get("/metrics") { // Provide metrics for prometheus and grafana
         // More details on https://ktor.io/docs/micrometer-metrics.html#prometheus_endpoint
