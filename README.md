@@ -44,7 +44,7 @@ Online management tool for files and documents
 * [x] Implement frontend login app with react
 * [x] Configure reverse proxy: [nginx](https://www.nginx.com/) or [traefik](https://traefik.io/)
 * [x] Call REST-API from frontend on login event
-* [ ] Implement logout button in frontend with REST-API call
+* [x] Implement logout button in frontend
 * [ ] Decide which database to use for user management, file management, notes.
 * [ ] Basic server implementation for user registration & login
 * [ ] ...
