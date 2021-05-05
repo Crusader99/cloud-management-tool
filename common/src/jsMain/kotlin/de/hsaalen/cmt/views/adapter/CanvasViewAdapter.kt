@@ -3,7 +3,7 @@ package de.hsaalen.cmt.views.adapter
 import de.crusader.objects.Point
 import de.crusader.objects.position
 import de.crusader.painter.draw
-import de.hsaalen.cmt.views.TestView
+import de.hsaalen.cmt.views.components.TestView
 import de.hsaalen.cmt.views.api.MPView
 import de.hsaalen.cmt.views.events.MPKeyboardEvent
 import de.hsaalen.cmt.views.events.MPMouseButton

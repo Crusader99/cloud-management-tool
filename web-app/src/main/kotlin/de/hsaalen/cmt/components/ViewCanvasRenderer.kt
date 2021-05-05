@@ -8,11 +8,8 @@ import de.hsaalen.cmt.views.events.MPKeyboardEvent
 import de.hsaalen.cmt.views.events.MPMouseButton
 import de.hsaalen.cmt.views.events.MPMouseEvent
 import kotlinx.coroutines.*
-import kotlinx.html.js.onMouseDownFunction
-import kotlinx.html.js.onMouseMoveFunction
-import kotlinx.html.js.onMouseUpFunction
+import kotlinx.html.tabIndex
 import org.w3c.dom.HTMLCanvasElement
-import org.w3c.dom.events.Event
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 import react.*
@@ -45,6 +42,11 @@ class ViewCanvasRenderer : RComponent<ViewCanvasRenderer.Props, RState>() {
      */
     override fun componentDidMount() {
         refreshJob?.cancel()
+        canvasRef.current.onmousemove = { props.view.onMouseMove(it.toMultiPlatform()) }
+        canvasRef.current.onmousedown = { props.view.onMouseDown(it.toMultiPlatform()) }
+        canvasRef.current.onmouseup = { props.view.onMouseUp(it.toMultiPlatform()) }
+        canvasRef.current.onkeydown = { props.view.onKeyDown(it.toMultiPlatform()) }
+        canvasRef.current.onkeyup = { props.view.onKeyUp(it.toMultiPlatform()) }
         refreshJob = GlobalScope.launch {
             while (isActive) {
                 delay(60)
@@ -69,24 +71,20 @@ class ViewCanvasRenderer : RComponent<ViewCanvasRenderer.Props, RState>() {
         styledCanvas {
             attrs {
                 ref = canvasRef
-                onMouseMoveFunction = { props.view.onMouseMove(it.toMultiPlatform()) }
-                onMouseDownFunction = { props.view.onMouseDown(it.toMultiPlatform()) }
-                onMouseUpFunction = { props.view.onMouseUp(it.toMultiPlatform()) }
+                tabIndex = "1"
             }
         }
     }
 
-    private inline fun <reified T : Any> Event.toMultiPlatform(): T {
-        return when (this) {
-            is MouseEvent -> MPMouseEvent(this.position, this.position, MPMouseButton.LEFT, 1)
-            is KeyboardEvent -> MPKeyboardEvent(
-                this.keyCode,
-                this.charCode.toChar(),
-                isControlDown = false,
-                isShiftDown = false
-            )
-            else -> throw UnsupportedOperationException()
-        } as T
-    }
+    private fun KeyboardEvent.toMultiPlatform() =
+        MPKeyboardEvent(
+            this.keyCode,
+            this.charCode.toChar(),
+            isControlDown = false,
+            isShiftDown = false
+        )
+
+    private fun MouseEvent.toMultiPlatform() =
+        MPMouseEvent(this.position, this.position, MPMouseButton.LEFT, 1)
 
 }

@@ -1,6 +1,6 @@
 package de.hsaalen.cmt.components
 
-import de.hsaalen.cmt.views.TestView
+import de.hsaalen.cmt.views.components.documenteditor.DocumentEditor
 import react.RBuilder
 import react.RComponent
 import react.RProps
@@ -29,7 +29,7 @@ class ViewDocumentEditor : RComponent<ViewDocumentEditor.Props, RState>() {
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        canvasRenderer(TestView())
+        canvasRenderer(DocumentEditor(props.text))
     }
 
 }
