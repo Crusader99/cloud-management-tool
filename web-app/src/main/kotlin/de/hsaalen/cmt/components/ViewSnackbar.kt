@@ -4,7 +4,6 @@ import com.ccfraser.muirwik.components.MSnackbarOnCloseReason
 import com.ccfraser.muirwik.components.lab.alert.MAlertSeverity
 import com.ccfraser.muirwik.components.lab.alert.mAlert
 import com.ccfraser.muirwik.components.mSnackbar
-import org.w3c.dom.events.Event
 import react.RBuilder
 import react.RComponent
 import react.RProps
@@ -36,16 +35,19 @@ class ViewSnackbar : RComponent<ViewSnackbar.Props, RState>() {
         val isVisible = props.info?.isVisible ?: false
         val message = props.info?.message ?: ""
         val severity = props.info?.severity ?: MAlertSeverity.info
-        mSnackbar(open = isVisible, autoHideDuration = 4_000, onClose = ::onClose) {
-            mAlert(message = message, severity = severity)
+        mSnackbar(
+            open = isVisible,
+            autoHideDuration = 4_000,
+            onClose = { _, reason -> onClose(reason) }) {
+            mAlert(message = message, severity = severity, onClose = { onClose() })
         }
     }
 
     /**
      * Called when snackbar is closed by the user or timeout.
      */
-    private fun onClose(event: Event, reason: MSnackbarOnCloseReason) {
-        if (event.target == null || reason == MSnackbarOnCloseReason.clickaway) {
+    private fun onClose(reason: MSnackbarOnCloseReason? = null) {
+        if (reason == MSnackbarOnCloseReason.clickaway) {
             return // Ignore clickaway
         }
 
