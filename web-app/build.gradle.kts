@@ -37,6 +37,9 @@ kotlin {
             commonWebpackConfig {
                 cssSupport.enabled = true
             }
+            runTask {
+                devServer = devServer?.copy(port = 8081)
+            }
         }
     }
 }
