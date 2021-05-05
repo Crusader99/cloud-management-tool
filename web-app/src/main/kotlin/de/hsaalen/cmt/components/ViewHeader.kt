@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.components
 
+import com.ccfraser.muirwik.components.mTooltip
 import kotlinx.css.Display
 import kotlinx.css.FlexBasis
 import kotlinx.css.display
@@ -20,6 +21,7 @@ import materialui.components.toolbar.toolbar
 import materialui.components.typography.enums.TypographyVariant
 import materialui.components.typography.typography
 import materialui.styles.withStyles
+import org.w3c.dom.events.Event
 import react.*
 import react.dom.a
 import react.dom.br
@@ -48,6 +50,9 @@ class ViewHeader : RComponent<ViewHeader.Props, ViewHeader.State>() {
         isDrawerVisible = false
     }
 
+    /**
+     * Called when page is rendered.
+     */
     override fun RBuilder.render() {
         div(props.rootStyle) {
             appBar {
@@ -57,6 +62,7 @@ class ViewHeader : RComponent<ViewHeader.Props, ViewHeader.State>() {
                             color = ButtonColor.inherit
                             onClickFunction = {
                                 setState {
+                                    // Show drawer on side
                                     isDrawerVisible = true
                                 }
                             }
@@ -90,13 +96,15 @@ class ViewHeader : RComponent<ViewHeader.Props, ViewHeader.State>() {
                             }
                         }
                         div(props.classes["grow"] as String) {}
-                        iconButton {
-                            attrs {
-                                color = ButtonColor.inherit
-                                onClickFunction = { props.onLogout() }
-                            }
-                            icon {
-                                +"logout_icon"
+                        mTooltip("Logout") {
+                            iconButton {
+                                attrs {
+                                    color = ButtonColor.inherit
+                                    onClickFunction = { props.onLogout() }
+                                }
+                                icon {
+                                    +"logout_icon"
+                                }
                             }
                         }
                     }
@@ -107,32 +115,51 @@ class ViewHeader : RComponent<ViewHeader.Props, ViewHeader.State>() {
                         open = state.isDrawerVisible
                         onClose = {
                             setState {
+                                // Hide drawer on side
                                 isDrawerVisible = false
                             }
                         }
                     }
-                    div {
-                        list {
-                            repeat(5) { index ->
-                                listItem {
-                                    attrs {
-                                        button = true
-                                    }
-                                    listItemText {
-                                        attrs {
-                                            primary = a {
-                                                +"Test $index"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    renderDrawer()
                 }
             }
         }
         h2 { br { } }
+    }
+
+    /**
+     * Render only the drawer menu on the left display side.
+     */
+    private fun RBuilder.renderDrawer() {
+        div {
+            list {
+                repeat(5) { index ->
+                    listButton("Test $index") {}
+                }
+                listButton("About") {
+
+                }
+            }
+        }
+    }
+
+    /**
+     * Extension function for creating a list button which is intended to be used in a drawer menu.
+     */
+    private fun RBuilder.listButton(title: String, onClick: (Event) -> Unit) {
+        listItem {
+            attrs {
+                button = true
+                onClickFunction = onClick
+            }
+            listItemText {
+                attrs {
+                    primary = a {
+                        +title
+                    }
+                }
+            }
+        }
     }
 
     companion object {

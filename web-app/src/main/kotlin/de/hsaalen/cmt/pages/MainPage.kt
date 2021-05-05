@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.pages
 
 import de.hsaalen.cmt.components.ViewResultList
+import de.hsaalen.cmt.network.Client
 import react.RBuilder
 import react.RComponent
 import react.RProps
@@ -12,13 +13,12 @@ import react.RState
 class MainPage : RComponent<MainPage.Props, RState>() {
 
     interface Props : RProps {
-//        val client: Client
+        var client: Client
     }
 
-    override fun RState.init() {
-
-    }
-
+    /**
+     * Called when page is rendered.
+     */
     override fun RBuilder.render() {
         ViewResultList.render(this)
     }

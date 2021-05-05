@@ -1,18 +1,16 @@
 package de.hsaalen.cmt.pages
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.ccfraser.muirwik.components.mBackdrop
+import com.ccfraser.muirwik.components.mCircularProgress
 import kotlinx.css.*
 import kotlinx.html.ButtonType
 import kotlinx.html.CommonAttributeGroupFacade
 import kotlinx.html.InputType
 import kotlinx.html.js.onChangeFunction
 import kotlinx.html.js.onSubmitFunction
-import materialui.components.backdrop.backdrop
 import materialui.components.button.button
 import materialui.components.button.enums.ButtonColor
 import materialui.components.button.enums.ButtonVariant
-import materialui.components.circularprogress.circularProgress
 import materialui.components.textfield.textField
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
@@ -29,6 +27,11 @@ import styled.styledDiv
  */
 class LoginPage : RComponent<LoginPage.Props, LoginPage.State>() {
 
+    /**
+     * Data which is typed in by the user.
+     */
+    data class Credentials(val username: String, val password: String)
+
     interface Props : RProps {
         var onLogin: (Credentials) -> Unit
     }
@@ -38,11 +41,6 @@ class LoginPage : RComponent<LoginPage.Props, LoginPage.State>() {
         var username: String
         var password: String
     }
-
-    /**
-     * Data which is typed in by the user.
-     */
-    data class Credentials(val username: String, val password: String)
 
     /**
      * Called when this component is loaded.
@@ -73,12 +71,12 @@ class LoginPage : RComponent<LoginPage.Props, LoginPage.State>() {
             }
             renderLoginForm()
         }
-        backdrop {
-            attrs {
-                open = state.isLoading
-                invisible = true
+
+        mBackdrop(open = state.isLoading, invisible = false) {
+            css {
+                zIndex = Int.MAX_VALUE
             }
-            circularProgress {}
+            mCircularProgress { }
         }
     }
 
@@ -122,7 +120,6 @@ class LoginPage : RComponent<LoginPage.Props, LoginPage.State>() {
                 attrs {
                     variant = ButtonVariant.contained
                     color = ButtonColor.primary
-                    disabled = state.isLoading
                     type = ButtonType.submit
                 }
             }
@@ -137,9 +134,7 @@ class LoginPage : RComponent<LoginPage.Props, LoginPage.State>() {
         setState {
             isLoading = true
         }
-        GlobalScope.launch {
-            props.onLogin(Credentials(state.username, state.password))
-        }
+        props.onLogin(Credentials(state.username, state.password))
     }
 
     /**

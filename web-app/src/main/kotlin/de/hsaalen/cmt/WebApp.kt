@@ -47,19 +47,21 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                 }
             }
 
-            val snackbar = state.snackbar
-            if (snackbar != null) {
-                child(ViewSnackbar::class) {
-                    attrs {
-                        info = snackbar
-//                        info.message = snackbar.message
-//                        info.severity = snackbar.severity
-                    }
+            child(ViewSnackbar::class) {
+                attrs {
+                    info = state.snackbar
                 }
             }
-            if (state.isLoggedIn) {
-                child(MainPage::class) {}
-            } else {
+
+            val localClient = state.client
+            if (localClient != null) { // When already logged in
+                child(MainPage::class) {
+                    attrs {
+                        client = localClient
+                    }
+                }
+            } else { // Currently not logged in
+                // Allow user to login
                 child(LoginPage::class) {
                     attrs {
                         onLogin = ::onLogin
@@ -77,10 +79,6 @@ class WebApp : RComponent<RProps, WebApp.State>() {
             try {
                 val serverConnection: Client
                 withTimeout(5_000) { // Timeout after 5 seconds
-                    println("Execute login...")
-                    setState {
-                        snackbar = ViewSnackbar.SnackbarInfo("Checking...", MAlertSeverity.info)
-                    }
                     delay(2000)
                     serverConnection = Client.login(credentials.username, credentials.password)
                 }
@@ -112,6 +110,9 @@ class WebApp : RComponent<RProps, WebApp.State>() {
 
     private fun onLogout() = onLogout(null)
 
+    /**
+     * Disconnect client, forget secret keys and show login page.
+     */
     private fun onLogout(reason: String?) {
         state.client?.disconnect()
         setState {
