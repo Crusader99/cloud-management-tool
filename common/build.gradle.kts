@@ -36,6 +36,7 @@ kotlin {
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
                 implementation("io.ktor:ktor-client-core:1.5.4")
                 implementation("io.ktor:ktor-client-serialization:1.5.4")
+                implementation("io.ktor:ktor-client-websockets:1.5.4")
             }
         }
         val commonTest by getting {

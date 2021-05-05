@@ -1,8 +1,8 @@
 package de.hsaalen.cmt.network
 
-object Paths {
+object RestPaths {
 
-    val base = "/api/v1.0"
+    val base = "api/v1.0"
 
     val list = "/list"
 

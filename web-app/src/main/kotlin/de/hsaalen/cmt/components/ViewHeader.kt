@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.components
 
+import com.ccfraser.muirwik.components.mTooltip
 import kotlinx.css.Display
 import kotlinx.css.FlexBasis
 import kotlinx.css.display
@@ -20,21 +21,26 @@ import materialui.components.toolbar.toolbar
 import materialui.components.typography.enums.TypographyVariant
 import materialui.components.typography.typography
 import materialui.styles.withStyles
+import org.w3c.dom.events.Event
 import react.*
 import react.dom.a
+import react.dom.br
 import react.dom.div
-
-interface HeaderProps : RProps {
-    val classes: dynamic
-}
-
-val HeaderProps.rootStyle: String
-    get() = classes["root"] as String
+import react.dom.h2
 
 /**
  * Defines the header of the app which also includes a search box and a button with menu options.
  */
-class ViewHeader : RComponent<HeaderProps, ViewHeader.State>() {
+class ViewHeader : RComponent<ViewHeader.Props, ViewHeader.State>() {
+
+    interface Props : RProps {
+        var onLogout: () -> Unit
+        var isLoggedIn: Boolean
+        val classes: dynamic
+    }
+
+    private val Props.rootStyle: String
+        get() = classes["root"] as String
 
     interface State : RState {
         var isDrawerVisible: Boolean
@@ -44,6 +50,9 @@ class ViewHeader : RComponent<HeaderProps, ViewHeader.State>() {
         isDrawerVisible = false
     }
 
+    /**
+     * Called when page is rendered.
+     */
     override fun RBuilder.render() {
         div(props.rootStyle) {
             appBar {
@@ -53,6 +62,7 @@ class ViewHeader : RComponent<HeaderProps, ViewHeader.State>() {
                             color = ButtonColor.inherit
                             onClickFunction = {
                                 setState {
+                                    // Show drawer on side
                                     isDrawerVisible = true
                                 }
                             }
@@ -67,24 +77,37 @@ class ViewHeader : RComponent<HeaderProps, ViewHeader.State>() {
                         }
                         +"Cloud Management Tool"
                     }
-                    tabs {
-                        tab {
-                            attrs {
-                                label = a { +"Search results" }
+                    if (props.isLoggedIn) {
+                        tabs {
+                            tab {
+                                attrs {
+                                    label = a { +"Search results" }
+                                }
+                            }
+                            tab {
+                                attrs {
+                                    label = a { +"File info" }
+                                }
+                            }
+                            tab {
+                                attrs {
+                                    label = a { +"File content" }
+                                }
                             }
                         }
-                        tab {
-                            attrs {
-                                label = a { +"File info" }
-                            }
-                        }
-                        tab {
-                            attrs {
-                                label = a { +"File content" }
+                        div(props.classes["grow"] as String) {}
+                        mTooltip("Logout") {
+                            iconButton {
+                                attrs {
+                                    color = ButtonColor.inherit
+                                    onClickFunction = { props.onLogout() }
+                                }
+                                icon {
+                                    +"logout_icon"
+                                }
                             }
                         }
                     }
-                    div(props.classes["grow"] as String) {}
                 }
                 drawer {
                     attrs {
@@ -92,27 +115,47 @@ class ViewHeader : RComponent<HeaderProps, ViewHeader.State>() {
                         open = state.isDrawerVisible
                         onClose = {
                             setState {
+                                // Hide drawer on side
                                 isDrawerVisible = false
                             }
                         }
                     }
-                    div {
-                        list {
-                            repeat(5) { index ->
-                                listItem {
-                                    attrs {
-                                        button = true
-                                    }
-                                    listItemText {
-                                        attrs {
-                                            primary = a {
-                                                +"Test $index"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                    renderDrawer()
+                }
+            }
+        }
+        h2 { br { } }
+    }
+
+    /**
+     * Render only the drawer menu on the left display side.
+     */
+    private fun RBuilder.renderDrawer() {
+        div {
+            list {
+                repeat(5) { index ->
+                    listButton("Test $index") {}
+                }
+                listButton("About") {
+
+                }
+            }
+        }
+    }
+
+    /**
+     * Extension function for creating a list button which is intended to be used in a drawer menu.
+     */
+    private fun RBuilder.listButton(title: String, onClick: (Event) -> Unit) {
+        listItem {
+            attrs {
+                button = true
+                onClickFunction = onClick
+            }
+            listItemText {
+                attrs {
+                    primary = a {
+                        +title
                     }
                 }
             }
@@ -120,9 +163,7 @@ class ViewHeader : RComponent<HeaderProps, ViewHeader.State>() {
     }
 
     companion object {
-        fun render(rBuilder: RBuilder) = rBuilder.run { styledComponent {} }
-
-        private val styledComponent = withStyles(ViewHeader::class, {
+        val styledComponent = withStyles(ViewHeader::class, {
             "root" {
                 display = Display.flex
             }

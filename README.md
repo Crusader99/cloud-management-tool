@@ -43,14 +43,19 @@ Online management tool for files and documents
 * [x] Experiment with compose and painter-library and react
 * [x] Implement frontend login app with react
 * [x] Configure reverse proxy: [nginx](https://www.nginx.com/) or [traefik](https://traefik.io/)
-* [ ] Call REST-API from frontend on login event
-* [ ] Decide which database to use for user management, file management, notes.
+* [x] Call REST-API from frontend on login event
+* [x] Implement logout button in frontend
+* [ ] Decide which database to use for user management, file management.
 * [ ] Basic server implementation for user registration & login
+* [ ] Implement text editor in frontend
+* [x] Connect websocket to backend server
+* [ ] Implement live sync for file edit
 * [ ] ...
 * [x] Configure Grafana & Prometheus
 * [x] Provide statistics with Ktor: /metrics
 * [ ] ...
 * [ ] Select all repository link references for documentation
+* [ ] Submit latex documentation until 15.08.2021
 
 ## Build & execute project
 
