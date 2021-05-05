@@ -34,8 +34,10 @@ class DocumentEditor(
             engine.cursor.move(EnumDirection.UP)
         } else if (e.isArrowDown) {
             engine.cursor.move(EnumDirection.DOWN)
-        }else if(e.isBackspace){
+        } else if (e.isBackspace) {
             engine.cursor.deletePreviousChar()
+        } else if (e.isDelete) {
+            engine.cursor.deleteFollowingChar()
         } else {
             engine.cursor.insert(char.toString())
         }

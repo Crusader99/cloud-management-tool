@@ -51,11 +51,23 @@ class EditorEngine(
 
         val y get() = pos.y
 
-        val isAtBeginning
-            get() = y <= 0 && x <= 0
+        val isAtStartOfDocument
+            get() = isOnFirstLine && isAtStartOfLine
 
-        val isAtEnd
-            get() = y >= ref.engine.lines.lastIndex && x >= ref.engine.lines.last().size
+        val isAtEndOfDocument
+            get() = isOnLastLine && isAtEndOfLine
+
+        val isAtStartOfLine
+            get() = x <= 0
+
+        val isAtEndOfLine
+            get() = x >= line.size
+
+        val isOnFirstLine
+            get() = y <= 0
+
+        val isOnLastLine
+            get() = y >= ref.engine.lines.lastIndex
 
         val line: Line
             get() = ref.engine.lines[y]
@@ -70,8 +82,14 @@ class EditorEngine(
         }
 
         fun deletePreviousChar() {
-            if (x > 0) {
+            if (!isAtStartOfLine) {
                 move(EnumDirection.LEFT, 1)
+                line.items.removeAt(x)
+            }
+        }
+
+        fun deleteFollowingChar() {
+            if (!isAtEndOfLine) {
                 line.items.removeAt(x)
             }
         }
