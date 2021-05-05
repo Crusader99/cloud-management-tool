@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.views.components.documenteditor
 
+import de.crusader.extensions.EnumDirection
 import de.crusader.objects.Point
 import de.crusader.objects.Rectangle
 import de.crusader.objects.color.Color
@@ -25,7 +26,19 @@ class DocumentEditor(
 
     override fun onKeyDown(e: MPKeyboardEvent) {
         val char = e.keyCode.toChar()
-        engine.cursor.insert(char.toString())
+        if (e.isArrowLeft) {
+            engine.cursor.move(EnumDirection.LEFT)
+        } else if (e.isArrowRight) {
+            engine.cursor.move(EnumDirection.RIGHT)
+        } else if (e.isArrowUp) {
+            engine.cursor.move(EnumDirection.UP)
+        } else if (e.isArrowDown) {
+            engine.cursor.move(EnumDirection.DOWN)
+        }else if(e.isBackspace){
+            engine.cursor.deletePreviousChar()
+        } else {
+            engine.cursor.insert(char.toString())
+        }
     }
 
     // Helper for creating animations

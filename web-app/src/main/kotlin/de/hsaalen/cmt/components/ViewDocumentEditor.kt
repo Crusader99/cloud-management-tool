@@ -9,10 +9,10 @@ import react.RState
 /**
  * Wrapper function to simplify creation of this react component.
  */
-fun RBuilder.documentEditor(text: String) =
+fun RBuilder.documentEditor(defaultText: String) =
     child(ViewDocumentEditor::class) {
         attrs {
-            this.text = text
+            this.defaultText = defaultText
         }
     }
 
@@ -22,14 +22,14 @@ fun RBuilder.documentEditor(text: String) =
 class ViewDocumentEditor : RComponent<ViewDocumentEditor.Props, RState>() {
 
     interface Props : RProps {
-        var text: String
+        var defaultText: String
     }
 
     /**
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        canvasRenderer(DocumentEditor(props.text))
+        canvasRenderer(DocumentEditor(props.defaultText))
     }
 
 }

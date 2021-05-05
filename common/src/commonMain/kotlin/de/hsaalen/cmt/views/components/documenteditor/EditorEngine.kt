@@ -19,17 +19,13 @@ class EditorEngine(
     }
 
     class Line(defaultText: String) {
-        private val items = mutableListOf<Char>()
+        val items = mutableListOf<Char>()
 
         val size: Int
             get() = items.size
 
         init {
-            insert(0, *defaultText.toCharArray())
-        }
-
-        fun insert(index: Int, vararg c: Char) {
-            items.addAll(index, c.toList())
+            items.addAll(defaultText.toList())
         }
 
         override fun toString() = items.toCharArray().concatToString()
@@ -67,10 +63,17 @@ class EditorEngine(
         /**
          * Moves the cursor in text content, returns true when operation successful.
          */
-        fun move(direction: EnumDirection): Boolean {
-            val expectedNewPosition = pos.add(direction.x, direction.y)
+        fun move(direction: EnumDirection, size: Int = 1): Boolean {
+            val expectedNewPosition = pos.add(direction.x * size, direction.y * size)
             set(expectedNewPosition)
             return pos == expectedNewPosition
+        }
+
+        fun deletePreviousChar() {
+            if (x > 0) {
+                move(EnumDirection.LEFT, 1)
+                line.items.removeAt(x)
+            }
         }
 
         fun set(newPos: CursorPos) {
@@ -83,7 +86,14 @@ class EditorEngine(
         }
 
         fun insert(text: String, moveCursor: Boolean = true) {
-            line.insert(x, *text.toCharArray())
+            line.items.addAll(x, text.toList())
+            if (moveCursor) {
+                move(EnumDirection.RIGHT, text.length)
+            }
+        }
+
+        fun newLine() {
+            ref.engine.lines.add(y, ref.engine.defaultLine)
         }
     }
 

@@ -20,7 +20,7 @@ class MainPage : RComponent<MainPage.Props, RState>() {
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        documentEditor("This is a test")
+        documentEditor(defaultText = "")
 //        ViewResultList.render(this)
     }
 
