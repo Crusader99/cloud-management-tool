@@ -26,20 +26,14 @@ class DocumentEditor(
 
     override fun onKeyDown(e: MPKeyboardEvent) {
         val char = e.keyCode.toChar()
-        if (e.isArrowLeft) {
-            engine.cursor.move(EnumDirection.LEFT)
-        } else if (e.isArrowRight) {
-            engine.cursor.move(EnumDirection.RIGHT)
-        } else if (e.isArrowUp) {
-            engine.cursor.move(EnumDirection.UP)
-        } else if (e.isArrowDown) {
-            engine.cursor.move(EnumDirection.DOWN)
-        } else if (e.isBackspace) {
-            engine.cursor.deletePreviousChar()
-        } else if (e.isDelete) {
-            engine.cursor.deleteFollowingChar()
-        } else {
-            engine.cursor.insert(char.toString())
+        when {
+            e.isArrowLeft -> engine.cursor.move(EnumDirection.LEFT)
+            e.isArrowRight -> engine.cursor.move(EnumDirection.RIGHT)
+            e.isArrowUp -> engine.cursor.move(EnumDirection.UP)
+            e.isArrowDown -> engine.cursor.move(EnumDirection.DOWN)
+            e.isBackspace -> engine.cursor.deletePreviousChar()
+            e.isDelete -> engine.cursor.deleteFollowingChar()
+            else -> engine.cursor.insert(char.toString())
         }
     }
 
