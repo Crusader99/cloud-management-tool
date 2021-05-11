@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") // There are some bugs with Intellij older than 2021.1
     kotlin("plugin.serialization")
+    id("com.github.gelangweilte-studenten.gradle-docker-tests") version "1.0.0"
     application
 }
 
@@ -43,4 +44,8 @@ dependencies {
 
     // JUnit test framework
     testImplementation(kotlin("test"))
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
