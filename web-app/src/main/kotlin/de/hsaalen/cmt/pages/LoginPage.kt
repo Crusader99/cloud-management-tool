@@ -15,10 +15,7 @@ import materialui.components.textfield.textField
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
 import react.*
-import react.dom.a
-import react.dom.br
-import react.dom.form
-import react.dom.h2
+import react.dom.*
 import styled.css
 import styled.styledDiv
 
@@ -114,13 +111,14 @@ class LoginPage : RComponent<LoginPage.Props, LoginPage.State>() {
                     }
                 }
             }
-            br {}
+            h3 {}
             button {
                 +"Login"
                 attrs {
                     variant = ButtonVariant.contained
                     color = ButtonColor.primary
                     type = ButtonType.submit
+                    fullWidth = true
                 }
             }
         }
