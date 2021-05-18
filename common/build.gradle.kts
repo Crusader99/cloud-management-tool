@@ -18,7 +18,7 @@ kotlin {
             kotlinOptions.jvmTarget = "1.8"
         }
     }
-    js().browser()
+    js(LEGACY).browser()
 
     sourceSets {
         val commonMain by getting {
