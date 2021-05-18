@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.components
+package de.hsaalen.cmt.components.features
 
 import com.ccfraser.muirwik.components.MSnackbarOnCloseReason
 import com.ccfraser.muirwik.components.lab.alert.MAlertSeverity

@@ -26,7 +26,7 @@ dependencies {
 }
 
 kotlin {
-    js {
+    js(LEGACY) {
         useCommonJs()
         binaries.executable()
         browser {
