@@ -28,6 +28,8 @@ dependencies {
     implementation("io.ktor:ktor-serialization:1.5.4")
     implementation("io.ktor:ktor-websockets:1.5.4")
     implementation("io.ktor:ktor-metrics-micrometer:1.5.4")
+    implementation("io.ktor:ktor-auth:1.5.4")
+    implementation("io.ktor:ktor-auth-jwt:1.5.4")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.0") {
         because("To override deprecated version form ktor")
