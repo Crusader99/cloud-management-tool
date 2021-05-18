@@ -26,6 +26,12 @@ Online management tool for files and documents
 * [React](https://kotlinlang.org/docs/js-get-started.html) (as frontend library)
 * [Material UI](https://material-ui.com/) (provides react components)
 
+## Databases:
+
+* SQL for user management and tags/labels
+* MongoDB for encrypted notes to allow update only one line
+* S3 container used only for encrypted files
+
 ## Platforms:
 
 * Browser: React-App
@@ -45,8 +51,9 @@ Online management tool for files and documents
 * [x] Configure reverse proxy: [nginx](https://www.nginx.com/) or [traefik](https://traefik.io/)
 * [x] Call REST-API from frontend on login event
 * [x] Implement logout button in frontend
-* [ ] Decide which database to use for user management, file management.
-* [ ] Basic server implementation for user registration & login
+* [x] Decide which database to use for user management, file management.
+* [x] REST-API server implementation for user registration & login
+* [ ] SQL DAO elements for user registration & login
 * [ ] Implement text editor in frontend
 * [x] Connect websocket to backend server
 * [ ] Implement live sync for file edit
