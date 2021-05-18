@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") // There are some bugs with Intellij older than 2021.1
     kotlin("plugin.serialization")
-    id("com.github.gelangweilte-studenten.gradle-docker-tests") version "1.0.0"
+    id("com.github.gelangweilte-studenten.gradle-docker-tests") version "1.1.1"
     application
 }
 
@@ -42,7 +42,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.3") {
         because("Ktor depends on this library and has issues when missing")
     }
-    implementation("io.micrometer:micrometer-registry-prometheus:1.6.6")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.7.0")
 
     // JUnit test framework
     testImplementation(kotlin("test"))

@@ -1,8 +1,8 @@
 allprojects {
     repositories {
+        mavenCentral()
         google()
         jcenter()
-        mavenCentral()
         maven("https://provider.ddnss.de/repository/")
     }
 
@@ -15,7 +15,7 @@ allprojects {
 
 plugins {
     kotlin("multiplatform") version "1.4.32" apply false
-    kotlin("plugin.serialization") version "1.4.32" apply false
+    kotlin("plugin.serialization") version "1.5.0" apply false
 
     // Gradle plugin for android development
     id("com.android.application") version "4.1.3" apply false
