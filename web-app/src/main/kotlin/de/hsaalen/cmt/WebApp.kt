@@ -78,8 +78,10 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                 // Allow user to login
                 child(LoginPage::class) {
                     attrs {
-                        onLogin = ::onLogin
-                        onRegister = ::onLogin
+                        onLogin = { credentials -> onLogin(credentials, isRegistration = false) }
+                        onRegister = { credentials -> onLogin(credentials, isRegistration = true) }
+                        lastEmail = ""
+                        isEnabled = !state.isLoading
                     }
                 }
             }
@@ -91,22 +93,25 @@ class WebApp : RComponent<RProps, WebApp.State>() {
     /**
      * Called when user had entered the username and password.
      */
-    private fun onLogin(credentials: Credentials) {
+    private fun onLogin(credentials: Credentials, isRegistration: Boolean) {
         GlobalScope.launch {
             try {
                 setState {
                     isLoading = true
                 }
-                val serverConnection: Client
+                val connection: Client
                 withTimeout(5_000) { // Timeout after 5 seconds
                     delay(2000)
-                    serverConnection = Client.login(credentials.email, credentials.password)
+                    connection = if (isRegistration) {
+                        Client.register(credentials.fullName, credentials.email, credentials.password)
+                    } else {
+                        Client.login(credentials.email, credentials.password)
+                    }
                 }
                 setState {
-                    client = serverConnection // Equivalent to isLoggedIn = true
+                    client = connection // Equivalent to isLoggedIn = true
                     isLoading = false
-                    snackbar =
-                        ViewSnackbar.SnackbarInfo("Successfully logged in!", MAlertSeverity.success)
+                    snackbar = ViewSnackbar.SnackbarInfo("Successfully logged in!", MAlertSeverity.success)
                 }
                 GlobalScope.launch {
                     try {

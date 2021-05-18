@@ -8,13 +8,13 @@ import react.setState
  * Wrapper function to simplify creation of the user registration component.
  */
 fun RBuilder.registerComponent(
-    defaultUser: String = "",
+    defaultCredentials: Credentials = Credentials(),
     onSubmit: (Credentials) -> Unit = {},
     buttonTitle: String = "Register",
     isEnabled: Boolean = true
 ) = child(RegisterComponent::class) {
     attrs {
-        this.defaultUser = defaultUser
+        this.defaultCredentials = defaultCredentials
         this.onSubmit = onSubmit
         this.buttonTitle = buttonTitle
         this.isEnabled = isEnabled
@@ -24,7 +24,7 @@ fun RBuilder.registerComponent(
 /**
  * A component for handling user registration.
  */
-class RegisterComponent : FormComponent() {
+class RegisterComponent(props: Props) : FormComponent(props) {
 
     /**
      * Called when this form component is rendered by the super class component implementation.
@@ -33,21 +33,23 @@ class RegisterComponent : FormComponent() {
         loginField(
             title = "Full name",
             isEnabled = props.isEnabled,
-            defaultText = props.defaultUser,
+            defaultText = props.defaultCredentials.fullName,
             onTextChange = { text ->
                 setState {
                     fullName = text
                 }
+                props.defaultCredentials.fullName = state.fullName
             })
         br {}
         loginField(
             title = "E-Mail",
             isEnabled = props.isEnabled,
-            defaultText = props.defaultUser,
+            defaultText = props.defaultCredentials.email,
             onTextChange = { text ->
                 setState {
                     email = text
                 }
+                props.defaultCredentials.email = state.email
             })
         br {}
         loginField(

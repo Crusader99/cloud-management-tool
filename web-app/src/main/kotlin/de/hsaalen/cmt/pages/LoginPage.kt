@@ -14,16 +14,23 @@ import styled.styledDiv
 /**
  * Page for user authentication
  */
-class LoginPage : RComponent<LoginPage.Props, LoginPage.State>() {
+class LoginPage(props: Props) : RComponent<LoginPage.Props, LoginPage.State>(props) {
 
     interface Props : RProps {
         var onLogin: (Credentials) -> Unit
         var onRegister: (Credentials) -> Unit
         var isEnabled: Boolean
+        var lastEmail: String
     }
 
     interface State : RState {
         var showRegistration: Boolean
+        var defaultCredentials: Credentials
+    }
+
+    override fun State.init(props: Props) {
+        showRegistration = false
+        defaultCredentials = Credentials(email = props.lastEmail)
     }
 
     /**
@@ -45,9 +52,17 @@ class LoginPage : RComponent<LoginPage.Props, LoginPage.State>() {
                 +"Authentication"
             }
             if (state.showRegistration) {
-                registerComponent(onSubmit = props.onRegister, isEnabled = props.isEnabled)
+                registerComponent(
+                    defaultCredentials = state.defaultCredentials,
+                    onSubmit = props.onRegister,
+                    isEnabled = props.isEnabled
+                )
             } else {
-                loginComponent(onSubmit = props.onLogin, isEnabled = props.isEnabled)
+                loginComponent(
+                    defaultCredentials = state.defaultCredentials,
+                    onSubmit = props.onLogin,
+                    isEnabled = props.isEnabled
+                )
             }
         }
         renderLink()

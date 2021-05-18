@@ -12,10 +12,10 @@ import react.dom.h3
 /**
  * A react component to simplify login/register forms.
  */
-abstract class FormComponent : RComponent<FormComponent.Props, FormComponent.State>() {
+abstract class FormComponent(props: Props) : RComponent<FormComponent.Props, FormComponent.State>(props) {
 
     interface Props : RProps {
-        var defaultUser: String
+        var defaultCredentials: Credentials
         var onSubmit: (Credentials) -> Unit
         var buttonTitle: String
         var isEnabled: Boolean
@@ -30,10 +30,10 @@ abstract class FormComponent : RComponent<FormComponent.Props, FormComponent.Sta
     /**
      * Called when this component is loaded.
      */
-    override fun State.init() {
-        fullName = ""
-        email = ""
-        password = ""
+    override fun State.init(props: Props) {
+        fullName = props.defaultCredentials.fullName
+        email = props.defaultCredentials.email
+        password = "" // Reset password
     }
 
     /**
