@@ -36,7 +36,7 @@ open class LoginComponent : FormComponent() {
             defaultText = props.defaultUser,
             onTextChange = { text ->
                 setState {
-                    username = text
+                    email = text
                 }
             })
         br {}

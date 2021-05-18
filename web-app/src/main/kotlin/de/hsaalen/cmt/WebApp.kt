@@ -80,7 +80,6 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     attrs {
                         onLogin = ::onLogin
                         onRegister = ::onLogin
-                        showRegistration = false
                     }
                 }
             }
@@ -101,7 +100,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                 val serverConnection: Client
                 withTimeout(5_000) { // Timeout after 5 seconds
                     delay(2000)
-                    serverConnection = Client.login(credentials.username, credentials.password)
+                    serverConnection = Client.login(credentials.email, credentials.password)
                 }
                 setState {
                     client = serverConnection // Equivalent to isLoggedIn = true

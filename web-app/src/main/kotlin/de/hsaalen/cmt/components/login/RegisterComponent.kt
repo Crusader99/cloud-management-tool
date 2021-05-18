@@ -31,12 +31,22 @@ class RegisterComponent : FormComponent() {
      */
     override fun RBuilder.renderComponents() {
         loginField(
-            title = "Username",
+            title = "Full name",
             isEnabled = props.isEnabled,
             defaultText = props.defaultUser,
             onTextChange = { text ->
                 setState {
-                    username = text
+                    fullName = text
+                }
+            })
+        br {}
+        loginField(
+            title = "E-Mail",
+            isEnabled = props.isEnabled,
+            defaultText = props.defaultUser,
+            onTextChange = { text ->
+                setState {
+                    email = text
                 }
             })
         br {}

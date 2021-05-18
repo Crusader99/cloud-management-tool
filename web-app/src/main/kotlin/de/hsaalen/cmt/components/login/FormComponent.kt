@@ -22,7 +22,8 @@ abstract class FormComponent : RComponent<FormComponent.Props, FormComponent.Sta
     }
 
     interface State : RState {
-        var username: String
+        var fullName: String
+        var email: String
         var password: String
     }
 
@@ -30,7 +31,8 @@ abstract class FormComponent : RComponent<FormComponent.Props, FormComponent.Sta
      * Called when this component is loaded.
      */
     override fun State.init() {
-        username = ""
+        fullName = ""
+        email = ""
         password = ""
     }
 
@@ -59,7 +61,7 @@ abstract class FormComponent : RComponent<FormComponent.Props, FormComponent.Sta
      */
     private fun onSubmit(event: Event) {
         event.preventDefault()
-        props.onSubmit(Credentials(state.username, state.password))
+        props.onSubmit(Credentials(state.fullName, state.email, state.password))
     }
 
 
