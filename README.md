@@ -53,9 +53,11 @@ Online management tool for files and documents
 * [x] Implement logout button in frontend
 * [x] Decide which database to use for user management, file management.
 * [x] REST-API server implementation for user registration & login
-* [ ] SQL DAO elements for user registration & login
+* [x] SQL DAO elements for user registration & login
 * [ ] Implement text editor in frontend
 * [x] Connect websocket to backend server
+* [x] Remove JWT cookie on logout
+* [ ] Simplify debugging without complete rebuild
 * [ ] Implement live sync for file edit
 * [ ] ...
 * [x] Configure Grafana & Prometheus
