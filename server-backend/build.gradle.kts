@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") // There are some bugs with Intellij older than 2021.1
     kotlin("plugin.serialization")
+    id("com.github.gelangweilte-studenten.gradle-docker-tests") version "1.1.1"
     application
 }
 
@@ -27,6 +28,15 @@ dependencies {
     implementation("io.ktor:ktor-serialization:1.5.4")
     implementation("io.ktor:ktor-websockets:1.5.4")
     implementation("io.ktor:ktor-metrics-micrometer:1.5.4")
+    implementation("io.ktor:ktor-auth:1.5.4")
+    implementation("io.ktor:ktor-auth-jwt:1.5.4")
+
+    // SQL database driver for postgres
+    implementation("org.jetbrains.exposed:exposed-core:0.31.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.31.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.31.1")
+    implementation("org.jetbrains.exposed:exposed-jodatime:0.31.1")
+    implementation("org.postgresql:postgresql:42.2.20")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.0") {
         because("To override deprecated version form ktor")
@@ -39,8 +49,12 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.3") {
         because("Ktor depends on this library and has issues when missing")
     }
-    implementation("io.micrometer:micrometer-registry-prometheus:1.6.6")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.7.0")
 
     // JUnit test framework
     testImplementation(kotlin("test"))
+}
+
+tasks.test {
+    useJUnitPlatform()
 }

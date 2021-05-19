@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.views
+package de.hsaalen.cmt.views.components
 
 import de.crusader.objects.Point
 import de.crusader.objects.Rectangle

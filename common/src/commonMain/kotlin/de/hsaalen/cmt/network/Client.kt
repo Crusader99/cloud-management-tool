@@ -1,12 +1,17 @@
 package de.hsaalen.cmt.network
 
-import de.hsaalen.cmt.network.dto.AuthLoginDto
-import de.hsaalen.cmt.network.dto.AuthResultDto
+import de.hsaalen.cmt.network.dto.client.ClientLoginDto
+import de.hsaalen.cmt.network.dto.client.ClientRegisterDto
+import de.hsaalen.cmt.network.dto.server.ServerErrorDto
+import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.GlobalScope
@@ -99,15 +104,71 @@ class Client {
         /**
          * Send login request to the server.
          */
-        suspend fun login(username: String, password: String): Client {
+        suspend fun login(email: String, password: String): Client {
             val passwordHashed = password // TODO: hash password
-            val request = AuthLoginDto(username, passwordHashed)
             val url = Url("$apiEndpoint/login")
-            val result: AuthResultDto = instance.post(url)
-            println(result.message)
-            val client = Client()
-            client.connectWebSocket()
-            return client
+            val result: HttpResponse = instance.post(url) {
+                header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                body = ClientLoginDto(email, passwordHashed)
+                expectSuccess = false
+            }
+
+            if (result.status.isSuccess()) {
+                val userInfo: ServerUserInfoDto = result.receive()
+                println("Logged in as: " + userInfo.email)
+                val client = Client()
+                client.connectWebSocket()
+                return client
+            } else {
+                val errorInfo: ServerErrorDto = result.receive()
+                val errorMessage = errorInfo.message
+                val statusCode = result.status.value
+                val statusDescription = result.status.description
+                println("Server-Error ($statusCode): $statusDescription: $errorMessage")
+                throw IllegalStateException(errorMessage)
+            }
+        }
+
+        /**
+         * Send login request to the server.
+         */
+        suspend fun register(firstName: String, email: String, password: String): Client {
+            val passwordHashed = password // TODO: hash password
+            val url = Url("$apiEndpoint/register")
+            val result: HttpResponse = instance.post(url) {
+                header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                body = ClientRegisterDto(firstName, email, passwordHashed)
+                expectSuccess = false
+            }
+
+            if (result.status.isSuccess()) {
+                val userInfo: ServerUserInfoDto = result.receive()
+                println("Logged in as: " + userInfo.email)
+                val client = Client()
+                client.connectWebSocket()
+                return client
+            } else {
+                val errorInfo: ServerErrorDto = result.receive()
+                val errorMessage = errorInfo.message
+                val statusCode = result.status.value
+                val statusDescription = result.status.description
+                println("Server-Error ($statusCode): $statusDescription: $errorMessage")
+                throw IllegalStateException(errorMessage)
+            }
+        }
+
+        /**
+         * Send login request to the server.
+         */
+        suspend fun restore(): ServerUserInfoDto? {
+            val url = Url("$apiEndpoint/restore")
+            return try {
+                val information: ServerUserInfoDto = instance.get(url)
+                println("Restored session for: " + information.email)
+                information
+            } catch (t: Throwable) {
+                null
+            }
         }
     }
 

@@ -2,7 +2,9 @@ package de.hsaalen.cmt
 
 import com.ccfraser.muirwik.components.lab.alert.MAlertSeverity
 import de.hsaalen.cmt.components.ViewHeader
-import de.hsaalen.cmt.components.ViewSnackbar
+import de.hsaalen.cmt.components.features.ViewSnackbar
+import de.hsaalen.cmt.components.features.loadingOverlay
+import de.hsaalen.cmt.components.login.Credentials
 import de.hsaalen.cmt.network.Client
 import de.hsaalen.cmt.pages.LoginPage
 import de.hsaalen.cmt.pages.MainPage
@@ -20,9 +22,10 @@ class WebApp : RComponent<RProps, WebApp.State>() {
     interface State : RState {
         var client: Client?
         var snackbar: ViewSnackbar.SnackbarInfo?
+        var isLoading: Boolean
     }
 
-    val State.isLoggedIn: Boolean
+    private val State.isLoggedIn: Boolean
         get() = client != null
 
     /**
@@ -31,6 +34,17 @@ class WebApp : RComponent<RProps, WebApp.State>() {
     override fun State.init() {
         client = null
         snackbar = null
+        isLoading = true
+
+        GlobalScope.launch {
+            val info = Client.restore()
+            setState {
+                isLoading = false
+                if (info != null) {
+                    client = Client()
+                }
+            }
+        }
     }
 
     /**
@@ -64,28 +78,40 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                 // Allow user to login
                 child(LoginPage::class) {
                     attrs {
-                        onLogin = ::onLogin
+                        onLogin = { credentials -> onLogin(credentials, isRegistration = false) }
+                        onRegister = { credentials -> onLogin(credentials, isRegistration = true) }
+                        lastEmail = ""
+                        isEnabled = !state.isLoading
                     }
                 }
             }
+
+            loadingOverlay(state.isLoading)
         }
     }
 
     /**
      * Called when user had entered the username and password.
      */
-    private fun onLogin(credentials: LoginPage.Credentials) {
+    private fun onLogin(credentials: Credentials, isRegistration: Boolean) {
         GlobalScope.launch {
             try {
-                val serverConnection: Client
+                setState {
+                    isLoading = true
+                }
+                val connection: Client
                 withTimeout(5_000) { // Timeout after 5 seconds
                     delay(2000)
-                    serverConnection = Client.login(credentials.username, credentials.password)
+                    connection = if (isRegistration) {
+                        Client.register(credentials.fullName, credentials.email, credentials.password)
+                    } else {
+                        Client.login(credentials.email, credentials.password)
+                    }
                 }
                 setState {
-                    client = serverConnection // Equivalent to isLoggedIn = true
-                    snackbar =
-                        ViewSnackbar.SnackbarInfo("Successfully logged in!", MAlertSeverity.success)
+                    client = connection // Equivalent to isLoggedIn = true
+                    isLoading = false
+                    snackbar = ViewSnackbar.SnackbarInfo("Successfully logged in!", MAlertSeverity.success)
                 }
                 GlobalScope.launch {
                     try {
@@ -104,6 +130,9 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                 val failMessage = "Login failed: " + ex.message
                 println(failMessage)
                 showSnackbar(failMessage, MAlertSeverity.error)
+                setState {
+                    isLoading = false
+                }
             }
         }
     }
@@ -114,18 +143,30 @@ class WebApp : RComponent<RProps, WebApp.State>() {
      * Disconnect client, forget secret keys and show login page.
      */
     private fun onLogout(reason: String?) {
-        state.client?.disconnect()
-        setState {
-            client = null // Equivalent to logout
+        GlobalScope.launch {
+            try {
+                setState {
+                    isLoading = true
+                }
+                state.client?.disconnect()
+                setState {
+                    client = null // Equivalent to logout
+                }
+                var message = "Logged out"
+                var severity = MAlertSeverity.success
+                if (reason != null) {
+                    message += ": "
+                    message += reason
+                    severity = MAlertSeverity.warning
+                }
+                showSnackbar(message, severity)
+                delay(400)
+            } finally {
+                setState {
+                    isLoading = false
+                }
+            }
         }
-        var message = "Logged out"
-        var severity = MAlertSeverity.success
-        if (reason != null) {
-            message += ": "
-            message += reason
-            severity = MAlertSeverity.warning
-        }
-        showSnackbar(message, severity)
     }
 
     /**

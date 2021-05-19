@@ -1,23 +1,12 @@
 package de.hsaalen.cmt.pages
 
-import com.ccfraser.muirwik.components.mBackdrop
-import com.ccfraser.muirwik.components.mCircularProgress
+import com.ccfraser.muirwik.components.MLinkUnderline
+import com.ccfraser.muirwik.components.mLink
+import de.hsaalen.cmt.components.login.Credentials
+import de.hsaalen.cmt.components.login.loginComponent
+import de.hsaalen.cmt.components.login.registerComponent
 import kotlinx.css.*
-import kotlinx.html.ButtonType
-import kotlinx.html.CommonAttributeGroupFacade
-import kotlinx.html.InputType
-import kotlinx.html.js.onChangeFunction
-import kotlinx.html.js.onSubmitFunction
-import materialui.components.button.button
-import materialui.components.button.enums.ButtonColor
-import materialui.components.button.enums.ButtonVariant
-import materialui.components.textfield.textField
-import org.w3c.dom.HTMLInputElement
-import org.w3c.dom.events.Event
 import react.*
-import react.dom.a
-import react.dom.br
-import react.dom.form
 import react.dom.h2
 import styled.css
 import styled.styledDiv
@@ -25,30 +14,23 @@ import styled.styledDiv
 /**
  * Page for user authentication
  */
-class LoginPage : RComponent<LoginPage.Props, LoginPage.State>() {
-
-    /**
-     * Data which is typed in by the user.
-     */
-    data class Credentials(val username: String, val password: String)
+class LoginPage(props: Props) : RComponent<LoginPage.Props, LoginPage.State>(props) {
 
     interface Props : RProps {
         var onLogin: (Credentials) -> Unit
+        var onRegister: (Credentials) -> Unit
+        var isEnabled: Boolean
+        var lastEmail: String
     }
 
     interface State : RState {
-        var isLoading: Boolean
-        var username: String
-        var password: String
+        var showRegistration: Boolean
+        var defaultCredentials: Credentials
     }
 
-    /**
-     * Called when this component is loaded.
-     */
-    override fun State.init() {
-        isLoading = false
-        username = ""
-        password = ""
+    override fun State.init(props: Props) {
+        showRegistration = false
+        defaultCredentials = Credentials(email = props.lastEmail)
     }
 
     /**
@@ -69,82 +51,48 @@ class LoginPage : RComponent<LoginPage.Props, LoginPage.State>() {
             h2 {
                 +"Authentication"
             }
-            renderLoginForm()
-        }
-
-        mBackdrop(open = state.isLoading, invisible = false) {
-            css {
-                zIndex = Int.MAX_VALUE
+            if (state.showRegistration) {
+                registerComponent(
+                    defaultCredentials = state.defaultCredentials,
+                    onSubmit = props.onRegister,
+                    isEnabled = props.isEnabled
+                )
+            } else {
+                loginComponent(
+                    defaultCredentials = state.defaultCredentials,
+                    onSubmit = props.onLogin,
+                    isEnabled = props.isEnabled
+                )
             }
-            mCircularProgress { }
         }
+        renderLink()
     }
 
     /**
-     * Called by the render function to add the login components.
+     * Render the link for switching between registration and login form.
      */
-    private fun RBuilder.renderLoginForm() {
-        form {
+    private fun RBuilder.renderLink() {
+        styledDiv {
             attrs {
-                onSubmitFunction = ::onSubmit
+                css {
+                    display = Display.flex
+                    flexDirection = FlexDirection.column
+                    alignItems = Align.flexEnd
+                    justifyContent = JustifyContent.right
+                }
             }
-            textField {
+            val displayText = if (state.showRegistration) "Use existing account" else "Create new account"
+            mLink(text = displayText, underline = MLinkUnderline.always) {
                 attrs {
-                    label = a { +"Username" }
-                    required = true
-                    disabled = state.isLoading
-                    onTextChange { text ->
+                    onClick = {
                         setState {
-                            username = text
+                            showRegistration = !showRegistration
                         }
                     }
-                }
-            }
-            br {}
-            textField {
-                attrs {
-                    type = InputType.password
-                    label = a { +"Password" }
-                    required = true
-                    disabled = state.isLoading
-                    onTextChange { text ->
-                        setState {
-                            password = text
-                        }
+                    css {
+                        cursor = Cursor.pointer
                     }
                 }
-            }
-            br {}
-            button {
-                +"Login"
-                attrs {
-                    variant = ButtonVariant.contained
-                    color = ButtonColor.primary
-                    type = ButtonType.submit
-                }
-            }
-        }
-    }
-
-    /**
-     * Called when user had entered the username and password.
-     */
-    private fun onSubmit(event: Event) {
-        event.preventDefault()
-        setState {
-            isLoading = true
-        }
-        props.onLogin(Credentials(state.username, state.password))
-    }
-
-    /**
-     * Extension helper function to simplify the text change event listener.
-     */
-    private fun CommonAttributeGroupFacade.onTextChange(event: (String) -> Unit) {
-        onChangeFunction = { e ->
-            val input = e.target as? HTMLInputElement
-            input?.value?.let { text ->
-                event(text)
             }
         }
     }

@@ -25,3 +25,17 @@ fun Route.handleWebSocket() = webSocket("/websocket") {
     }
 }
 
+// TODO: remove (this was experimental code with the RSocket library)
+// See https://github.com/rsocket/rsocket-kotlin
+//
+//fun Route.handleRSocket() = rSocket("rsocket") {
+//    this.requester.fireAndForget()
+//    RSocketRequestHandler {
+//        fireAndForget { request: Payload ->
+//            println("RSocket: fireAndForget")
+//            val json = request.data.readText()
+////            val obj: TestDto = ProtoBuf.decodeFromString(json)
+//            println("RSocket: Got a json obj with: " + obj.text)
+//        }
+//    }
+//}

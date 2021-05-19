@@ -1,10 +1,13 @@
 package de.hsaalen.cmt
 
+import de.hsaalen.cmt.environment.REST_PORT
+import de.hsaalen.cmt.exceptions.ConfigurationException
 import de.hsaalen.cmt.rest.RestServer
+import de.hsaalen.cmt.sql.Postgresql
 import mu.KotlinLogging
 
 /**
- * Local logger instance
+ * The local logging instance
  */
 private val logger = KotlinLogging.logger { }
 
@@ -14,13 +17,14 @@ private val logger = KotlinLogging.logger { }
 fun main() {
     logger.info("Starting server backend...")
 
-    // Find configured port
-    val portKey = "REST_PORT"
-    logger.info("Reading $portKey environment variable...")
-    val port = System.getenv(portKey)?.toInt() ?: 8080
+    val engine = try {
+        Postgresql.configure()
+        RestServer.configure(REST_PORT)
+    } catch (ex: Throwable) {
+        throw ConfigurationException(ex)
+    }
 
     // Start REST API server
-    logger.info("Binding to port $port...")
-    val engine = RestServer.configure(port)
+    logger.info("Binding to port $REST_PORT...")
     engine.start(wait = true)
 }

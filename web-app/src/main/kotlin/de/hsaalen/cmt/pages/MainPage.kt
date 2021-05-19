@@ -1,6 +1,6 @@
 package de.hsaalen.cmt.pages
 
-import de.hsaalen.cmt.components.ViewResultList
+import de.hsaalen.cmt.components.documentEditor
 import de.hsaalen.cmt.network.Client
 import react.RBuilder
 import react.RComponent
@@ -20,7 +20,8 @@ class MainPage : RComponent<MainPage.Props, RState>() {
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        ViewResultList.render(this)
+        documentEditor(defaultText = "")
+//        ViewResultList.render(this)
     }
 
 }

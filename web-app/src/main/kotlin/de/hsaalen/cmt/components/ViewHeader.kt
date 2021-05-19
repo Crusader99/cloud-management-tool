@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.components
 
 import com.ccfraser.muirwik.components.mTooltip
+import de.hsaalen.cmt.SoftwareInfo
 import kotlinx.css.Display
 import kotlinx.css.FlexBasis
 import kotlinx.css.display
@@ -44,10 +45,12 @@ class ViewHeader : RComponent<ViewHeader.Props, ViewHeader.State>() {
 
     interface State : RState {
         var isDrawerVisible: Boolean
+        var isAboutDialogOpen: Boolean
     }
 
     override fun State.init() {
         isDrawerVisible = false
+        isAboutDialogOpen = false
     }
 
     /**
@@ -125,6 +128,11 @@ class ViewHeader : RComponent<ViewHeader.Props, ViewHeader.State>() {
             }
         }
         h2 { br { } }
+        aboutDialog(
+            text = SoftwareInfo.description,
+            open = state.isAboutDialogOpen,
+            onClose = ::onCloseAboutDialog
+        )
     }
 
     /**
@@ -137,7 +145,9 @@ class ViewHeader : RComponent<ViewHeader.Props, ViewHeader.State>() {
                     listButton("Test $index") {}
                 }
                 listButton("About") {
-
+                    setState {
+                        isAboutDialogOpen = true
+                    }
                 }
             }
         }
@@ -159,6 +169,15 @@ class ViewHeader : RComponent<ViewHeader.Props, ViewHeader.State>() {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Called when the about dialog is closed by the user.
+     */
+    private fun onCloseAboutDialog() {
+        setState {
+            isAboutDialogOpen = false
         }
     }
 

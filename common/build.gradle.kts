@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
@@ -18,22 +16,28 @@ kotlin {
             kotlinOptions.jvmTarget = "1.8"
         }
     }
-    js().browser()
+    js(LEGACY) {
+        useCommonJs()
+        browser()
+    }
 
     sourceSets {
         val commonMain by getting {
             dependencies { // Use api instead implementation to allow transitive access from modules
-                api("de.crusader:kotlin-extensions:1.0.17")
-                api("de.crusader:library-objects:1.0.16")
+                api("de.crusader:kotlin-extensions:1.1.1")
+                api("de.crusader:library-objects:1.1.1")
 
                 if (file("$rootDir/library-painter").exists()) {
                     // Allows easier debugging without publishing changes
                     api(project(":library-painter"))
                 } else {
-                    api("de.crusader:library-painter:1.0.27")
+                    api("de.crusader:library-painter:1.1.1")
                 }
 
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3") {
+                    because("Coroutines 1.5.0 is incompatible with ktor 1.5.4")
+                    // Coroutines 1.5.0 produces CancellationException on startup while runtime
+                }
                 implementation("io.ktor:ktor-client-core:1.5.4")
                 implementation("io.ktor:ktor-client-serialization:1.5.4")
                 implementation("io.ktor:ktor-client-websockets:1.5.4")
@@ -81,8 +85,4 @@ android {
             isMinifyEnabled = false
         }
     }
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
 }
