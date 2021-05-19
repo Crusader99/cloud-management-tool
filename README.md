@@ -35,7 +35,7 @@ Online management tool for files and documents
 ## Platforms:
 
 * Browser: React-App
-* Smartphone: Android native app or React-Native
+* Smartphone: Native Android-App
 
 ## Roadmap:
 
@@ -54,9 +54,9 @@ Online management tool for files and documents
 * [x] Decide which database to use for user management, file management.
 * [x] REST-API server implementation for user registration & login
 * [x] SQL DAO elements for user registration & login
-* [ ] Implement text editor in frontend
 * [x] Connect websocket to backend server
-* [x] Remove JWT cookie on logout
+* [ ] Implement text editor in frontend
+* [ ] Remove JWT cookie on logout
 * [ ] Simplify debugging without complete rebuild
 * [ ] Implement live sync for file edit
 * [ ] ...
