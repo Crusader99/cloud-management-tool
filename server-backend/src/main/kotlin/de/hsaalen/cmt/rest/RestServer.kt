@@ -89,7 +89,7 @@ object RestServer {
                 }
             }
         }
-        registerRoutes()
+        registerRoutes() // Handle the REST API calls
     }
 
 }

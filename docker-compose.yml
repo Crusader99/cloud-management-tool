@@ -1,9 +1,18 @@
 version: "3.9"
 services:
-  server-backend: # Internal port is 8080
-    build: server-backend
   web-app: # Internal port is 8081
     build: web-app
+  server-backend:
+    build: server-backend
+    depends_on:
+      - postgres
+    environment:
+      REST_PORT: 8080
+      POSTGRESQL_HOST: postgres
+      POSTGRESQL_PORT: 5432
+      POSTGRESQL_USER: ${POSTGRES_USER}
+      POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRESQL_DB: ${POSTGRES_DB}
   postgres:
     image: postgres
     restart: always

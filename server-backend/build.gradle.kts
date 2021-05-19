@@ -31,6 +31,13 @@ dependencies {
     implementation("io.ktor:ktor-auth:1.5.4")
     implementation("io.ktor:ktor-auth-jwt:1.5.4")
 
+    // SQL database driver for postgres
+    implementation("org.jetbrains.exposed:exposed-core:0.31.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.31.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.31.1")
+    implementation("org.jetbrains.exposed:exposed-jodatime:0.31.1")
+    implementation("org.postgresql:postgresql:42.2.20")
+
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.0") {
         because("To override deprecated version form ktor")
     }

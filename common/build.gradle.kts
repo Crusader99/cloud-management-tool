@@ -24,8 +24,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies { // Use api instead implementation to allow transitive access from modules
-                api("de.crusader:kotlin-extensions:1.1.0")
-                api("de.crusader:library-objects:1.1.0")
+                api("de.crusader:kotlin-extensions:1.1.1")
+                api("de.crusader:library-objects:1.1.1")
 
                 if (file("$rootDir/library-painter").exists()) {
                     // Allows easier debugging without publishing changes
