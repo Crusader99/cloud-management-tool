@@ -25,7 +25,7 @@ import org.joda.time.DateTime
  */
 fun Application.registerRoutes() = routing {
     route("/" + RestPaths.base) {
-        get("/") {
+        get {
             call.respondText("Hello world from backend! :-)")
         }
         post("/login") {
@@ -67,6 +67,7 @@ fun Application.registerRoutes() = routing {
         post("/logout") {
             // Reset cookie using http header
             call.response.cookies.appendExpired(name = JwtCookie.cookieName, path = "/", domain = "")
+            call.respond(Unit)
         }
         authenticate {
             get("/restore") { // Check is authorization cookie is set and refresh jwt token when already logged in

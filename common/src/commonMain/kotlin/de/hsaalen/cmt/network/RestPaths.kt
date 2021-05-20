@@ -6,4 +6,7 @@ object RestPaths {
 
     val list = "/list"
 
+    // The url to use for requests to REST API server
+    var apiEndpoint = base
+
 }
