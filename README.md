@@ -24,7 +24,8 @@ Online management tool for files and documents
 * [Ktor](https://ktor.io/) (for client & server as network framework)
 * [Kotlinx Serialization](https://github.com/Kotlin/kotlinx.serialization) (for JSON in REST API)
 * [Exposed](https://github.com/JetBrains/Exposed) (ORM framework for Kotlin)
-* [React](https://kotlinlang.org/docs/js-get-started.html) (as frontend library)
+* [React](https://kotlinlang.org/docs/js-get-started.html) (as frontend library with
+  wrappers: [#1](https://github.com/subroh0508/kotlin-material-ui) [#2](https://github.com/cfnz/muirwik))
 * [Material UI](https://material-ui.com/) (provides react components)
 
 ## Databases:
@@ -47,7 +48,7 @@ Online management tool for files and documents
 * [x] Configure [ktor](https://ktor.io/) for backend
 * [x] Make frontend GUI design decisions
 * [x] Create running projects for frontend: android, web/pc
-* [x] Experiment with compose and painter-library and react
+* [x] Experiment with compose and painter-library and [react](https://kotlinlang.org/docs/js-get-started.html)
 * [x] Implement frontend login app with react
 * [x] Configure reverse proxy: [nginx](https://www.nginx.com/) or [traefik](https://traefik.io/)
 * [x] Call REST-API from frontend on login event
