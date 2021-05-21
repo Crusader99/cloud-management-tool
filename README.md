@@ -23,14 +23,15 @@ Online management tool for files and documents
 * [Kotlinx Coroutines](https://github.com/Kotlin/kotlinx.coroutines) (lightweight multithreading)
 * [Ktor](https://ktor.io/) (for client & server as network framework)
 * [Kotlinx Serialization](https://github.com/Kotlin/kotlinx.serialization) (for JSON in REST API)
+* [Exposed](https://github.com/JetBrains/Exposed) (ORM framework for Kotlin)
 * [React](https://kotlinlang.org/docs/js-get-started.html) (as frontend library)
 * [Material UI](https://material-ui.com/) (provides react components)
 
 ## Databases:
 
-* SQL for user management and tags/labels
-* MongoDB for encrypted notes to allow update only one line
-* S3 container used only for encrypted files
+* [PostgreSQL](https://www.postgresql.org/) for user management and tags/labels
+* [MongoDB](https://www.mongodb.com/) for encrypted notes to allow update only one line
+* Amazon S3 compatible container used as storage for encrypted files
 
 ## Platforms:
 
@@ -43,7 +44,7 @@ Online management tool for files and documents
 * [x] Create running project for backend
 * [x] Configure Dockerfile for backend
 * [x] Configure Docker-Compose
-* [x] Configure [Ktor](https://ktor.io/) for backend
+* [x] Configure [ktor](https://ktor.io/) for backend
 * [x] Make frontend GUI design decisions
 * [x] Create running projects for frontend: android, web/pc
 * [x] Experiment with compose and painter-library and react
@@ -55,8 +56,8 @@ Online management tool for files and documents
 * [x] REST-API server implementation for user registration & login
 * [x] SQL DAO elements for user registration & login
 * [x] Connect websocket to backend server
+* [x] Remove JWT cookie on logout
 * [ ] Implement text editor in frontend
-* [ ] Remove JWT cookie on logout
 * [ ] Simplify debugging without complete rebuild
 * [ ] Implement live sync for file edit
 * [ ] ...
