@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.jwt
 
+import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import io.ktor.auth.*
 import kotlinx.serialization.Serializable
 
@@ -13,5 +14,10 @@ data class JwtPayload(val fullName: String, val email: String) : Principal {
      * Generate new JWT token and use this payload data.
      */
     fun generateToken() = JwtCookie.generateToken(this)
+
+    /**
+     * Convert to data transfer object.
+     */
+    fun toServerUserInfoDto() = ServerUserInfoDto(fullName, email)
 
 }

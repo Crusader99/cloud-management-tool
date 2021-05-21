@@ -9,16 +9,13 @@ import de.hsaalen.cmt.network.dto.client.ClientLoginDto
 import de.hsaalen.cmt.network.dto.client.ClientRegisterDto
 import de.hsaalen.cmt.network.dto.server.ServerPreviewItemsDto
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
-import de.hsaalen.cmt.sql.UserDao
-import de.hsaalen.cmt.sql.UserTable
+import de.hsaalen.cmt.services.ServiceUsers
 import de.hsaalen.cmt.websocket.handleWebSocket
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
-import org.joda.time.DateTime
 
 /**
  * Register and handle REST API routes from clients.
@@ -31,38 +28,16 @@ fun Application.registerRoutes() = routing {
         post("/login") {
             val request: ClientLoginDto = call.receive()
             println("Login: " + request.email)
-            val user: UserDao = newSuspendedTransaction {
-                UserDao.find { UserTable.email eq request.email }.single()
-            }
-            if (user.passwordHashed != request.passwordHashed) {
-                throw SecurityException("Wrong password!")
-            }
-            val payload = JwtPayload(user.fullName, request.email)
-            call.response.updateJwtCookie(payload)
-            call.respond(ServerUserInfoDto(payload.fullName, payload.email))
+            val user = ServiceUsers.login(request.email, request.passwordHashed)
+            call.response.updateJwtCookie(user.toJwtPayload())
+            call.respond(user)
         }
         post("/register") {
             val request: ClientRegisterDto = call.receive()
-            if ("@" !in request.email || "." !in request.email) {
-                throw SecurityException("Invalid email!")
-            } else if (request.passwordHashed.length < 8) {
-                throw SecurityException("Password to short! Minimum 8 characters required")
-            }
             println("Register: " + request.email)
-            newSuspendedTransaction {
-                val now = DateTime.now()
-                UserDao.new {
-                    fullName = request.fullName
-                    email = request.email
-                    dateFirstLogin = now
-                    dateLastLogin = now
-                    totalLogins = 1
-                    passwordHashed = request.passwordHashed
-                }
-            }
-            val payload = JwtPayload(request.fullName, request.email)
-            call.response.updateJwtCookie(payload)
-            call.respond(ServerUserInfoDto(payload.fullName, payload.email))
+            val user = ServiceUsers.register(request.fullName, request.email, request.passwordHashed)
+            call.response.updateJwtCookie(user.toJwtPayload())
+            call.respond(user)
         }
         post("/logout") {
             // Reset cookie using http header
@@ -73,7 +48,7 @@ fun Application.registerRoutes() = routing {
             get("/restore") { // Check is authorization cookie is set and refresh jwt token when already logged in
                 val payload = call.request.readJwtCookie()
                 call.response.updateJwtCookie(payload)
-                call.respond(ServerUserInfoDto(payload.fullName, payload.email))
+                call.respond(payload.toServerUserInfoDto())
             }
             get("/list") {
                 call.respond(ServerPreviewItemsDto(listOf("abc")))
@@ -95,3 +70,5 @@ fun Application.registerRoutes() = routing {
         call.respond(RestServer.micrometerRegistry.scrape())
     }
 }
+
+private fun ServerUserInfoDto.toJwtPayload() = JwtPayload(fullName, email)

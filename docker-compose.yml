@@ -2,8 +2,8 @@ version: "3.9"
 services:
   web-app: # Internal port is 8081
     build: web-app
-  server-backend:
-    build: server-backend
+  backend-server:
+    build: backend-server
     depends_on:
       - postgres
     environment:
@@ -42,7 +42,7 @@ services:
     ports:
       - 9090:9090
     depends_on:
-      - server-backend
+      - backend-server
   grafana:
     image: grafana/grafana:7.5.3
     ports:
@@ -60,7 +60,7 @@ services:
       - ./docker-compose/traefik:/etc/traefik
     privileged: true
     depends_on:
-      - server-backend
+      - backend-server
       - web-app
     ports:
       - 80:80
