@@ -21,7 +21,7 @@ internal object Client {
 
     /**
      * Actual network client from ktor with multi platform support.
-      */
+     */
     val instance = HttpClient {
         install(JsonFeature) {
             serializer = KotlinxSerializer()
@@ -74,8 +74,12 @@ internal object Client {
             println("Server-Error ($statusCode): $statusDescription: $errorMessage")
             throw ServerException(statusCode, errorMessage)
         } catch (t: Throwable) {
-            println("Server-Error ($statusCode)")
-            throw ServerException(statusCode, "Server-Error ($statusCode)", t)
+            val message = "Server-Error ($statusCode)"
+            println(message)
+            if (statusCode == 504) { // 504 = Gateway timeout
+                throw ConnectException(message, t)
+            }
+            throw ServerException(statusCode, message, t)
         }
     }
 
