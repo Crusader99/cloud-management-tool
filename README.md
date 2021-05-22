@@ -58,8 +58,9 @@ Online management tool for files and documents
 * [x] SQL DAO elements for user registration & login
 * [x] Connect websocket to backend server
 * [x] Remove JWT cookie on logout
+* [x] Simplify debugging without complete rebuild
+* [ ] Ensure session is restored after page reload
 * [ ] Implement text editor in frontend
-* [ ] Simplify debugging without complete rebuild
 * [ ] Implement live sync for file edit
 * [ ] ...
 * [x] Configure Grafana & Prometheus
