@@ -59,7 +59,7 @@ Online management tool for files and documents
 * [x] Connect websocket to backend server
 * [x] Remove JWT cookie on logout
 * [x] Simplify debugging without complete rebuild
-* [ ] Ensure session is restored after page reload
+* [x] Ensure session is restored after page reload
 * [ ] Implement text editor in frontend
 * [ ] Implement live sync for file edit
 * [ ] ...
@@ -83,7 +83,7 @@ sdk.dir=/opt/android
 Build all modules, including android:
 > gradlew build
 
-Start backend using docker:
+Start backend using docker (opens reverse-proxy on port 80):
 > sudo docker-compose up --build
 
 Cleanup data and volumes:
@@ -91,7 +91,7 @@ Cleanup data and volumes:
 
 ### Execute without docker-compose:
 
-Debug web-app:
+Debug web-app (opens dev-server on port 8081):
 > gradle :web-app:browserDevelopmentRun --continuous
 
 Run server-backend:
