@@ -42,12 +42,13 @@ object ServiceUsers {
             try {
                 val now = DateTime.now()
                 UserDao.new {
-                    this.fullName = fullName
                     this.email = email
-                    this.dateFirstLogin = now
-                    this.dateLastLogin = now
-                    this.totalLogins = 1
                     this.passwordHashed = passwordHashed
+                    this.fullName = fullName
+                    this.dateLastLogin = now
+                    this.dateFirstLogin = now
+                    this.datePasswordChange = now
+                    this.totalLogins = 1
                 }.toServerUserInfoDto()
             } catch (ex: Exception) {
                 if (UserDao.count(UserTable.email eq email) > 0) {
