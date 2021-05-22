@@ -21,7 +21,7 @@ class Session(val userInfo: ServerUserInfoDto) {
     var webSocketSendingQueue = Channel<Frame>()
     var webSocketReceiveHandlers = mutableListOf<(Frame) -> Unit>()
 
-    init{
+    init {
         GlobalScope.launch {
             connectWebSocket()
         }
@@ -31,7 +31,7 @@ class Session(val userInfo: ServerUserInfoDto) {
      * Connect to server with websocket for live synchronization.
      */
     private suspend fun connectWebSocket() {
-        var url = "${ RestPaths.base}/websocket"
+        var url = "${RestPaths.base}/websocket"
         if (url.startsWith("http")) {
             // Replace http protocol with ws protocol
             // Should also work with tls encryption
@@ -50,11 +50,11 @@ class Session(val userInfo: ServerUserInfoDto) {
                                 if (isActive && isConnected) {
                                     send(frame)
                                 } else {
-                                    throw IllegalStateException("No connected")
+                                    throw IllegalStateException("Not connected with websocket")
                                 }
                             }
                         } catch (ex: Throwable) {
-                            Requests.logout()
+                            isConnected = false
                         }
                     }
 
@@ -62,7 +62,11 @@ class Session(val userInfo: ServerUserInfoDto) {
                         println("Waiting for websocket receive")
                         val frame = incoming.receive()
                         for (handler in webSocketReceiveHandlers) {
-                            handler(frame)
+                            if (isConnected) {
+                                handler(frame)
+                            } else {
+                                throw IllegalStateException("Not connected with websocket")
+                            }
                         }
 //                        when (val frame = incoming.receive()) {
 //                            is Frame.Text -> println(frame.readText())
@@ -74,7 +78,7 @@ class Session(val userInfo: ServerUserInfoDto) {
                 }
 
             } finally {
-                Requests.logout()
+                isConnected = false
             }
         }
     }

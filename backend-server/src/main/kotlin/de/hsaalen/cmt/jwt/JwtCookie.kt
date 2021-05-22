@@ -59,5 +59,5 @@ fun ApplicationResponse.updateJwtCookie(payload: JwtPayload) = cookies.append(
     path = "/",
 //    secure = true, // Requires https protocol
     httpOnly = true, // Access only from HTTP headers
-    extensions = mapOf("SameSite" to "None")
+//    extensions = mapOf("SameSite" to "None") // Not required in same site
 )

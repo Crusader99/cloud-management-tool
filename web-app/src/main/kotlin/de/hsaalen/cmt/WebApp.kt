@@ -159,7 +159,11 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                         }
                     } catch (t: Throwable) {
                         if (state.session != null) {
-                            onLogout(t.message)
+                            setState {
+                                session = null
+                                page = EnumPageType.UNAVAILABLE
+                            }
+                            showSnackbar(t.message, MAlertSeverity.warning)
                         }
                     }
                 }
@@ -174,12 +178,10 @@ class WebApp : RComponent<RProps, WebApp.State>() {
         }
     }
 
-    private fun onLogout() = onLogout(null)
-
     /**
      * Disconnect client, forget secret keys and show login page.
      */
-    private fun onLogout(reason: String?) {
+    private fun onLogout() {
         GlobalScope.launch {
             try {
                 setState {
@@ -190,14 +192,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     session = null
                     page = EnumPageType.AUTHENTICATION
                 }
-                var message = "Logged out"
-                var severity = MAlertSeverity.success
-                if (reason != null) {
-                    message += ": "
-                    message += reason
-                    severity = MAlertSeverity.warning
-                }
-                showSnackbar(message, severity)
+                showSnackbar("Logged out", MAlertSeverity.success)
                 delay(400)
             } finally {
                 setState {
@@ -212,7 +207,10 @@ class WebApp : RComponent<RProps, WebApp.State>() {
     /**
      * Show snackbar for 4 seconds.
      */
-    private fun showSnackbar(message: String, severity: MAlertSeverity) {
+    private fun showSnackbar(message: String?, severity: MAlertSeverity) {
+        if (message == null) {
+            return
+        }
         setState {
             snackbar = ViewSnackbar.SnackbarInfo(message, severity)
         }
