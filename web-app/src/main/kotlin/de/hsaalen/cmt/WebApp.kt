@@ -5,7 +5,9 @@ import de.hsaalen.cmt.components.ViewHeader
 import de.hsaalen.cmt.components.features.ViewSnackbar
 import de.hsaalen.cmt.components.features.loadingOverlay
 import de.hsaalen.cmt.components.login.Credentials
-import de.hsaalen.cmt.network.Client
+import de.hsaalen.cmt.network.client.Session
+import de.hsaalen.cmt.network.exceptions.ConnectException
+import de.hsaalen.cmt.pages.FallbackPage
 import de.hsaalen.cmt.pages.LoginPage
 import de.hsaalen.cmt.pages.MainPage
 import kotlinx.coroutines.*
@@ -18,31 +20,48 @@ import react.dom.header
  * The main app component.
  */
 class WebApp : RComponent<RProps, WebApp.State>() {
-
     interface State : RState {
-        var client: Client?
+        var session: Session?
         var snackbar: ViewSnackbar.SnackbarInfo?
+        var page: EnumPageType
         var isLoading: Boolean
     }
-
-    private val State.isLoggedIn: Boolean
-        get() = client != null
 
     /**
      * Called when this component is loaded.
      */
-    override fun State.init() {
-        client = null
+    override fun State.init() = reconnect()
+
+    /**
+     * Configures the react state to open the connecting page.
+     */
+    private fun State.reconnect() {
+        session = null
         snackbar = null
         isLoading = true
+        page = EnumPageType.CONNECTING
 
         GlobalScope.launch {
-            val info = Client.restore()
-            setState {
-                isLoading = false
-                if (info != null) {
-                    client = Client()
+            try {
+                val restoredSession = Session.restore()
+                setState {
+                    isLoading = false
+                    if (restoredSession == null) {
+                        // Not logged in
+                        page = EnumPageType.AUTHENTICATION
+                    } else {
+                        // Logged in
+                        session = restoredSession
+                        page = EnumPageType.OVERVIEW
+                    }
                 }
+            } catch (ex: ConnectException) {
+                setState {
+                    isLoading = false
+                    page = EnumPageType.UNAVAILABLE
+                }
+            } catch (ex: Exception) {
+                // Ignore other errors
             }
         }
     }
@@ -55,7 +74,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
             header {
                 ViewHeader.styledComponent {
                     attrs {
-                        isLoggedIn = state.isLoggedIn
+                        isLoggedIn = state.page.isLoggedIn
                         onLogout = ::onLogout
                     }
                 }
@@ -67,21 +86,38 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                 }
             }
 
-            val localClient = state.client
-            if (localClient != null) { // When already logged in
-                child(MainPage::class) {
-                    attrs {
-                        client = localClient
+            when (state.page) {
+                EnumPageType.CONNECTING -> {
+                }
+                EnumPageType.UNAVAILABLE -> {
+                    child(FallbackPage::class) {
+                        attrs {
+                            onRetry = {
+                                setState {
+                                    reconnect()
+                                }
+                            }
+                        }
                     }
                 }
-            } else { // Currently not logged in
-                // Allow user to login
-                child(LoginPage::class) {
-                    attrs {
-                        onLogin = { credentials -> onLogin(credentials, isRegistration = false) }
-                        onRegister = { credentials -> onLogin(credentials, isRegistration = true) }
-                        lastEmail = ""
-                        isEnabled = !state.isLoading
+                EnumPageType.AUTHENTICATION -> {
+                    // Allow user to login
+                    child(LoginPage::class) {
+                        attrs {
+                            onLogin = { credentials -> onLogin(credentials, isRegistration = false) }
+                            onRegister = { credentials -> onLogin(credentials, isRegistration = true) }
+                            lastEmail = ""
+                            isEnabled = !state.isLoading
+                        }
+                    }
+                }
+                EnumPageType.OVERVIEW -> {
+                    val localSession = state.session!! // TODO: exception handling
+                    // When already logged in
+                    child(MainPage::class) {
+                        attrs {
+                            session = localSession
+                        }
                     }
                 }
             }
@@ -99,30 +135,35 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                 setState {
                     isLoading = true
                 }
-                val connection: Client
+                val newSession: Session
                 withTimeout(5_000) { // Timeout after 5 seconds
                     delay(2000)
-                    connection = if (isRegistration) {
-                        Client.register(credentials.fullName, credentials.email, credentials.password)
+                    newSession = if (isRegistration) {
+                        Session.register(credentials.fullName, credentials.email, credentials.password)
                     } else {
-                        Client.login(credentials.email, credentials.password)
+                        Session.login(credentials.email, credentials.password)
                     }
                 }
                 setState {
-                    client = connection // Equivalent to isLoggedIn = true
+                    session = newSession // Equivalent to isLoggedIn = true
                     isLoading = false
+                    page = EnumPageType.OVERVIEW
                     snackbar = ViewSnackbar.SnackbarInfo("Successfully logged in!", MAlertSeverity.success)
                 }
                 GlobalScope.launch {
                     try {
                         while (isActive) {
-                            val client = state.client ?: break
+                            val client = state.session ?: break
                             check(client.isConnected) { "Disconnect from server" }
                             delay(1000)
                         }
                     } catch (t: Throwable) {
-                        if (state.client != null) {
-                            onLogout(t.message)
+                        if (state.session != null) {
+                            setState {
+                                session = null
+                                page = EnumPageType.UNAVAILABLE
+                            }
+                            showSnackbar(t.message, MAlertSeverity.warning)
                         }
                     }
                 }
@@ -137,32 +178,26 @@ class WebApp : RComponent<RProps, WebApp.State>() {
         }
     }
 
-    private fun onLogout() = onLogout(null)
-
     /**
      * Disconnect client, forget secret keys and show login page.
      */
-    private fun onLogout(reason: String?) {
+    private fun onLogout() {
         GlobalScope.launch {
             try {
                 setState {
                     isLoading = true
                 }
-                state.client?.disconnect()
+                state.session?.logout()
                 setState {
-                    client = null // Equivalent to logout
+                    session = null
+                    page = EnumPageType.AUTHENTICATION
                 }
-                var message = "Logged out"
-                var severity = MAlertSeverity.success
-                if (reason != null) {
-                    message += ": "
-                    message += reason
-                    severity = MAlertSeverity.warning
-                }
-                showSnackbar(message, severity)
+                showSnackbar("Logged out", MAlertSeverity.success)
                 delay(400)
             } finally {
                 setState {
+                    session = null
+                    page = EnumPageType.AUTHENTICATION
                     isLoading = false
                 }
             }
@@ -172,7 +207,10 @@ class WebApp : RComponent<RProps, WebApp.State>() {
     /**
      * Show snackbar for 4 seconds.
      */
-    private fun showSnackbar(message: String, severity: MAlertSeverity) {
+    private fun showSnackbar(message: String?, severity: MAlertSeverity) {
+        if (message == null) {
+            return
+        }
         setState {
             snackbar = ViewSnackbar.SnackbarInfo(message, severity)
         }

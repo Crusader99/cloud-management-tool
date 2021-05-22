@@ -14,4 +14,4 @@ http:
     server-backend:
       loadBalancer:
         servers:
-          - url: http://server-backend:8080
+          - url: http://backend-server:8080

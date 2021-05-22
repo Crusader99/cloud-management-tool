@@ -1,7 +1,7 @@
 package de.hsaalen.cmt.pages
 
 import de.hsaalen.cmt.components.documentEditor
-import de.hsaalen.cmt.network.Client
+import de.hsaalen.cmt.network.client.Session
 import react.RBuilder
 import react.RComponent
 import react.RProps
@@ -13,7 +13,7 @@ import react.RState
 class MainPage : RComponent<MainPage.Props, RState>() {
 
     interface Props : RProps {
-        var client: Client
+        var session: Session
     }
 
     /**

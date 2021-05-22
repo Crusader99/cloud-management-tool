@@ -18,7 +18,7 @@ pluginManagement {
 }
 
 include(":common")
-include(":server-backend")
+include(":backend-server")
 include(":web-app")
 
 // File local.properties with "sdk.dir" required

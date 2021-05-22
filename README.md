@@ -23,19 +23,21 @@ Online management tool for files and documents
 * [Kotlinx Coroutines](https://github.com/Kotlin/kotlinx.coroutines) (lightweight multithreading)
 * [Ktor](https://ktor.io/) (for client & server as network framework)
 * [Kotlinx Serialization](https://github.com/Kotlin/kotlinx.serialization) (for JSON in REST API)
-* [React](https://kotlinlang.org/docs/js-get-started.html) (as frontend library)
+* [Exposed](https://github.com/JetBrains/Exposed) (ORM framework for Kotlin)
+* [React](https://kotlinlang.org/docs/js-get-started.html) (as frontend library with
+  wrappers: [#1](https://github.com/subroh0508/kotlin-material-ui) [#2](https://github.com/cfnz/muirwik))
 * [Material UI](https://material-ui.com/) (provides react components)
 
 ## Databases:
 
-* SQL for user management and tags/labels
-* MongoDB for encrypted notes to allow update only one line
-* S3 container used only for encrypted files
+* [PostgreSQL](https://www.postgresql.org/) for user management and tags/labels
+* [MongoDB](https://www.mongodb.com/) for encrypted notes to allow update only one line
+* Amazon S3 compatible container used as storage for encrypted files
 
 ## Platforms:
 
 * Browser: React-App
-* Smartphone: Android native app or React-Native
+* Smartphone: Native Android-App
 
 ## Roadmap:
 
@@ -43,10 +45,10 @@ Online management tool for files and documents
 * [x] Create running project for backend
 * [x] Configure Dockerfile for backend
 * [x] Configure Docker-Compose
-* [x] Configure [Ktor](https://ktor.io/) for backend
+* [x] Configure [ktor](https://ktor.io/) for backend
 * [x] Make frontend GUI design decisions
 * [x] Create running projects for frontend: android, web/pc
-* [x] Experiment with compose and painter-library and react
+* [x] Experiment with compose and painter-library and [react](https://kotlinlang.org/docs/js-get-started.html)
 * [x] Implement frontend login app with react
 * [x] Configure reverse proxy: [nginx](https://www.nginx.com/) or [traefik](https://traefik.io/)
 * [x] Call REST-API from frontend on login event
@@ -54,10 +56,11 @@ Online management tool for files and documents
 * [x] Decide which database to use for user management, file management.
 * [x] REST-API server implementation for user registration & login
 * [x] SQL DAO elements for user registration & login
-* [ ] Implement text editor in frontend
 * [x] Connect websocket to backend server
 * [x] Remove JWT cookie on logout
-* [ ] Simplify debugging without complete rebuild
+* [x] Simplify debugging without complete rebuild
+* [x] Ensure session is restored after page reload
+* [ ] Implement text editor in frontend
 * [ ] Implement live sync for file edit
 * [ ] ...
 * [x] Configure Grafana & Prometheus
@@ -68,12 +71,19 @@ Online management tool for files and documents
 
 ## Build & execute project
 
+To build the android project ensure the file `local.properties` exists in root project structure with following content.
+Make sure the android sdk is installed and path is correct.
+
+```
+sdk.dir=/opt/android
+```
+
 ### With gradle & docker-compose:
 
 Build all modules, including android:
 > gradlew build
 
-Start backend using docker:
+Start backend using docker (opens reverse-proxy on port 80):
 > sudo docker-compose up --build
 
 Cleanup data and volumes:
@@ -81,7 +91,7 @@ Cleanup data and volumes:
 
 ### Execute without docker-compose:
 
-Debug web-app:
+Debug web-app (opens dev-server on port 8081):
 > gradle :web-app:browserDevelopmentRun --continuous
 
 Run server-backend:

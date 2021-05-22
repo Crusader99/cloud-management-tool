@@ -38,7 +38,7 @@ kotlin {
                 cssSupport.enabled = true
             }
             runTask {
-                devServer = devServer?.copy(port = 8081)
+                devServer = devServer?.copy(port = 8081, proxy = mapOf("/api" to "http://localhost:80"))
             }
         }
     }
