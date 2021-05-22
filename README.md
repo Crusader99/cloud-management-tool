@@ -70,6 +70,13 @@ Online management tool for files and documents
 
 ## Build & execute project
 
+To build the android project ensure the file `local.properties` exists in root project structure with following content.
+Make sure the android sdk is installed and path is correct.
+
+```
+sdk.dir=/opt/android
+```
+
 ### With gradle & docker-compose:
 
 Build all modules, including android:
