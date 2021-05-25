@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.tasks.factory.dependsOn
+
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -35,9 +37,17 @@ kotlin.target {
     attributes.attribute(attr, "android")
 }
 
+val websiteCopy by tasks.registering(Copy::class) {
+    // TODO: copy website to local cache
+}
+
+tasks.assemble.dependsOn(websiteCopy)
+
 dependencies {
     implementation(project(":common"))
 
+    // https://developer.android.com/jetpack/androidx/migrate/artifact-mappings
+    implementation("androidx.webkit:webkit:1.4.0") // Used to provide android web-browser
     implementation("androidx.core:core-ktx:1.5.0")
     implementation("androidx.appcompat:appcompat:1.3.0")
     implementation("com.google.android.material:material:1.3.0")
