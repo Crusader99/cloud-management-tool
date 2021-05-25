@@ -5,7 +5,9 @@ import react.RBuilder
 import react.RComponent
 import react.RProps
 import react.RState
-import react.dom.div
+import react.dom.*
+import styled.css
+import styled.styledDiv
 
 interface ViewResultListState : RState {
 }
@@ -20,8 +22,38 @@ class ViewResultList : RComponent<RProps, ViewResultListState>() {
     }
 
     override fun RBuilder.render() {
-        div {
+        styledDiv {
+            attrs {
+                css {
 
+                }
+            }
+            table {
+                tr {
+                    th {
+                        +"Display Name"
+                    }
+                    th {
+                        +"Labels"
+                    }
+                    th {
+                        +"Last Access"
+                    }
+                }
+                repeat(2000){
+                    tr {
+                        td {
+                            +"A name"
+                        }
+                        td {
+                            +"Note"
+                        }
+                        td{
+                            +"19.10.2020"
+                        }
+                    }
+                }
+            }
         }
     }
 

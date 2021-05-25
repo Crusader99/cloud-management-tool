@@ -1,6 +1,6 @@
 package de.hsaalen.cmt.pages
 
-import de.hsaalen.cmt.components.documentEditor
+import de.hsaalen.cmt.components.ViewResultList
 import de.hsaalen.cmt.network.client.Session
 import react.RBuilder
 import react.RComponent
@@ -10,7 +10,7 @@ import react.RState
 /**
  * The main app component.
  */
-class MainPage : RComponent<MainPage.Props, RState>() {
+class OverviewPage : RComponent<OverviewPage.Props, RState>() {
 
     interface Props : RProps {
         var session: Session
@@ -20,8 +20,7 @@ class MainPage : RComponent<MainPage.Props, RState>() {
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        documentEditor(defaultText = "")
-//        ViewResultList.render(this)
+        ViewResultList.render(this)
     }
 
 }

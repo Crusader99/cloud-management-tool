@@ -18,7 +18,7 @@ object Themes {
     val LIGHT: MuiTheme = createMuiTheme {
         palette {
             primary {
-                main = Color("#1890f2")
+                main = Color(Theme.primaryColor.hex)
             }
         }
     }

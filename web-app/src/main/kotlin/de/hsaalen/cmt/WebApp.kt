@@ -9,7 +9,7 @@ import de.hsaalen.cmt.network.client.Session
 import de.hsaalen.cmt.network.exceptions.ConnectException
 import de.hsaalen.cmt.pages.FallbackPage
 import de.hsaalen.cmt.pages.LoginPage
-import de.hsaalen.cmt.pages.MainPage
+import de.hsaalen.cmt.pages.OverviewPage
 import kotlinx.coroutines.*
 import materialui.styles.themeprovider.themeProvider
 import react.*
@@ -56,6 +56,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     }
                 }
             } catch (ex: ConnectException) {
+                delay(2000)
                 setState {
                     isLoading = false
                     page = EnumPageType.UNAVAILABLE
@@ -92,11 +93,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                 EnumPageType.UNAVAILABLE -> {
                     child(FallbackPage::class) {
                         attrs {
-                            onRetry = {
-                                setState {
-                                    reconnect()
-                                }
-                            }
+                            onRetry = ::onReconnect
                         }
                     }
                 }
@@ -104,8 +101,10 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     // Allow user to login
                     child(LoginPage::class) {
                         attrs {
-                            onLogin = { credentials -> onLogin(credentials, isRegistration = false) }
-                            onRegister = { credentials -> onLogin(credentials, isRegistration = true) }
+                            onLogin =
+                                { credentials -> onLogin(credentials, isRegistration = false) }
+                            onRegister =
+                                { credentials -> onLogin(credentials, isRegistration = true) }
                             lastEmail = ""
                             isEnabled = !state.isLoading
                         }
@@ -114,7 +113,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                 EnumPageType.OVERVIEW -> {
                     val localSession = state.session!! // TODO: exception handling
                     // When already logged in
-                    child(MainPage::class) {
+                    child(OverviewPage::class) {
                         attrs {
                             session = localSession
                         }
@@ -139,7 +138,11 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                 withTimeout(5_000) { // Timeout after 5 seconds
                     delay(2000)
                     newSession = if (isRegistration) {
-                        Session.register(credentials.fullName, credentials.email, credentials.password)
+                        Session.register(
+                            credentials.fullName,
+                            credentials.email,
+                            credentials.password
+                        )
                     } else {
                         Session.login(credentials.email, credentials.password)
                     }
@@ -148,7 +151,8 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     session = newSession // Equivalent to isLoggedIn = true
                     isLoading = false
                     page = EnumPageType.OVERVIEW
-                    snackbar = ViewSnackbar.SnackbarInfo("Successfully logged in!", MAlertSeverity.success)
+                    snackbar =
+                        ViewSnackbar.SnackbarInfo("Successfully logged in!", MAlertSeverity.success)
                 }
                 GlobalScope.launch {
                     try {
@@ -201,6 +205,15 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     isLoading = false
                 }
             }
+        }
+    }
+
+    /**
+     * Handle reconnect to backend API.
+     */
+    private fun onReconnect() {
+        setState {
+            reconnect()
         }
     }
 
