@@ -6,10 +6,10 @@ import de.hsaalen.cmt.jwt.readJwtCookie
 import de.hsaalen.cmt.jwt.updateJwtCookie
 import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.dto.client.ClientLoginDto
+import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.client.ClientRegisterDto
-import de.hsaalen.cmt.network.dto.objects.Reference
-import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
+import de.hsaalen.cmt.services.ServiceReferences
 import de.hsaalen.cmt.services.ServiceUsers
 import de.hsaalen.cmt.websocket.handleWebSocket
 import io.ktor.application.*
@@ -17,8 +17,6 @@ import io.ktor.auth.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import kotlin.random.Random
-import kotlin.random.nextInt
 
 /**
  * Register and handle REST API routes from clients.
@@ -59,19 +57,14 @@ fun Application.registerRoutes() = routing {
                 call.respond(payload.toServerUserInfoDto())
             }
             get("/listReferences") {
-                val refs = mutableListOf<Reference>()
-
-                // Currently create only dummy objects
-                // TODO: replace with actual db query
-                repeat(10 + Random.nextInt(100)) { index ->
-                    val accessCode = Random.nextInt('A'.toInt()..'Z'.toInt()).toChar().toString()
-                    val displayName = "File-Ref-$index"
-                    val now = System.currentTimeMillis()
-                    val labels = listOf("note")
-                    refs += Reference(accessCode, displayName, "text", now, now, labels)
-                }
-
-                call.respond(ServerReferenceListDto(refs))
+                val query = ClientReferenceQueryDto()
+                val result = ServiceReferences.listReferences(query)
+                call.respond(result)
+            }
+            post("/listReferences") {
+                val query: ClientReferenceQueryDto = call.receive()
+                val result = ServiceReferences.listReferences(query)
+                call.respond(result)
             }
             get("/create") {
                 call.respondText("Upload")

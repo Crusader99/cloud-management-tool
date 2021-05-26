@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.network.client
 
 import de.hsaalen.cmt.network.RestPaths
+import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.network.exceptions.ConnectException
 import io.ktor.client.features.websocket.*
@@ -84,9 +85,9 @@ class Session(val userInfo: ServerUserInfoDto) {
     }
 
     /**
-     * Provide a list of all related references.
+     * Provide a list of all related references to search query.
      */
-    suspend fun listReferences() = Requests.listReferences()
+    suspend fun listReferences(query: ClientReferenceQueryDto) = Requests.listReferences(query)
 
     /**
      * Disconnect the websocket from server
