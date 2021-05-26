@@ -7,7 +7,8 @@ import de.hsaalen.cmt.jwt.updateJwtCookie
 import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.dto.client.ClientLoginDto
 import de.hsaalen.cmt.network.dto.client.ClientRegisterDto
-import de.hsaalen.cmt.network.dto.server.ServerPreviewItemsDto
+import de.hsaalen.cmt.network.dto.objects.Reference
+import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.services.ServiceUsers
 import de.hsaalen.cmt.websocket.handleWebSocket
@@ -16,6 +17,8 @@ import io.ktor.auth.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 /**
  * Register and handle REST API routes from clients.
@@ -35,13 +38,18 @@ fun Application.registerRoutes() = routing {
         post("/register") {
             val request: ClientRegisterDto = call.receive()
             println("Register: " + request.email)
-            val user = ServiceUsers.register(request.fullName, request.email, request.passwordHashed)
+            val user =
+                ServiceUsers.register(request.fullName, request.email, request.passwordHashed)
             call.response.updateJwtCookie(user.toJwtPayload())
             call.respond(user)
         }
         post("/logout") {
             // Reset cookie using http header
-            call.response.cookies.appendExpired(name = JwtCookie.cookieName, path = "/", domain = "")
+            call.response.cookies.appendExpired(
+                name = JwtCookie.cookieName,
+                path = "/",
+                domain = ""
+            )
             call.respond(Unit)
         }
         authenticate {
@@ -50,8 +58,20 @@ fun Application.registerRoutes() = routing {
                 call.response.updateJwtCookie(payload)
                 call.respond(payload.toServerUserInfoDto())
             }
-            get("/list") {
-                call.respond(ServerPreviewItemsDto(listOf("abc")))
+            get("/listReferences") {
+                val refs = mutableListOf<Reference>()
+
+                // Currently create only dummy objects
+                // TODO: replace with actual db query
+                repeat(10 + Random.nextInt(100)) { index ->
+                    val accessCode = Random.nextInt('A'.toInt()..'Z'.toInt()).toChar().toString()
+                    val displayName = "File-Ref-$index"
+                    val now = System.currentTimeMillis()
+                    val labels = listOf("note")
+                    refs += Reference(accessCode, displayName, "text", now, now, labels)
+                }
+
+                call.respond(ServerReferenceListDto(refs))
             }
             get("/create") {
                 call.respondText("Upload")

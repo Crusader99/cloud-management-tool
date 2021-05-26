@@ -84,6 +84,11 @@ class Session(val userInfo: ServerUserInfoDto) {
     }
 
     /**
+     * Provide a list of all related references.
+     */
+    suspend fun listReferences() = Requests.listReferences()
+
+    /**
      * Disconnect the websocket from server
      */
     suspend fun logout() {

@@ -1,26 +1,44 @@
 package de.hsaalen.cmt.pages
 
-import de.hsaalen.cmt.components.ViewResultList
+import de.hsaalen.cmt.components.ViewReferenceList
 import de.hsaalen.cmt.network.client.Session
-import react.RBuilder
-import react.RComponent
-import react.RProps
-import react.RState
+import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import react.*
 
 /**
- * The main app component.
+ * The overview app component for displaying results of the search.
  */
-class OverviewPage : RComponent<OverviewPage.Props, RState>() {
+class OverviewPage : RComponent<OverviewPage.Props, OverviewPage.State>() {
 
     interface Props : RProps {
         var session: Session
+    }
+
+    interface State : RState {
+        var dto: ServerReferenceListDto?
+    }
+
+    override fun State.init() {
+        dto = null
+        GlobalScope.launch {
+            val received = props.session.listReferences()
+            setState {
+                dto = received
+            }
+        }
     }
 
     /**
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        ViewResultList.render(this)
+        child(ViewReferenceList::class) {
+            attrs {
+                dto = state.dto
+            }
+        }
     }
 
 }
