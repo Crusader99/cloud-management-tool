@@ -38,7 +38,7 @@ class RegisterComponent(props: Props) : FormComponent(props) {
                 setState {
                     fullName = text
                 }
-                props.defaultCredentials.fullName = state.fullName
+                props.defaultCredentials.fullName = text
             })
         br {}
         loginField(
@@ -49,7 +49,7 @@ class RegisterComponent(props: Props) : FormComponent(props) {
                 setState {
                     email = text
                 }
-                props.defaultCredentials.email = state.email
+                props.defaultCredentials.email = text
             })
         br {}
         loginField(
