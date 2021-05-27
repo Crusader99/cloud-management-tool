@@ -2,7 +2,6 @@ allprojects {
     repositories {
         mavenCentral()
         google()
-        jcenter()
         maven("https://provider.ddnss.de/repository/")
     }
 
