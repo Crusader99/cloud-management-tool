@@ -1,8 +1,8 @@
-package de.hsaalen.cmt.services
+package services
 
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
-import de.hsaalen.cmt.sql.schema.UserDao
-import de.hsaalen.cmt.sql.schema.UserTable
+import sql.schema.UserDao
+import sql.schema.UserTable
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.joda.time.DateTime

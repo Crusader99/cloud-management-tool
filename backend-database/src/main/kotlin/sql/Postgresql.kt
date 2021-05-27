@@ -1,10 +1,10 @@
-package de.hsaalen.cmt.sql
+package sql
 
 import de.hsaalen.cmt.environment.*
-import de.hsaalen.cmt.sql.schema.ReferenceTable
-import de.hsaalen.cmt.sql.schema.RevisionTable
-import de.hsaalen.cmt.sql.schema.LabelTable
-import de.hsaalen.cmt.sql.schema.UserTable
+import sql.schema.ReferenceTable
+import sql.schema.RevisionTable
+import sql.schema.LabelTable
+import sql.schema.UserTable
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -28,7 +28,7 @@ object Postgresql {
         logger.info("Connecting to postgresql using $url")
         Database.connect(url, driver = driverClass, user = POSTGRESQL_USER, password = POSTGRESQL_PASSWORD)
         transaction {
-            // Configure de.hsaalen.cmt.sql logger to simplify debugging
+            // Configure sql logger to simplify debugging
             addLogger(Slf4jSqlDebugLogger)
 
             // Creates the tables when not existing

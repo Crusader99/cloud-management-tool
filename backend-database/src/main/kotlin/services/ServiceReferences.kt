@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.services
+package services
 
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.Reference

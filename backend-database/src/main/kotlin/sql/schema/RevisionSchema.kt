@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.sql.schema
+package sql.schema
 
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass

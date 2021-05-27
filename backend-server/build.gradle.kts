@@ -7,17 +7,20 @@ plugins {
 
 application.mainClass.set("de.hsaalen.cmt.ServerBackendKt")
 
-val attr = Attribute.of("de.crusader.targetAttribute", String::class.java)
-
 kotlin.target {
-    // Choose 'jvm' from disambiguating targets
-    attributes.attribute(attr, "jvm")
     compilations.all {
         kotlinOptions.jvmTarget = "1.8"
     }
 }
 
+configurations.all {
+    // Choose 'jvm' from disambiguating targets
+    val attr = Attribute.of("de.crusader.targetAttribute", String::class.java)
+    attributes.attribute(attr, "jvm")
+}
+
 dependencies {
+    implementation(project(":backend-database"))
     implementation(project(":common"))
 
     // Network framework
@@ -31,21 +34,13 @@ dependencies {
     implementation("io.ktor:ktor-auth:1.5.4")
     implementation("io.ktor:ktor-auth-jwt:1.5.4")
 
-    // SQL database driver for postgres
-    implementation("org.jetbrains.exposed:exposed-core:0.31.1")
-    implementation("org.jetbrains.exposed:exposed-dao:0.31.1")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.31.1")
-    implementation("org.jetbrains.exposed:exposed-jodatime:0.31.1")
-    implementation("org.postgresql:postgresql:42.2.20")
-
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.0") {
         because("To override deprecated version form ktor")
     }
 
     // Statistics & logging frameworks
-    implementation("io.github.microutils:kotlin-logging-jvm:2.0.6") {
-        // See https://github.com/MicroUtils/kotlin-logging
-    }
+    // See https://github.com/MicroUtils/kotlin-logging
+    implementation("io.github.microutils:kotlin-logging-jvm:2.0.6")
     implementation("ch.qos.logback:logback-classic:1.2.3") {
         because("Ktor depends on this library and has issues when missing")
     }
