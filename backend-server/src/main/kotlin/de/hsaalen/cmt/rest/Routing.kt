@@ -9,8 +9,8 @@ import de.hsaalen.cmt.network.dto.client.ClientLoginDto
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.client.ClientRegisterDto
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
-import services.ServiceReferences
-import services.ServiceUsers
+import de.hsaalen.cmt.services.ServiceReferences
+import de.hsaalen.cmt.services.ServiceUsers
 import de.hsaalen.cmt.websocket.handleWebSocket
 import io.ktor.application.*
 import io.ktor.auth.*

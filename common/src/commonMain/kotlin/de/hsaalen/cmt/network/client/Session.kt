@@ -126,7 +126,7 @@ class Session(val userInfo: ServerUserInfoDto) {
          * Request server to restore user session. Session can only restored when JWT cookie is still valid.
          *
          * @return Session instance when session has been restored or null when it can't be restored.
-         * @throws ConnectException when no connection to backend services was possible.
+         * @throws ConnectException when no connection to backend de.hsaalen.cmt.services was possible.
          */
         suspend fun restore(): Session? {
             return try {

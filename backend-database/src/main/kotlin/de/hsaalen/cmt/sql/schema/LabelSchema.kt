@@ -1,4 +1,4 @@
-package sql.schema
+package de.hsaalen.cmt.sql.schema
 
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table

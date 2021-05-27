@@ -3,7 +3,7 @@ package de.hsaalen.cmt
 import de.hsaalen.cmt.environment.REST_PORT
 import de.hsaalen.cmt.exceptions.ConfigurationException
 import de.hsaalen.cmt.rest.RestServer
-import sql.Postgresql
+import de.hsaalen.cmt.sql.Postgresql
 import mu.KotlinLogging
 
 /**

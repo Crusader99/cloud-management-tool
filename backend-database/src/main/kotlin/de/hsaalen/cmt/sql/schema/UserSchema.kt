@@ -1,4 +1,4 @@
-package sql.schema
+package de.hsaalen.cmt.sql.schema
 
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import org.jetbrains.exposed.dao.UUIDEntity
