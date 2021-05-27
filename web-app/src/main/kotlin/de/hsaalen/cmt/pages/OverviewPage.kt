@@ -15,6 +15,7 @@ class OverviewPage : RComponent<OverviewPage.Props, OverviewPage.State>() {
 
     interface Props : RProps {
         var session: Session
+        var onItemOpen: () -> Unit
     }
 
     interface State : RState {
@@ -40,6 +41,7 @@ class OverviewPage : RComponent<OverviewPage.Props, OverviewPage.State>() {
         child(ViewReferenceList::class) {
             attrs {
                 dto = state.dto
+                onItemOpen = props.onItemOpen
             }
         }
     }

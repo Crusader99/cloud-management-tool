@@ -8,4 +8,5 @@ enum class EnumPageType(val isLoggedIn: Boolean) {
     UNAVAILABLE(false),
     AUTHENTICATION(false),
     OVERVIEW(true),
+    EDIT_DOCUMENT(true),
 }

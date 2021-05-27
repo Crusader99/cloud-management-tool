@@ -7,6 +7,7 @@ import de.hsaalen.cmt.components.features.loadingOverlay
 import de.hsaalen.cmt.components.login.Credentials
 import de.hsaalen.cmt.network.client.Session
 import de.hsaalen.cmt.network.exceptions.ConnectException
+import de.hsaalen.cmt.pages.DocumentEditPage
 import de.hsaalen.cmt.pages.FallbackPage
 import de.hsaalen.cmt.pages.LoginPage
 import de.hsaalen.cmt.pages.OverviewPage
@@ -89,6 +90,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
 
             when (state.page) {
                 EnumPageType.CONNECTING -> {
+                    // Keep empty to print empty page
                 }
                 EnumPageType.UNAVAILABLE -> {
                     child(FallbackPage::class) {
@@ -114,6 +116,19 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     val localSession = state.session!! // TODO: exception handling
                     // When already logged in
                     child(OverviewPage::class) {
+                        attrs {
+                            session = localSession
+                            onItemOpen = {
+                                setState {
+                                    page = EnumPageType.EDIT_DOCUMENT
+                                }
+                            }
+                        }
+                    }
+                }
+                EnumPageType.EDIT_DOCUMENT -> {
+                    val localSession = state.session!! // TODO: exception handling
+                    child(DocumentEditPage::class) {
                         attrs {
                             session = localSession
                         }

@@ -5,6 +5,7 @@ import de.crusader.objects.color.Color
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.toCssColor
 import kotlinx.css.*
+import kotlinx.html.js.onClickFunction
 import react.RBuilder
 import react.RComponent
 import react.RProps
@@ -19,6 +20,7 @@ class ViewReferenceList : RComponent<ViewReferenceList.Props, RState>() {
 
     interface Props : RProps {
         var dto: ServerReferenceListDto?
+        var onItemOpen: () -> Unit
     }
 
     /**
@@ -95,6 +97,9 @@ class ViewReferenceList : RComponent<ViewReferenceList.Props, RState>() {
             hover {
                 backgroundColor = Color.GRAY.toCssColor()
             }
+        }
+        attrs {
+            onClickFunction = { props.onItemOpen() }
         }
         for (column in columns) {
             styledTd {
