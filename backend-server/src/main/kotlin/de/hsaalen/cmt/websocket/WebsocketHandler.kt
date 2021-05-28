@@ -1,8 +1,17 @@
 package de.hsaalen.cmt.websocket
 
+import de.hsaalen.cmt.network.dto.websocket.LiveTextEditDto
 import io.ktor.http.cio.websocket.*
 import io.ktor.routing.*
 import io.ktor.websocket.*
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
+/**
+ * List of all current web-socket connections.
+ */
+private val connections = mutableListOf<WebSocketSession>()
 
 /**
  * Handler for web-sockets that are used for live synchronisation of cloud data, e.g. file edit.
@@ -10,18 +19,32 @@ import io.ktor.websocket.*
 fun Route.handleWebSocket() = webSocket("/websocket") {
     println("websocket connected!")
     try {
-        outgoing.send(Frame.Text("test"))
+        connections += this
+//        outgoing.send(Frame.Text("test"))
         for (frame in incoming) {
             if (frame is Frame.Text) {
-                val text = frame.readText()
-                println("websocket: received: $text")
-                outgoing.send(Frame.Text("received: $text"))
+                val jsonText = frame.readText()
+                println("websocket: received: $jsonText")
+                val dto: LiveTextEditDto = Json.decodeFromString(jsonText)
+                broadcastToOthers(dto)
             } else {
                 println("websocket: received unknown frame: " + frame.frameType.name)
             }
         }
     } finally {
         println("websocket disconnected")
+        connections -= this
+    }
+}
+
+/**
+ * Broadcast a DTO to all web-socket clients except to the own client.
+ */
+private suspend fun WebSocketSession.broadcastToOthers(dto: LiveTextEditDto) {
+    val jsonText = Json.encodeToString(dto)
+    for (others in connections.filter { it != this }) {
+        println("send: $jsonText")
+        others.outgoing.send(Frame.Text(jsonText))
     }
 }
 

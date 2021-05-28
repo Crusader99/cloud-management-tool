@@ -16,13 +16,11 @@ import materialui.styles.themeprovider.themeProvider
 import react.*
 import react.dom.header
 
-
 /**
  * The main app component.
  */
 class WebApp : RComponent<RProps, WebApp.State>() {
     interface State : RState {
-        var session: Session?
         var snackbar: ViewSnackbar.SnackbarInfo?
         var page: EnumPageType
         var isLoading: Boolean
@@ -33,11 +31,12 @@ class WebApp : RComponent<RProps, WebApp.State>() {
      */
     override fun State.init() = reconnect()
 
+
     /**
      * Configures the react state to open the connecting page.
      */
     private fun State.reconnect() {
-        session = null
+        Session.instance = null
         snackbar = null
         isLoading = true
         page = EnumPageType.CONNECTING
@@ -52,7 +51,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                         page = EnumPageType.AUTHENTICATION
                     } else {
                         // Logged in
-                        session = restoredSession
+                        Session.instance = restoredSession
                         page = EnumPageType.OVERVIEW
                     }
                 }
@@ -113,7 +112,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     }
                 }
                 EnumPageType.OVERVIEW -> {
-                    val localSession = state.session!! // TODO: exception handling
+                    val localSession = Session.instance!! // TODO: exception handling
                     // When already logged in
                     child(OverviewPage::class) {
                         attrs {
@@ -127,7 +126,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     }
                 }
                 EnumPageType.EDIT_DOCUMENT -> {
-                    val localSession = state.session!! // TODO: exception handling
+                    val localSession = Session.instance!! // TODO: exception handling
                     child(DocumentEditPage::class) {
                         attrs {
                             session = localSession
@@ -163,7 +162,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     }
                 }
                 setState {
-                    session = newSession // Equivalent to isLoggedIn = true
+                    Session.instance = newSession // Equivalent to isLoggedIn = true
                     isLoading = false
                     page = EnumPageType.OVERVIEW
                     snackbar =
@@ -172,14 +171,14 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                 GlobalScope.launch {
                     try {
                         while (isActive) {
-                            val client = state.session ?: break
+                            val client = Session.instance ?: break
                             check(client.isConnected) { "Disconnect from server" }
                             delay(1000)
                         }
                     } catch (t: Throwable) {
-                        if (state.session != null) {
+                        if (Session.instance != null) {
                             setState {
-                                session = null
+                                Session.instance = null
                                 page = EnumPageType.UNAVAILABLE
                             }
                             showSnackbar(t.message, MAlertSeverity.warning)
@@ -206,16 +205,16 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                 setState {
                     isLoading = true
                 }
-                state.session?.logout()
+                Session.instance?.logout()
                 setState {
-                    session = null
+                    Session.instance = null
                     page = EnumPageType.AUTHENTICATION
                 }
                 showSnackbar("Logged out", MAlertSeverity.success)
                 delay(400)
             } finally {
                 setState {
-                    session = null
+                    Session.instance = null
                     page = EnumPageType.AUTHENTICATION
                     isLoading = false
                 }

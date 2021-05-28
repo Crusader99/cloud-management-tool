@@ -8,9 +8,13 @@ import de.crusader.painter.Painter
 import de.crusader.painter.animation.Animator
 import de.crusader.painter.animation.EnumInterpolator
 import de.crusader.painter.util.EnumRelationType
+import de.hsaalen.cmt.network.client.Session
+import de.hsaalen.cmt.network.dto.websocket.LiveTextEditDto
 import de.hsaalen.cmt.views.api.MPView
 import de.hsaalen.cmt.views.events.MPKeyboardEvent
 import de.hsaalen.cmt.views.events.MPMouseEvent
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * Document editor, implemented in multi-platform code to support multiple targets.
@@ -20,6 +24,13 @@ class DocumentEditor(
 ) : MPView() {
 
     private val engine = EditorEngine(true, EditorEngine.Line(defaultText))
+
+    init {
+        Session.instance?.registerListener { dto ->
+            println("Received " + dto.newTextEncrypted)
+            engine.text = dto.newTextEncrypted
+        }
+    }
 
     override fun onMouseDown(e: MPMouseEvent) {
     }
@@ -34,6 +45,10 @@ class DocumentEditor(
             e.isBackspace -> engine.cursor.deletePreviousChar()
             e.isDelete -> engine.cursor.deleteFollowingChar()
             else -> engine.cursor.insert(char.toString())
+        }
+        GlobalScope.launch {
+            val dto = LiveTextEditDto("", engine.text)
+            Session.instance?.liveTextEdit(dto)
         }
     }
 
