@@ -42,15 +42,15 @@ class ViewCanvasRenderer : RComponent<ViewCanvasRenderer.Props, RState>() {
      */
     override fun componentDidMount() {
         refreshJob?.cancel()
-        canvasRef.current.onmousemove = { props.view.onMouseMove(it.toMultiPlatform()) }
-        canvasRef.current.onmousedown = { props.view.onMouseDown(it.toMultiPlatform()) }
-        canvasRef.current.onmouseup = { props.view.onMouseUp(it.toMultiPlatform()) }
-        canvasRef.current.onkeydown = { props.view.onKeyDown(it.toMultiPlatform()) }
-        canvasRef.current.onkeyup = { props.view.onKeyUp(it.toMultiPlatform()) }
+        canvasRef.current?.onmousemove = { props.view.onMouseMove(it.toMultiPlatform()) }
+        canvasRef.current?.onmousedown = { props.view.onMouseDown(it.toMultiPlatform()) }
+        canvasRef.current?.onmouseup = { props.view.onMouseUp(it.toMultiPlatform()) }
+        canvasRef.current?.onkeydown = { props.view.onKeyDown(it.toMultiPlatform()) }
+        canvasRef.current?.onkeyup = { props.view.onKeyUp(it.toMultiPlatform()) }
         refreshJob = GlobalScope.launch {
             while (isActive) {
                 delay(60)
-                canvasRef.current.draw { p ->
+                canvasRef.current?.draw { p ->
                     props.view.onRepaint(p)
                 }
             }
