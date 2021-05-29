@@ -24,15 +24,15 @@ dependencies {
     implementation(project(":common"))
 
     // Network framework
-    implementation("io.ktor:ktor-server-core:1.5.4")
-    implementation("io.ktor:ktor-server-cio:1.5.4") {
+    implementation("io.ktor:ktor-server-core:1.6.0")
+    implementation("io.ktor:ktor-server-cio:1.6.0") {
         because("Known issues with netty & jetty")
     }
-    implementation("io.ktor:ktor-serialization:1.5.4")
-    implementation("io.ktor:ktor-websockets:1.5.4")
-    implementation("io.ktor:ktor-metrics-micrometer:1.5.4")
-    implementation("io.ktor:ktor-auth:1.5.4")
-    implementation("io.ktor:ktor-auth-jwt:1.5.4")
+    implementation("io.ktor:ktor-serialization:1.6.0")
+    implementation("io.ktor:ktor-websockets:1.6.0")
+    implementation("io.ktor:ktor-metrics-micrometer:1.6.0")
+    implementation("io.ktor:ktor-auth:1.6.0")
+    implementation("io.ktor:ktor-auth-jwt:1.6.0")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.0") {
         because("To override deprecated version form ktor")
