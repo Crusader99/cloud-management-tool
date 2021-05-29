@@ -1,13 +1,7 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("com.android.library")
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
 }
 
 val attr = Attribute.of("de.crusader.targetAttribute", String::class.java)
@@ -18,9 +12,6 @@ kotlin {
     }
     jvm {
         attributes.attribute(attr, "jvm")
-        compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
-        }
     }
     js(BOTH) {
         useCommonJs()

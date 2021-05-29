@@ -19,7 +19,8 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            val file = getDefaultProguardFile("proguard-android-optimize.txt")
+            proguardFiles(file, "proguard-rules.pro")
         }
     }
     compileOptions {
@@ -32,7 +33,7 @@ android {
 }
 
 // Choose 'jvm' from disambiguating targets
-kotlin.target {
+configurations.all {
     val attr = Attribute.of("de.crusader.targetAttribute", String::class.java)
     attributes.attribute(attr, "android")
 }
