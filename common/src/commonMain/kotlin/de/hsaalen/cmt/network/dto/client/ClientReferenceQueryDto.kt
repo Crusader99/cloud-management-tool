@@ -8,4 +8,4 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ClientReferenceQueryDto(
     val searchName: String? = null
-)
+) : ClientDto

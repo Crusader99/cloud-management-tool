@@ -9,4 +9,4 @@ import kotlinx.serialization.Serializable
 data class LiveTextEditDto(
     val ref: String,
     val newTextEncrypted: String,
-)
+) : LiveDto

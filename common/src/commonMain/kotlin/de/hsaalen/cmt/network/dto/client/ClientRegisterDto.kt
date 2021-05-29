@@ -10,4 +10,4 @@ data class ClientRegisterDto(
     val fullName: String,
     val email: String,
     val passwordHashed: String
-)
+) : ClientDto

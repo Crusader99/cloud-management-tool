@@ -9,4 +9,4 @@ import kotlinx.serialization.Serializable
 data class ServerUserInfoDto(
     val fullName: String,
     val email: String
-)
+) : ServerDto

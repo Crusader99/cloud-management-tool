@@ -9,4 +9,4 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ServerReferenceListDto(
     val references: List<Reference>
-)
+) : ServerDto
