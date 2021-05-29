@@ -42,7 +42,7 @@ kotlin {
                 cssSupport.enabled = true
             }
             runTask {
-                val proxyTable = mapOf("/api" to "http://localhost:80")
+                val proxyTable = mutableMapOf<String, Any>("/api" to "http://localhost:80")
                 devServer = devServer?.copy(port = 8081, proxy = proxyTable)
             }
         }
