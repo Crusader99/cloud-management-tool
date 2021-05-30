@@ -14,7 +14,8 @@ object ReferenceTable : UUIDTable("reference") {
     val accessCode = varchar("access_code", 32).uniqueIndex()
     val displayName = varchar("display_name", 128)
     val contentType = varchar("content_type", 32)
-    val latestRevision = reference("latest_revision", RevisionTable, onDelete = ReferenceOption.RESTRICT)
+    // val latestRevision = reference("latest_revision", RevisionTable, onDelete = ReferenceOption.RESTRICT)
+    // TODO fix initialization problem
 }
 
 /**
@@ -26,6 +27,5 @@ class ReferenceDao(id: EntityID<UUID>) : UUIDEntity(id) {
     var accessCode by ReferenceTable.accessCode
     var displayName by ReferenceTable.displayName
     var contentType by ReferenceTable.contentType
-    var latestRevision by RevisionDao referencedOn ReferenceTable.latestRevision
 
 }

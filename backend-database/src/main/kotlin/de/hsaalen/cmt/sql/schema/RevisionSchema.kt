@@ -28,5 +28,13 @@ object RevisionTable : UUIDTable("revision") {
 class RevisionDao(id: EntityID<UUID>) : UUIDEntity(id) {
     companion object : UUIDEntityClass<RevisionDao>(RevisionTable)
 
+    var item by ReferenceDao referencedOn RevisionTable.item
+    var index by RevisionTable.index
+
+    var dateCreation by RevisionTable.dateCreation
+    var dateLastAccess by RevisionTable.dateLastAccess
+    var comment by RevisionTable.comment
+    var creator by UserDao referencedOn RevisionTable.creator
+    var accessCount by RevisionTable.accessCount
 
 }
