@@ -1,3 +1,8 @@
+import com.github.gradledockertests.tasks.DockerRunTask
+import com.github.gradledockertests.tasks.DockerStopTask
+import com.github.gradledockertests.util.firstPublishedPort
+import com.github.gradledockertests.util.freeHostSystemPort
+
 plugins {
     kotlin("jvm") // There are some bugs with Intellij older than 2021.1
     kotlin("plugin.serialization")
@@ -34,6 +39,27 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
+val dockerPostgres by tasks.registering(DockerRunTask::class) {
+    environment["POSTGRES_USER"] = "admin"
+    environment["POSTGRES_PASSWORD"] = "admin"
+    environment["POSTGRES_DB"] = "postgres"
+    addPort(freeHostSystemPort, 5432)
+    args("-itd")
+    image("postgres")
+}
+
+val dockerStop by tasks.registering(DockerStopTask::class) {
+    stopContainerFromTask(dockerPostgres)
+}
+
 tasks.test {
+    dependsOn(dockerPostgres)
+    finalizedBy(dockerStop)
+
+    environment["POSTGRESQL_USER"] = "admin"
+    environment["POSTGRESQL_PASSWORD"] = "admin"
+    environment["POSTGRESQL_DB"] = "postgres"
+    environment["POSTGRESQL_PORT"] = dockerPostgres.firstPublishedPort
+
     useJUnitPlatform()
 }
