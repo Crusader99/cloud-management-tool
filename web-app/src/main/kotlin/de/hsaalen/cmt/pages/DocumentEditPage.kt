@@ -10,7 +10,7 @@ import react.RState
 /**
  * The main app component.
  */
-class MainPage : RComponent<MainPage.Props, RState>() {
+class DocumentEditPage : RComponent<DocumentEditPage.Props, RState>() {
 
     interface Props : RProps {
         var session: Session
@@ -21,7 +21,6 @@ class MainPage : RComponent<MainPage.Props, RState>() {
      */
     override fun RBuilder.render() {
         documentEditor(defaultText = "")
-//        ViewResultList.render(this)
     }
 
 }

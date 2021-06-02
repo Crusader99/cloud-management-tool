@@ -9,4 +9,4 @@ import kotlinx.serialization.Serializable
 data class ClientLoginDto(
     val email: String,
     val passwordHashed: String
-)
+) : ClientDto

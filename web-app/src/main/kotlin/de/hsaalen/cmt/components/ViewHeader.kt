@@ -178,6 +178,7 @@ class ViewHeader : RComponent<ViewHeader.Props, ViewHeader.State>() {
     private fun onCloseAboutDialog() {
         setState {
             isAboutDialogOpen = false
+            isDrawerVisible = false
         }
     }
 

@@ -2,7 +2,9 @@ package de.hsaalen.cmt.network.client
 
 import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.dto.client.ClientLoginDto
+import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.client.ClientRegisterDto
+import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import io.ktor.http.*
 
@@ -19,7 +21,11 @@ internal object Requests {
     /**
      * Send register request to the server.
      */
-    suspend fun register(firstName: String, email: String, passwordHashed: String): ServerUserInfoDto {
+    suspend fun register(
+        firstName: String,
+        email: String,
+        passwordHashed: String
+    ): ServerUserInfoDto {
         val url = Url("$apiEndpoint/register")
         return Client.request(url) {
             method = HttpMethod.Post
@@ -49,12 +55,24 @@ internal object Requests {
     }
 
     /**
-     * Send request to the server for restoring user session. Session can only restored when JWT cookie is still valid.
+     * Send request to the server for restoring user session. Session can only restored when JWT
+     * cookie is still valid.
      */
     suspend fun restore(): ServerUserInfoDto {
         val url = Url("$apiEndpoint/restore")
         return Client.request(url) {
             method = HttpMethod.Get
+        }
+    }
+
+    /**
+     * Provide a list of all related references to search query.
+     */
+    suspend fun listReferences(query: ClientReferenceQueryDto): ServerReferenceListDto {
+        val url = Url("$apiEndpoint/listReferences")
+        return Client.request(url) {
+            method = HttpMethod.Post
+            body = query
         }
     }
 

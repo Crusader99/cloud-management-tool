@@ -1,7 +1,9 @@
 package de.hsaalen.cmt.network.client
 
 import de.hsaalen.cmt.network.RestPaths
+import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
+import de.hsaalen.cmt.network.dto.websocket.LiveTextEditDto
 import de.hsaalen.cmt.network.exceptions.ConnectException
 import io.ktor.client.features.websocket.*
 import io.ktor.http.cio.websocket.*
@@ -9,6 +11,11 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
+typealias Listener = (LiveTextEditDto) -> Unit
 
 /**
  * Client session with websocket connection to server backend.
@@ -18,13 +25,20 @@ class Session(val userInfo: ServerUserInfoDto) {
     // True while the websocket is connected to the server
     var isConnected = true
 
-    var webSocketSendingQueue = Channel<Frame>()
-    var webSocketReceiveHandlers = mutableListOf<(Frame) -> Unit>()
+    private var webSocketSendingQueue = Channel<Frame>()
+    private val webSocketListeners = mutableListOf<Listener>()
 
     init {
         GlobalScope.launch {
             connectWebSocket()
         }
+    }
+
+    /**
+     * Add listener for handling received DTOs.
+     */
+    fun registerListener(packetListener: Listener) {
+        webSocketListeners += packetListener
     }
 
     /**
@@ -41,8 +55,6 @@ class Session(val userInfo: ServerUserInfoDto) {
             try {
                 Client.instance.ws(urlString = url) {
                     println("Connected websocket")
-                    send("test with text frame")
-                    send(Frame.Text("custom fame"))
 
                     GlobalScope.launch {
                         try {
@@ -61,9 +73,15 @@ class Session(val userInfo: ServerUserInfoDto) {
                     while (isActive && isConnected) {
                         println("Waiting for websocket receive")
                         val frame = incoming.receive()
-                        for (handler in webSocketReceiveHandlers) {
+                        val dto: LiveTextEditDto = if (frame is Frame.Text) {
+                            val jsonText = frame.readText()
+                            Json.decodeFromString(jsonText)
+                        } else {
+                            throw UnsupportedOperationException(frame::class.simpleName)
+                        }
+                        for (handler in webSocketListeners) {
                             if (isConnected) {
-                                handler(frame)
+                                handler(dto)
                             } else {
                                 throw IllegalStateException("Not connected with websocket")
                             }
@@ -84,6 +102,19 @@ class Session(val userInfo: ServerUserInfoDto) {
     }
 
     /**
+     * Send to text edit DTO to server and other clients.
+     */
+    suspend fun liveTextEdit(dto: LiveTextEditDto) {
+        val jsonText = Json.encodeToString(dto)
+        webSocketSendingQueue.send(Frame.Text(jsonText))
+    }
+
+    /**
+     * Provide a list of all related references to search query.
+     */
+    suspend fun listReferences(query: ClientReferenceQueryDto) = Requests.listReferences(query)
+
+    /**
      * Disconnect the websocket from server
      */
     suspend fun logout() {
@@ -96,6 +127,11 @@ class Session(val userInfo: ServerUserInfoDto) {
     }
 
     companion object {
+        /**
+         * The current session instance.
+         */
+        var instance: Session? = null
+
         /**
          * Send login request to the server.
          */
@@ -120,7 +156,7 @@ class Session(val userInfo: ServerUserInfoDto) {
          * Request server to restore user session. Session can only restored when JWT cookie is still valid.
          *
          * @return Session instance when session has been restored or null when it can't be restored.
-         * @throws ConnectException when no connection to backend services was possible.
+         * @throws ConnectException when no connection to backend de.hsaalen.cmt.services was possible.
          */
         suspend fun restore(): Session? {
             return try {

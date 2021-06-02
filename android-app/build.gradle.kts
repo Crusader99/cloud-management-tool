@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.tasks.factory.dependsOn
+
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -17,7 +19,8 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            val file = getDefaultProguardFile("proguard-android-optimize.txt")
+            proguardFiles(file, "proguard-rules.pro")
         }
     }
     compileOptions {
@@ -30,16 +33,24 @@ android {
 }
 
 // Choose 'jvm' from disambiguating targets
-kotlin.target {
+configurations.all {
     val attr = Attribute.of("de.crusader.targetAttribute", String::class.java)
     attributes.attribute(attr, "android")
 }
 
+val websiteCopy by tasks.registering(Copy::class) {
+    // TODO: copy website to local cache
+}
+
+tasks.assemble.dependsOn(websiteCopy)
+
 dependencies {
     implementation(project(":common"))
 
-    implementation("androidx.core:core-ktx:1.3.2")
-    implementation("androidx.appcompat:appcompat:1.2.0")
+    // https://developer.android.com/jetpack/androidx/migrate/artifact-mappings
+    implementation("androidx.webkit:webkit:1.4.0") // Used to provide android web-browser
+    implementation("androidx.core:core-ktx:1.5.0")
+    implementation("androidx.appcompat:appcompat:1.3.0")
     implementation("com.google.android.material:material:1.3.0")
     implementation("androidx.constraintlayout:constraintlayout:2.0.4")
     implementation("androidx.navigation:navigation-fragment-ktx:2.3.5")

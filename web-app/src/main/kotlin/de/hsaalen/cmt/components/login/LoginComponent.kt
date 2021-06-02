@@ -38,7 +38,7 @@ open class LoginComponent(props: Props) : FormComponent(props) {
                 setState {
                     email = text
                 }
-                props.defaultCredentials.email = state.email
+                props.defaultCredentials.email = text
             })
         br {}
         loginField(

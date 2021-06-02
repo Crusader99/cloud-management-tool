@@ -60,6 +60,7 @@ Online management tool for files and documents
 * [x] Remove JWT cookie on logout
 * [x] Simplify debugging without complete rebuild
 * [x] Ensure session is restored after page reload
+* [x] Make frontend work on android
 * [ ] Implement text editor in frontend
 * [ ] Implement live sync for file edit
 * [ ] ...

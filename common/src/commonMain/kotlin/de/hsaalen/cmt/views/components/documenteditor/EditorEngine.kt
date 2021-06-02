@@ -13,6 +13,15 @@ class EditorEngine(
 
     val cursor = Cursor(CursorReference(this, CursorOwner(), 0), CursorPos(0, 0))
 
+    var text: String
+        get() = lines.joinToString("\n")
+        set(value) {
+            lines.clear()
+            for (line in value.lineSequence()) {
+                lines += Line(line)
+            }
+        }
+
     fun clear() {
         lines.clear()
         lines += defaultLine // Only keep one empty line

@@ -18,9 +18,14 @@ object Themes {
     val LIGHT: MuiTheme = createMuiTheme {
         palette {
             primary {
-                main = Color("#1890f2")
+                main = Theme.primaryColor.toCssColor()
             }
         }
     }
 
 }
+
+/**
+ * Convert common multiplatform color class to css color.
+ */
+fun de.crusader.objects.color.Color.toCssColor() = Color(hex)

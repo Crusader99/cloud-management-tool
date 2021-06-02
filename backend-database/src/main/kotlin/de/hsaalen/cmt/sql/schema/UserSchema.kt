@@ -1,6 +1,5 @@
 package de.hsaalen.cmt.sql.schema
 
-import de.hsaalen.cmt.jwt.JwtPayload
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
@@ -35,11 +34,6 @@ class UserDao(id: EntityID<UUID>) : UUIDEntity(id) {
     var dateFirstLogin by UserTable.dateFirstLogin
     var datePasswordChange by UserTable.datePasswordChange
     var totalLogins by UserTable.totalLogins
-
-    /**
-     * Convert to JWT payload that can be used in cookie.
-     */
-    fun toJwtPayload() = JwtPayload(fullName, email)
 
     /**
      * Convert to data transfer object.

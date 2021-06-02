@@ -8,4 +8,4 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ServerErrorDto(
     val message: String
-)
+) : ServerDto

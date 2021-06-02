@@ -6,9 +6,10 @@ import de.hsaalen.cmt.jwt.readJwtCookie
 import de.hsaalen.cmt.jwt.updateJwtCookie
 import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.dto.client.ClientLoginDto
+import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.client.ClientRegisterDto
-import de.hsaalen.cmt.network.dto.server.ServerPreviewItemsDto
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
+import de.hsaalen.cmt.services.ServiceReferences
 import de.hsaalen.cmt.services.ServiceUsers
 import de.hsaalen.cmt.websocket.handleWebSocket
 import io.ktor.application.*
@@ -35,13 +36,18 @@ fun Application.registerRoutes() = routing {
         post("/register") {
             val request: ClientRegisterDto = call.receive()
             println("Register: " + request.email)
-            val user = ServiceUsers.register(request.fullName, request.email, request.passwordHashed)
+            val user =
+                ServiceUsers.register(request.fullName, request.email, request.passwordHashed)
             call.response.updateJwtCookie(user.toJwtPayload())
             call.respond(user)
         }
         post("/logout") {
             // Reset cookie using http header
-            call.response.cookies.appendExpired(name = JwtCookie.cookieName, path = "/", domain = "")
+            call.response.cookies.appendExpired(
+                name = JwtCookie.cookieName,
+                path = "/",
+                domain = ""
+            )
             call.respond(Unit)
         }
         authenticate {
@@ -50,8 +56,15 @@ fun Application.registerRoutes() = routing {
                 call.response.updateJwtCookie(payload)
                 call.respond(payload.toServerUserInfoDto())
             }
-            get("/list") {
-                call.respond(ServerPreviewItemsDto(listOf("abc")))
+            get("/listReferences") {
+                val query = ClientReferenceQueryDto()
+                val result = ServiceReferences.listReferences(query)
+                call.respond(result)
+            }
+            post("/listReferences") {
+                val query: ClientReferenceQueryDto = call.receive()
+                val result = ServiceReferences.listReferences(query)
+                call.respond(result)
             }
             get("/create") {
                 call.respondText("Upload")

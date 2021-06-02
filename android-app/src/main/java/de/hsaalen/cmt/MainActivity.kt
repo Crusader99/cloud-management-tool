@@ -1,38 +1,79 @@
 package de.hsaalen.cmt
 
+import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
+import android.util.Log
+import android.webkit.CookieManager
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
 import androidx.appcompat.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
+import androidx.webkit.WebViewAssetLoader
+import androidx.webkit.WebViewAssetLoader.AssetsPathHandler
+import androidx.webkit.WebViewClientCompat
+import de.crusader.extensions.toFullString
 
+/**
+ * Main activity that provides a web view for providing the web content.
+ */
 class MainActivity : AppCompatActivity() {
+
+    /**
+     * Simplify getting the web view element.
+     */
+    private val webView
+        get() = findViewById<WebView>(R.id.webView)
+
+    // https://appassets.androidplatform.net/assets/www/index.html
+    private val endpointWebAsserts = "http://10.0.2.2/"
+    private val endpointRestApi = "http://10.0.2.2/"
+
+    fun isLocalWebAsset(url: String): Boolean {
+        return url.startsWith(endpointWebAsserts)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setSupportActionBar(findViewById(R.id.toolbar))
 
-        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+        // Set top status-bar color of the window
+        window.statusBarColor = Theme.primaryColor.argb
+
+        // Assert loader to load local web content
+        val assetLoader = WebViewAssetLoader.Builder()
+            .addPathHandler("/assets/", AssetsPathHandler(this))
+            .build()
+
+        // Webclient providing correct handlers for web content
+        webView.webViewClient = object : WebViewClientCompat() {
+            override fun shouldInterceptRequest(
+                view: WebView,
+                request: WebResourceRequest
+            ): WebResourceResponse? {
+                // return assetLoader.shouldInterceptRequest(request.url)
+                return null
+            }
+
+            override fun shouldOverrideUrlLoading(
+                view: WebView,
+                request: WebResourceRequest
+            ) = if (isLocalWebAsset(request.url.toString())) {
+                false
+            } else {
+                val i = Intent(Intent.ACTION_VIEW, request.url)
+                startActivity(i)
+                true
+            }
+        }
+
+        // Open local web page
+        try {
+            CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true)
+            webView.settings.javaScriptEnabled = true
+            webView.loadUrl(endpointWebAsserts)
+        } catch (ex: Throwable) {
+            Log.e("APP-DEBUG", ex.toFullString())
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
 }

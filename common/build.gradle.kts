@@ -12,11 +12,8 @@ kotlin {
     }
     jvm {
         attributes.attribute(attr, "jvm")
-        compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
-        }
     }
-    js(LEGACY) {
+    js(BOTH) {
         useCommonJs()
         browser()
     }
@@ -34,13 +31,10 @@ kotlin {
                     api("de.crusader:library-painter:1.1.1")
                 }
 
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3") {
-                    because("Coroutines 1.5.0 is incompatible with ktor 1.5.4")
-                    // Coroutines 1.5.0 produces CancellationException on startup while runtime
-                }
-                implementation("io.ktor:ktor-client-core:1.5.4")
-                implementation("io.ktor:ktor-client-serialization:1.5.4")
-                implementation("io.ktor:ktor-client-websockets:1.5.4")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
+                implementation("io.ktor:ktor-client-core:1.6.0")
+                implementation("io.ktor:ktor-client-serialization:1.6.0")
+                implementation("io.ktor:ktor-client-websockets:1.6.0")
             }
         }
         val commonTest by getting {
