@@ -22,8 +22,8 @@ dependencies {
 
     implementation("com.ccfraser.muirwik:muirwik-components:0.6.7")
 
-    implementation("net.subroh0508.kotlinmaterialui:core:0.5.6")
-    implementation("net.subroh0508.kotlinmaterialui:lab:0.5.6")
+    implementation("net.subroh0508.kotlinmaterialui:core:0.5.7")
+    implementation("net.subroh0508.kotlinmaterialui:lab:0.5.7")
 
     // Test framework on javascript platform
     testImplementation(kotlin("test-js"))
