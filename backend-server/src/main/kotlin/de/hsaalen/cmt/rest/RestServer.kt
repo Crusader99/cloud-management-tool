@@ -2,6 +2,7 @@ package de.hsaalen.cmt.rest
 
 import com.auth0.jwt.JWT
 import de.crusader.extensions.initialCause
+import de.crusader.extensions.toFullString
 import de.hsaalen.cmt.jwt.JwtCookie
 import de.hsaalen.cmt.jwt.toPayload
 import de.hsaalen.cmt.network.dto.server.ServerErrorDto
@@ -21,12 +22,20 @@ import io.ktor.websocket.*
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import kotlinx.serialization.json.Json
+import mu.KotlinLogging
 import org.slf4j.event.Level
 import java.time.Duration
 
 object RestServer {
-    // Registry to provide metrics for prometheus and grafana
+    /**
+     * Registry to provide metrics for prometheus and grafana
+     */
     val micrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+
+    /**
+     * The local logging instance
+     */
+    private val logger = KotlinLogging.logger { }
 
     /**
      * Configure an embedded HTTP server for providing a REST API.
@@ -68,6 +77,7 @@ object RestServer {
             exception<Exception> { cause ->
                 // Handle unexpected errors occurred in server and send a valid json to client
                 val message = cause.message ?: cause.initialCause.message ?: "Unknown error occurred"
+                logger.warn("Exception occurred while handling request", cause)
                 call.respond(HttpStatusCode.InternalServerError, ServerErrorDto(message))
             }
         }

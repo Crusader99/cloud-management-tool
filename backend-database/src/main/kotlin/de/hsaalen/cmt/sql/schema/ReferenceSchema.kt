@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.sql.schema
 
+import de.hsaalen.cmt.network.dto.objects.Reference
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -28,4 +29,9 @@ class ReferenceDao(id: EntityID<UUID>) : UUIDEntity(id) {
     var displayName by ReferenceTable.displayName
     var contentType by ReferenceTable.contentType
 
+    fun toReference() : Reference{
+        val now = System.currentTimeMillis()
+        val labels = listOf("note") // TODO implement
+        return Reference(id.value.toString(), accessCode, displayName, contentType, now, now, labels)
+    }
 }

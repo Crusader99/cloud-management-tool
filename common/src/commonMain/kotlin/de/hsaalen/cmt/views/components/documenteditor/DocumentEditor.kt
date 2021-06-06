@@ -8,7 +8,7 @@ import de.crusader.painter.Painter
 import de.crusader.painter.animation.Animator
 import de.crusader.painter.animation.EnumInterpolator
 import de.crusader.painter.util.EnumRelationType
-import de.hsaalen.cmt.network.client.Session
+import de.hsaalen.cmt.network.session.Session
 import de.hsaalen.cmt.network.dto.websocket.LiveTextEditDto
 import de.hsaalen.cmt.views.api.MPView
 import de.hsaalen.cmt.views.events.MPKeyboardEvent

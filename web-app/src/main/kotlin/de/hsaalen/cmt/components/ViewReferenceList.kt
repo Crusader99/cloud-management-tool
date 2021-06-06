@@ -2,6 +2,7 @@ package de.hsaalen.cmt.components
 
 import de.crusader.extensions.toDate
 import de.crusader.objects.color.Color
+import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.toCssColor
 import kotlinx.css.*
@@ -20,7 +21,7 @@ class ViewReferenceList : RComponent<ViewReferenceList.Props, RState>() {
 
     interface Props : RProps {
         var dto: ServerReferenceListDto?
-        var onItemOpen: () -> Unit
+        var onItemOpen: (Reference) -> Unit
     }
 
     /**
@@ -74,14 +75,10 @@ class ViewReferenceList : RComponent<ViewReferenceList.Props, RState>() {
         }
         val dto = props.dto
         if (dto == null) {
-            renderTableBodyRow("Loading...") // Currently no references loaded
+            renderTableBodyRow(null) // Currently no references loaded
         } else {
             for (ref in dto.references) {
-                renderTableBodyRow(
-                    ref.displayName,
-                    ref.labels.joinToString(),
-                    ref.dateLastAccess.toDate().toDateString()
-                )
+                renderTableBodyRow(ref)
             }
         }
     }
@@ -89,7 +86,13 @@ class ViewReferenceList : RComponent<ViewReferenceList.Props, RState>() {
     /**
      * Called when the only a single row of the table body should be rendered.
      */
-    private fun RBuilder.renderTableBodyRow(vararg columns: String) = styledTr {
+    private fun RBuilder.renderTableBodyRow(ref: Reference?) = styledTr {
+        val columns = if (ref == null) arrayOf("Loading...") else arrayOf(
+            ref.displayName,
+            ref.labels.joinToString(),
+            ref.dateLastAccess.toDate().toDateString(),
+        )
+
         css {
             fontSize = 15.px
             cursor = Cursor.pointer
@@ -99,7 +102,9 @@ class ViewReferenceList : RComponent<ViewReferenceList.Props, RState>() {
             }
         }
         attrs {
-            onClickFunction = { props.onItemOpen() }
+            if (ref != null) {
+                onClickFunction = { props.onItemOpen(ref) }
+            }
         }
         for (column in columns) {
             styledTd {

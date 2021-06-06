@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.network.client
+package de.hsaalen.cmt.network.session
 
 import de.hsaalen.cmt.network.dto.server.ServerErrorDto
 import de.hsaalen.cmt.network.exceptions.ConnectException
@@ -70,7 +70,7 @@ internal object Client {
         val statusDescription = response.status.description
         try {
             val errorInfo: ServerErrorDto = response.receive()
-            val errorMessage = errorInfo.message
+            val errorMessage = errorInfo.error
             println("Server-Error ($statusCode): $statusDescription: $errorMessage")
             throw ServerException(statusCode, errorMessage)
         } catch (t: Throwable) {

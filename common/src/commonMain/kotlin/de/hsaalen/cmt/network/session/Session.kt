@@ -1,10 +1,13 @@
-package de.hsaalen.cmt.network.client
+package de.hsaalen.cmt.network.session
 
 import de.hsaalen.cmt.network.RestPaths
-import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.network.dto.websocket.LiveTextEditDto
 import de.hsaalen.cmt.network.exceptions.ConnectException
+import de.hsaalen.cmt.network.requests.RequestAuthentication
+import de.hsaalen.cmt.network.requests.RequestCreateReferences
+import de.hsaalen.cmt.network.requests.RequestDownload
+import de.hsaalen.cmt.network.requests.RequestListReferences
 import io.ktor.client.features.websocket.*
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.GlobalScope
@@ -20,10 +23,11 @@ typealias Listener = (LiveTextEditDto) -> Unit
 /**
  * Client session with websocket connection to server backend.
  */
-class Session(val userInfo: ServerUserInfoDto) {
+class Session(val userInfo: ServerUserInfoDto) : RequestListReferences, RequestCreateReferences, RequestDownload {
 
     // True while the websocket is connected to the server
     var isConnected = true
+        private set
 
     private var webSocketSendingQueue = Channel<Frame>()
     private val webSocketListeners = mutableListOf<Listener>()
@@ -110,17 +114,12 @@ class Session(val userInfo: ServerUserInfoDto) {
     }
 
     /**
-     * Provide a list of all related references to search query.
-     */
-    suspend fun listReferences(query: ClientReferenceQueryDto) = Requests.listReferences(query)
-
-    /**
      * Disconnect the websocket from server
      */
     suspend fun logout() {
         isConnected = false
         try {
-            Requests.logout()
+            RequestAuthentication.logout()
         } catch (t: Exception) {
             // Ignore any errors
         }
@@ -137,7 +136,7 @@ class Session(val userInfo: ServerUserInfoDto) {
          */
         suspend fun login(email: String, passwordPlain: String): Session {
             val passwordHashed = passwordPlain // TODO: hash password
-            val userInfo = Requests.login(email, passwordHashed)
+            val userInfo = RequestAuthentication.login(email, passwordHashed)
             println("Logged in as: " + userInfo.email)
             return Session(userInfo)
         }
@@ -147,7 +146,7 @@ class Session(val userInfo: ServerUserInfoDto) {
          */
         suspend fun register(firstName: String, email: String, passwordPlain: String): Session {
             val passwordHashed = passwordPlain // TODO: hash password
-            val userInfo = Requests.register(firstName, email, passwordHashed)
+            val userInfo = RequestAuthentication.register(firstName, email, passwordHashed)
             println("Logged in as: " + userInfo.email)
             return Session(userInfo)
         }
@@ -160,7 +159,7 @@ class Session(val userInfo: ServerUserInfoDto) {
          */
         suspend fun restore(): Session? {
             return try {
-                val userInfo = Requests.restore()
+                val userInfo = RequestAuthentication.restore()
                 println("Restored session for: " + userInfo.email)
                 Session(userInfo)
             } catch (t: Exception) {

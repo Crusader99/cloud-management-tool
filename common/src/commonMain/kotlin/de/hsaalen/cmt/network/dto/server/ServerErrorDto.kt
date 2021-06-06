@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class ServerErrorDto(
-    val message: String
+    val error: String
 ) : ServerDto

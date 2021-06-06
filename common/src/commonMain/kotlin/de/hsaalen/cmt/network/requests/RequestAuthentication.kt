@@ -1,22 +1,16 @@
-package de.hsaalen.cmt.network.client
+package de.hsaalen.cmt.network.requests
 
-import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.dto.client.ClientLoginDto
-import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.client.ClientRegisterDto
-import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
+import de.hsaalen.cmt.network.session.Client
 import io.ktor.http.*
 
 /**
  * Collection of all HTTP requests used by web-app and android-app.
  * Provides full multi-platform support by using ktor clients.
  */
-internal object Requests {
-
-    // The url to use for requests to REST API server
-    private val apiEndpoint
-        get() = RestPaths.apiEndpoint
+internal object RequestAuthentication : Request {
 
     /**
      * Send register request to the server.
@@ -65,15 +59,5 @@ internal object Requests {
         }
     }
 
-    /**
-     * Provide a list of all related references to search query.
-     */
-    suspend fun listReferences(query: ClientReferenceQueryDto): ServerReferenceListDto {
-        val url = Url("$apiEndpoint/listReferences")
-        return Client.request(url) {
-            method = HttpMethod.Post
-            body = query
-        }
-    }
 
 }
