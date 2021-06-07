@@ -31,6 +31,9 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jodatime:0.31.1")
     implementation("org.postgresql:postgresql:42.2.20")
 
+    // Mongo DB driver to support live edit in text documents
+    implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.2.7")
+
     // Statistics & logging frameworks
     // See https://github.com/MicroUtils/kotlin-logging
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.6")

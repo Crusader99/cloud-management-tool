@@ -2,7 +2,7 @@ package de.hsaalen.cmt.network.session
 
 import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
-import de.hsaalen.cmt.network.dto.websocket.LiveTextEditDto
+import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
 import de.hsaalen.cmt.network.exceptions.ConnectException
 import de.hsaalen.cmt.network.requests.RequestAuthentication
 import de.hsaalen.cmt.network.requests.RequestCreateReferences
@@ -18,12 +18,15 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-typealias Listener = (LiveTextEditDto) -> Unit
+typealias Listener = (DocumentChangeDto) -> Unit
 
 /**
  * Client session with websocket connection to server backend.
  */
-class Session(val userInfo: ServerUserInfoDto) : RequestListReferences, RequestCreateReferences, RequestDownload {
+class Session(val userInfo: ServerUserInfoDto) :
+    RequestListReferences,
+    RequestCreateReferences,
+    RequestDownload {
 
     // True while the websocket is connected to the server
     var isConnected = true
@@ -77,7 +80,7 @@ class Session(val userInfo: ServerUserInfoDto) : RequestListReferences, RequestC
                     while (isActive && isConnected) {
                         println("Waiting for websocket receive")
                         val frame = incoming.receive()
-                        val dto: LiveTextEditDto = if (frame is Frame.Text) {
+                        val dto: DocumentChangeDto = if (frame is Frame.Text) {
                             val jsonText = frame.readText()
                             Json.decodeFromString(jsonText)
                         } else {
@@ -108,7 +111,7 @@ class Session(val userInfo: ServerUserInfoDto) : RequestListReferences, RequestC
     /**
      * Send to text edit DTO to server and other clients.
      */
-    suspend fun liveTextEdit(dto: LiveTextEditDto) {
+    suspend fun liveTextEdit(dto: DocumentChangeDto) {
         val jsonText = Json.encodeToString(dto)
         webSocketSendingQueue.send(Frame.Text(jsonText))
     }
@@ -170,4 +173,5 @@ class Session(val userInfo: ServerUserInfoDto) : RequestListReferences, RequestC
         }
 
     }
+
 }

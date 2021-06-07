@@ -1,14 +1,16 @@
 package de.hsaalen.cmt.pages
 
-import de.hsaalen.cmt.components.documentEditor
+import de.hsaalen.cmt.components.canvasRenderer
 import de.hsaalen.cmt.network.dto.objects.Reference
+import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
 import de.hsaalen.cmt.network.session.Session
+import de.hsaalen.cmt.views.components.documenteditor.DocumentEditor
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import react.*
 
 /**
- * The main app component.
+ * A React component for editing documents live with other user users.
  */
 class DocumentEditPage : RComponent<DocumentEditPage.Props, DocumentEditPage.State>() {
 
@@ -35,7 +37,18 @@ class DocumentEditPage : RComponent<DocumentEditPage.Props, DocumentEditPage.Sta
      */
     override fun RBuilder.render() {
         val text = state.defaultText ?: "Loading..."
-        documentEditor(defaultText = text)
+        canvasRenderer(DocumentEditor(text, ::onTextChanged))
+    }
+
+
+    /**
+     * Called after every key the user pressed.
+     */
+    private fun onTextChanged(newText: String) {
+        GlobalScope.launch {
+            val dto = DocumentChangeDto(props.reference.uuid, newText)
+            Session.instance?.liveTextEdit(dto)
+        }
     }
 
 }

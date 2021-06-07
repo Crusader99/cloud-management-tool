@@ -16,6 +16,7 @@ import de.hsaalen.cmt.websocket.handleWebSocket
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -91,6 +92,21 @@ fun Application.registerRoutes() = routing {
                 call.respondOutputStream {
                     stream.copyTo(this)
                 }
+            }
+            post("/import") { // TODO: update or remove
+                val multipart = call.receiveMultipart()
+                val email = call.request.readJwtCookie().email
+                multipart.forEachPart { part ->
+                    // Get all file parts of this multipart
+                    if (part is PartData.FileItem) {
+                        val fileName = part.originalFileName ?: "unknown"
+                        val fileContent = part.streamProvider()
+//                        ServiceReferences.import(fileName, fileContent, email)
+                    }
+                    // Close part to prevent memory leaks
+                    part.dispose()
+                }
+                call.respondText("Imported")
             }
             handleWebSocket()
         }

@@ -9,4 +9,5 @@ import kotlinx.serialization.Serializable
 data class ClientCreateReferenceDto(
     val displayName: String,
     val comment: String = "",
+    val content: String = ""
 ) : ClientDto

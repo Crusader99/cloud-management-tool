@@ -10,8 +10,24 @@ repositories {
 
 // Simplify declaration of kotlin wrapper modules
 fun kotlinWrapper(module: String) = "org.jetbrains:kotlin-$module-pre.153-kotlin-1.4.32"
+//fun kotlinWrapper(module: String) = "org.jetbrains.kotlin-wrappers:kotlin-$module-pre.204-kotlin-1.5.0"
 
 dependencies {
+//    modules {
+//        module("org.jetbrains:kotlin-react") {
+//            replacedBy("org.jetbrains.kotlin-wrappers:kotlin-react")
+//        }
+//        module("org.jetbrains:kotlin-react-dom") {
+//            replacedBy("org.jetbrains.kotlin-wrappers:kotlin-react-dom")
+//        }
+//        module("org.jetbrains:kotlin-css-js") {
+//            replacedBy("org.jetbrains.kotlin-wrappers:kotlin-css-js")
+//        }
+//        module("org.jetbrains:kotlin-extensions") {
+//            replacedBy("org.jetbrains.kotlin-wrappers:kotlin-extensions")
+//        }
+//    }
+
     implementation(project(":common"))
 
     // React components

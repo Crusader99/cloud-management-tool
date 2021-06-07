@@ -40,12 +40,16 @@ internal object Client {
      */
     suspend inline fun <reified RECEIVE> request(
         url: Url,
+        json: Boolean = true,
+        timeout : Long = 5_000,
         crossinline configure: HttpRequestBuilder.() -> Unit = {}
     ): RECEIVE {
         val response: HttpResponse = try {
-            withTimeout(5_000L) {
+            withTimeout(timeout) {
                 instance.request(url) {
-                    header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                    if (json) {
+                        header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                    }
                     configure()
                     expectSuccess = false
                 }

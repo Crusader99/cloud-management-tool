@@ -9,9 +9,15 @@ internal interface RequestCreateReferences : Request {
     /**
      * Request server to create a new reference.
      */
-    suspend fun createReference(displayName: String) {
+    suspend fun createReference(displayName: String, documentContent: String = "") {
+        createReference(ClientCreateReferenceDto(displayName, content = documentContent))
+    }
+
+    /**
+     * Request server to create a new reference.
+     */
+    suspend fun createReference(dto: ClientCreateReferenceDto) {
         val url = Url("$apiEndpoint/createReference")
-        val dto = ClientCreateReferenceDto(displayName)
         return Client.request(url) {
             method = HttpMethod.Post
             body = dto

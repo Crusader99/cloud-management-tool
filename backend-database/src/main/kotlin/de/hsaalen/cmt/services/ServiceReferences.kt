@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.services
 
+import de.hsaalen.cmt.mongo.MongoDB
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.Reference
@@ -25,7 +26,7 @@ object ServiceReferences {
         info: ClientCreateReferenceDto,
         creatorEmail: String,
     ): Reference {
-        return newSuspendedTransaction {
+        val ref: Reference = newSuspendedTransaction {
             val creator = UserDao.find(UserTable.email eq creatorEmail)
                 .singleOrNull()
                 ?: throw IllegalStateException("User $creatorEmail not found!")
@@ -55,6 +56,8 @@ object ServiceReferences {
                 labels = listOf("Not implemented yet")
             )
         }
+        MongoDB.createDocument(ref.uuid, info.content)
+        return ref
     }
 
     suspend fun listReferences(query: ClientReferenceQueryDto): ServerReferenceListDto {
@@ -65,7 +68,7 @@ object ServiceReferences {
     }
 
     suspend fun downloadContent(uuid: String): InputStream {
-        return "This is a test".byteInputStream()
+        return MongoDB.getDocumentContent(uuid).inputStream()
     }
 
 }

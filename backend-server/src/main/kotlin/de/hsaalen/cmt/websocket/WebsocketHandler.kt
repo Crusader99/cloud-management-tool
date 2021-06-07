@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.websocket
 
-import de.hsaalen.cmt.network.dto.websocket.LiveTextEditDto
+import de.hsaalen.cmt.mongo.MongoDB
+import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
 import io.ktor.http.cio.websocket.*
 import io.ktor.routing.*
 import io.ktor.websocket.*
@@ -25,7 +26,8 @@ fun Route.handleWebSocket() = webSocket("/websocket") {
             if (frame is Frame.Text) {
                 val jsonText = frame.readText()
                 println("websocket: received: $jsonText")
-                val dto: LiveTextEditDto = Json.decodeFromString(jsonText)
+                val dto: DocumentChangeDto = Json.decodeFromString(jsonText)
+                MongoDB.updateDocument(dto)
                 broadcastToOthers(dto)
             } else {
                 println("websocket: received unknown frame: " + frame.frameType.name)
@@ -40,7 +42,7 @@ fun Route.handleWebSocket() = webSocket("/websocket") {
 /**
  * Broadcast a DTO to all web-socket clients except to the own client.
  */
-private suspend fun WebSocketSession.broadcastToOthers(dto: LiveTextEditDto) {
+private suspend fun WebSocketSession.broadcastToOthers(dto: DocumentChangeDto) {
     val jsonText = Json.encodeToString(dto)
     for (others in connections.filter { it != this }) {
         println("send: $jsonText")

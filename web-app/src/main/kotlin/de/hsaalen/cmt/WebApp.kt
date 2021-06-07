@@ -5,6 +5,8 @@ import de.hsaalen.cmt.components.ViewHeader
 import de.hsaalen.cmt.components.features.ViewSnackbar
 import de.hsaalen.cmt.components.features.loadingOverlay
 import de.hsaalen.cmt.components.login.Credentials
+import de.hsaalen.cmt.extensions.openFileSelector
+import de.hsaalen.cmt.extensions.readText
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.exceptions.ConnectException
 import de.hsaalen.cmt.network.session.Session
@@ -12,6 +14,7 @@ import de.hsaalen.cmt.pages.DocumentEditPage
 import de.hsaalen.cmt.pages.FallbackPage
 import de.hsaalen.cmt.pages.LoginPage
 import de.hsaalen.cmt.pages.OverviewPage
+import de.hsaalen.cmt.support.SimpleNoteImportJson
 import kotlinx.coroutines.*
 import materialui.styles.themeprovider.themeProvider
 import react.*
@@ -87,11 +90,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                                     Session.instance?.createReference("test")
                                 }
                             },
-                            "Import" to {
-                                GlobalScope.launch {
-                                    // TODO: implement file upload dialog for import
-                                }
-                            },
+                            "Import" to { onImportData() },
                         )
                     }
                 }
@@ -258,6 +257,32 @@ class WebApp : RComponent<RProps, WebApp.State>() {
         }
         setState {
             snackbar = ViewSnackbar.SnackbarInfo(message, severity)
+        }
+    }
+
+    /**
+     * Import data from simplenote json format.
+     */
+    private fun onImportData() {
+        suspend fun import(fileName: String, fileContent: String) {
+            println("importing...")
+            if (fileName == "notes.json") {
+                for (imported in SimpleNoteImportJson.import(json = fileContent)) {
+                    Session.instance!!.createReference(imported)
+                }
+            } else if (fileName.endsWith(".txt", true)) {
+                Session.instance!!.createReference(fileName, fileContent)
+            } else {
+                throw UnsupportedOperationException("File format unsupported: $fileName")
+            }
+        }
+
+        GlobalScope.launch {
+            for (file in openFileSelector()) {
+                println("selected " + file.name)
+                val text = file.readText()
+                import(file.name, text)
+            }
         }
     }
 
