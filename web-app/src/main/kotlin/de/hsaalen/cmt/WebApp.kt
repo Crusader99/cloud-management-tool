@@ -279,9 +279,12 @@ class WebApp : RComponent<RProps, WebApp.State>() {
 
         GlobalScope.launch {
             for (file in openFileSelector()) {
+                // TODO: remove debug messages
                 println("selected " + file.name)
                 val text = file.readText()
+                println("read file content")
                 import(file.name, text)
+                println("imported")
             }
         }
     }

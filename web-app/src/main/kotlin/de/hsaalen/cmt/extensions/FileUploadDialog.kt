@@ -1,14 +1,13 @@
 package de.hsaalen.cmt.extensions
 
 import kotlinx.browser.document
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
 import org.w3c.dom.HTMLInputElement
 import org.w3c.files.File
 import org.w3c.files.FileList
 import org.w3c.files.FileReader
 import org.w3c.files.get
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * Suspend function for asking the user to select files.
@@ -18,18 +17,17 @@ suspend fun openFileSelector(): List<File> {
     fileSelector.type = "file"
     fileSelector.multiple = false
 
-    val channel = Channel<FileList>()
-    fun handle() {
-        val files = fileSelector.files ?: return
-        GlobalScope.launch {
-            channel.send(files)
+    val files: FileList = suspendCoroutine { continuation ->
+        fun handle() {
+            val files = fileSelector.files ?: return
+            continuation.resume(files)
         }
+
+        fileSelector.onchange = { handle() }
+        fileSelector.onblur = { handle() }
+        fileSelector.click()
     }
 
-    fileSelector.onchange = { handle() }
-    fileSelector.onblur = { handle() }
-    fileSelector.click()
-    val files = channel.receive()
     val list = mutableListOf<File>()
     repeat(files.length) { index ->
         list += files[index] ?: return list
@@ -42,12 +40,11 @@ suspend fun openFileSelector(): List<File> {
  */
 suspend fun File.readText(): String {
     val reader = FileReader()
-    val channel = Channel<dynamic>()
-    reader.onload = {
-        GlobalScope.launch {
-            channel.send(reader.result)
+    val result: dynamic = suspendCoroutine { continuation ->
+        reader.onload = {
+            continuation.resume(reader.result)
         }
+        reader.readAsText(this)
     }
-    reader.readAsText(this)
-    return channel.receive().toString()
+    return result.toString()
 }
