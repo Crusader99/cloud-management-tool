@@ -1,5 +1,7 @@
 package de.hsaalen.cmt.services
 
+import de.hsaalen.cmt.mongo.MongoDB
+import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
@@ -7,10 +9,10 @@ import de.hsaalen.cmt.sql.schema.ReferenceDao
 import de.hsaalen.cmt.sql.schema.RevisionDao
 import de.hsaalen.cmt.sql.schema.UserDao
 import de.hsaalen.cmt.sql.schema.UserTable
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.joda.time.DateTime
-import kotlin.random.Random
-import kotlin.random.nextInt
+import java.io.InputStream
 
 /**
  * Handles database operations for the reference and revision management.
@@ -21,16 +23,17 @@ object ServiceReferences {
      * Create a new reference to a first revision.
      */
     suspend fun createItem(
-        displayName: String,
+        info: ClientCreateReferenceDto,
         creatorEmail: String,
-        comment: String = ""
     ): Reference {
-        return newSuspendedTransaction {
-            val creator = UserDao.find { UserTable.email eq creatorEmail }.single()
+        val ref: Reference = newSuspendedTransaction {
+            val creator = UserDao.find(UserTable.email eq creatorEmail)
+                .singleOrNull()
+                ?: throw IllegalStateException("User $creatorEmail not found!")
             val now = DateTime.now()
             val reference = ReferenceDao.new {
                 this.accessCode = "ACCESS_CODE"
-                this.displayName = displayName
+                this.displayName = info.displayName
                 this.contentType = "document"
             }
             val revision = RevisionDao.new {
@@ -39,11 +42,12 @@ object ServiceReferences {
 
                 this.dateCreation = now
                 this.dateLastAccess = now
-                this.comment = comment
+                this.comment = info.comment
                 this.creator = creator
                 this.accessCount = 0
             }
             Reference(
+                uuid = reference.id.toString(),
                 accessCode = reference.accessCode,
                 displayName = reference.displayName,
                 contentType = reference.contentType,
@@ -52,23 +56,19 @@ object ServiceReferences {
                 labels = listOf("Not implemented yet")
             )
         }
+        MongoDB.createDocument(ref.uuid, info.content)
+        return ref
     }
 
     suspend fun listReferences(query: ClientReferenceQueryDto): ServerReferenceListDto {
-        val refs = mutableListOf<Reference>()
-
-//        ReferenceDao.find {  }
-
-        // Currently create only dummy objects
-        // TODO: replace with actual db query
-        repeat(10 + Random.nextInt(100)) { index ->
-            val accessCode = Random.nextInt('A'.toInt()..'Z'.toInt()).toChar().toString()
-            val displayName = "File-Ref-$index"
-            val now = System.currentTimeMillis()
-            val labels = listOf("note")
-            refs += Reference(accessCode, displayName, "text", now, now, labels)
+        val refs = newSuspendedTransaction {
+            ReferenceDao.all().map { it.toReference() }
         }
         return ServerReferenceListDto(refs)
+    }
+
+    suspend fun downloadContent(uuid: String): InputStream {
+        return MongoDB.getDocumentContent(uuid).inputStream()
     }
 
 }

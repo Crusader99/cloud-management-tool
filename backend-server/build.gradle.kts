@@ -48,6 +48,8 @@ dependencies {
 
     // JUnit test framework
     testImplementation(kotlin("test"))
+    testImplementation("de.crusader:webscraper-selenium:3.1.0")
+    testImplementation("de.crusader:webscraper-htmlunit:3.1.0")
 }
 
 tasks.test {

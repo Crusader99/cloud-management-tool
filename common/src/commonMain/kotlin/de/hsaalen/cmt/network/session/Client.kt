@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.network.client
+package de.hsaalen.cmt.network.session
 
 import de.hsaalen.cmt.network.dto.server.ServerErrorDto
 import de.hsaalen.cmt.network.exceptions.ConnectException
@@ -40,12 +40,16 @@ internal object Client {
      */
     suspend inline fun <reified RECEIVE> request(
         url: Url,
+        json: Boolean = true,
+        timeout : Long = 5_000,
         crossinline configure: HttpRequestBuilder.() -> Unit = {}
     ): RECEIVE {
         val response: HttpResponse = try {
-            withTimeout(5_000L) {
+            withTimeout(timeout) {
                 instance.request(url) {
-                    header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                    if (json) {
+                        header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                    }
                     configure()
                     expectSuccess = false
                 }
@@ -70,7 +74,7 @@ internal object Client {
         val statusDescription = response.status.description
         try {
             val errorInfo: ServerErrorDto = response.receive()
-            val errorMessage = errorInfo.message
+            val errorMessage = errorInfo.error
             println("Server-Error ($statusCode): $statusDescription: $errorMessage")
             throw ServerException(statusCode, errorMessage)
         } catch (t: Throwable) {

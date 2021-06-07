@@ -1,26 +1,54 @@
 package de.hsaalen.cmt.pages
 
-import de.hsaalen.cmt.components.documentEditor
-import de.hsaalen.cmt.network.client.Session
-import react.RBuilder
-import react.RComponent
-import react.RProps
-import react.RState
+import de.hsaalen.cmt.components.canvasRenderer
+import de.hsaalen.cmt.network.dto.objects.Reference
+import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
+import de.hsaalen.cmt.network.session.Session
+import de.hsaalen.cmt.views.components.documenteditor.DocumentEditor
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import react.*
 
 /**
- * The main app component.
+ * A React component for editing documents live with other user users.
  */
-class DocumentEditPage : RComponent<DocumentEditPage.Props, RState>() {
+class DocumentEditPage : RComponent<DocumentEditPage.Props, DocumentEditPage.State>() {
 
     interface Props : RProps {
         var session: Session
+        var reference: Reference
+    }
+
+    interface State : RState {
+        var defaultText: String?
+    }
+
+    override fun State.init() {
+        GlobalScope.launch {
+            val text = Session.instance?.download(props.reference.uuid)
+            setState {
+                defaultText = text
+            }
+        }
     }
 
     /**
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        documentEditor(defaultText = "")
+        val text = state.defaultText ?: "Loading..."
+        canvasRenderer(DocumentEditor(text, ::onTextChanged))
+    }
+
+
+    /**
+     * Called after every key the user pressed.
+     */
+    private fun onTextChanged(newText: String) {
+        GlobalScope.launch {
+            val dto = DocumentChangeDto(props.reference.uuid, newText)
+            Session.instance?.liveTextEdit(dto)
+        }
     }
 
 }

@@ -38,6 +38,7 @@ class ViewHeader : RComponent<ViewHeader.Props, ViewHeader.State>() {
         var onLogout: () -> Unit
         var isLoggedIn: Boolean
         val classes: dynamic
+        var drawerMenu: Map<String, (Event) -> Unit>
     }
 
     private val Props.rootStyle: String
@@ -141,8 +142,8 @@ class ViewHeader : RComponent<ViewHeader.Props, ViewHeader.State>() {
     private fun RBuilder.renderDrawer() {
         div {
             list {
-                repeat(5) { index ->
-                    listButton("Test $index") {}
+                for ((text, onClick) in props.drawerMenu) {
+                    listButton(text, onClick)
                 }
                 listButton("About") {
                     setState {

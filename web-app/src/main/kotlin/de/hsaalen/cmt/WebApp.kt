@@ -5,12 +5,16 @@ import de.hsaalen.cmt.components.ViewHeader
 import de.hsaalen.cmt.components.features.ViewSnackbar
 import de.hsaalen.cmt.components.features.loadingOverlay
 import de.hsaalen.cmt.components.login.Credentials
-import de.hsaalen.cmt.network.client.Session
+import de.hsaalen.cmt.extensions.openFileSelector
+import de.hsaalen.cmt.extensions.readText
+import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.exceptions.ConnectException
+import de.hsaalen.cmt.network.session.Session
 import de.hsaalen.cmt.pages.DocumentEditPage
 import de.hsaalen.cmt.pages.FallbackPage
 import de.hsaalen.cmt.pages.LoginPage
 import de.hsaalen.cmt.pages.OverviewPage
+import de.hsaalen.cmt.support.SimpleNoteImportJson
 import kotlinx.coroutines.*
 import materialui.styles.themeprovider.themeProvider
 import react.*
@@ -23,6 +27,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
     interface State : RState {
         var snackbar: ViewSnackbar.SnackbarInfo?
         var page: EnumPageType
+        var reference: Reference?
         var isLoading: Boolean
     }
 
@@ -40,6 +45,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
         snackbar = null
         isLoading = true
         page = EnumPageType.CONNECTING
+        reference = null
 
         GlobalScope.launch {
             try {
@@ -77,6 +83,15 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     attrs {
                         isLoggedIn = state.page.isLoggedIn
                         onLogout = ::onLogout
+                        drawerMenu = mapOf(
+                            "Create" to {
+                                GlobalScope.launch {
+                                    // TODO: implement input field for file name
+                                    Session.instance?.createReference("test")
+                                }
+                            },
+                            "Import" to { onImportData() },
+                        )
                     }
                 }
             }
@@ -117,8 +132,9 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     child(OverviewPage::class) {
                         attrs {
                             session = localSession
-                            onItemOpen = {
+                            onItemOpen = { ref ->
                                 setState {
+                                    reference = ref
                                     page = EnumPageType.EDIT_DOCUMENT
                                 }
                             }
@@ -127,9 +143,11 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                 }
                 EnumPageType.EDIT_DOCUMENT -> {
                     val localSession = Session.instance!! // TODO: exception handling
+                    val ref = state.reference!!
                     child(DocumentEditPage::class) {
                         attrs {
                             session = localSession
+                            reference = ref
                         }
                     }
                 }
@@ -165,8 +183,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     Session.instance = newSession // Equivalent to isLoggedIn = true
                     isLoading = false
                     page = EnumPageType.OVERVIEW
-                    snackbar =
-                        ViewSnackbar.SnackbarInfo("Successfully logged in!", MAlertSeverity.success)
+                    snackbar = ViewSnackbar.SnackbarInfo("Successfully logged in!", MAlertSeverity.success)
                 }
                 GlobalScope.launch {
                     try {
@@ -240,6 +257,32 @@ class WebApp : RComponent<RProps, WebApp.State>() {
         }
         setState {
             snackbar = ViewSnackbar.SnackbarInfo(message, severity)
+        }
+    }
+
+    /**
+     * Import data from simplenote json format.
+     */
+    private fun onImportData() {
+        suspend fun import(fileName: String, fileContent: String) {
+            println("importing...")
+            if (fileName == "notes.json") {
+                for (imported in SimpleNoteImportJson.import(json = fileContent)) {
+                    Session.instance!!.createReference(imported)
+                }
+            } else if (fileName.endsWith(".txt", true)) {
+                Session.instance!!.createReference(fileName, fileContent)
+            } else {
+                throw UnsupportedOperationException("File format unsupported: $fileName")
+            }
+        }
+
+        GlobalScope.launch {
+            for (file in openFileSelector()) {
+                println("selected " + file.name)
+                val text = file.readText()
+                import(file.name, text)
+            }
         }
     }
 

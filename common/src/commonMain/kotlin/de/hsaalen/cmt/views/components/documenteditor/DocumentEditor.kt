@@ -8,19 +8,17 @@ import de.crusader.painter.Painter
 import de.crusader.painter.animation.Animator
 import de.crusader.painter.animation.EnumInterpolator
 import de.crusader.painter.util.EnumRelationType
-import de.hsaalen.cmt.network.client.Session
-import de.hsaalen.cmt.network.dto.websocket.LiveTextEditDto
+import de.hsaalen.cmt.network.session.Session
 import de.hsaalen.cmt.views.api.MPView
 import de.hsaalen.cmt.views.events.MPKeyboardEvent
 import de.hsaalen.cmt.views.events.MPMouseEvent
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 /**
  * Document editor, implemented in multi-platform code to support multiple targets.
  */
 class DocumentEditor(
-    defaultText: String = ""
+    defaultText: String = "",
+    private val onTextChanged: (String) -> Unit
 ) : MPView() {
 
     private val engine = EditorEngine(true, EditorEngine.Line(defaultText))
@@ -46,10 +44,7 @@ class DocumentEditor(
             e.isDelete -> engine.cursor.deleteFollowingChar()
             else -> engine.cursor.insert(char.toString())
         }
-        GlobalScope.launch {
-            val dto = LiveTextEditDto("", engine.text)
-            Session.instance?.liveTextEdit(dto)
-        }
+        onTextChanged(engine.text)
     }
 
     // Helper for creating animations

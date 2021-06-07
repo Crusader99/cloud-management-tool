@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
  * Data transfer object for editing a text document.
  */
 @Serializable
-data class LiveTextEditDto(
-    val ref: String,
+data class DocumentChangeDto(
+    val uuid: String,
     val newTextEncrypted: String,
 ) : LiveDto

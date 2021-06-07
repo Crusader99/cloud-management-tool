@@ -18,7 +18,7 @@ object ServiceUsers {
      */
     suspend fun login(email: String, passwordPlain: String): ServerUserInfoDto {
         val user: UserDao = newSuspendedTransaction {
-            UserDao.find { UserTable.email eq email }.single()
+            UserDao.find(UserTable.email eq email).single()
         }
         val passwordHashed = hashPassword(passwordPlain)
         if (user.passwordHashed != passwordHashed) {
