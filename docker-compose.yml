@@ -30,15 +30,13 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     volumes:
       - mongodb:/data/db
-  phppgadmin: # Simplifies management of postgres
-    image: neimheadh/phppgadmin
+  adminer: # Provides easy to use web interface to manage databases
+    image: adminer:4
+    restart: always
     environment:
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASS: ${POSTGRES_PASSWORD}
+      ADMINER_DEFAULT_SERVER: postgres
     ports:
-      - "${PHPPGADMIN_PORT}:80"
+      - "${ADMINER_PORT}:8080"
   prometheus:
     image: prom/prometheus:v2.26.0
     volumes:
