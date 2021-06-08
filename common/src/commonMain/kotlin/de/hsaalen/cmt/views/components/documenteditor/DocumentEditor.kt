@@ -7,7 +7,6 @@ import de.crusader.objects.color.Color
 import de.crusader.painter.Painter
 import de.crusader.painter.animation.Animator
 import de.crusader.painter.animation.EnumInterpolator
-import de.crusader.painter.util.EnumRelationType
 import de.hsaalen.cmt.network.session.Session
 import de.hsaalen.cmt.views.api.MPView
 import de.hsaalen.cmt.views.events.MPKeyboardEvent
@@ -67,14 +66,20 @@ class DocumentEditor(
             .rectangle(rec.reduce(12))
             .draw()
 
-        p.createString()
-            .color(Color.WHITE)
-            .text(engine.cursor.line.toString())
-            .rectangle(p.rectangle.location(0, 0).timesSize(animator.animation))
-            .size(34f)
-            .relation(EnumRelationType.CENTER, EnumRelationType.CENTER)
-            .filled(true)
-            .draw()
+        val x = 5
+        var y = 0
+        for (line in engine.lines) {
+            val drawString = p.createString()
+                .color(Color.WHITE)
+                .text(line.toString())
+                .rectangle(p.rectangle.location(x, y).timesSize(animator.animation))
+                .size(34f)
+
+            drawString.draw()
+            y += drawString.y
+        }
+
+
     }
 
 }

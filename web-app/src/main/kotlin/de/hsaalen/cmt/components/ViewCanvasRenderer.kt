@@ -8,11 +8,14 @@ import de.hsaalen.cmt.views.events.MPKeyboardEvent
 import de.hsaalen.cmt.views.events.MPMouseButton
 import de.hsaalen.cmt.views.events.MPMouseEvent
 import kotlinx.coroutines.*
+import kotlinx.css.pct
+import kotlinx.css.width
 import kotlinx.html.tabIndex
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 import react.*
+import styled.css
 import styled.styledCanvas
 
 /**
@@ -72,6 +75,9 @@ class ViewCanvasRenderer : RComponent<ViewCanvasRenderer.Props, RState>() {
             attrs {
                 ref = canvasRef
                 tabIndex = "1"
+            }
+            css {
+                width = 100.pct
             }
         }
     }

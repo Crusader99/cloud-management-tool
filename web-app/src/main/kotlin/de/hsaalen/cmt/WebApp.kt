@@ -117,10 +117,8 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     // Allow user to login
                     child(LoginPage::class) {
                         attrs {
-                            onLogin =
-                                { credentials -> onLogin(credentials, isRegistration = false) }
-                            onRegister =
-                                { credentials -> onLogin(credentials, isRegistration = true) }
+                            onLogin = { credentials -> onLogin(credentials, isRegistration = false) }
+                            onRegister = { credentials -> onLogin(credentials, isRegistration = true) }
                             lastEmail = ""
                             isEnabled = !state.isLoading
                         }
