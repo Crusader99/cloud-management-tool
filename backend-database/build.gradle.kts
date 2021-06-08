@@ -25,10 +25,10 @@ dependencies {
     implementation(project(":common"))
 
     // SQL database driver for postgres
-    implementation("org.jetbrains.exposed:exposed-core:0.31.1")
-    implementation("org.jetbrains.exposed:exposed-dao:0.31.1")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.31.1")
-    implementation("org.jetbrains.exposed:exposed-jodatime:0.31.1")
+    implementation("org.jetbrains.exposed:exposed-core:0.32.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.32.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.32.1")
+    implementation("org.jetbrains.exposed:exposed-jodatime:0.32.1")
     implementation("org.postgresql:postgresql:42.2.20")
 
     // Mongo DB driver to support live edit in text documents
@@ -36,7 +36,7 @@ dependencies {
 
     // Statistics & logging frameworks
     // See https://github.com/MicroUtils/kotlin-logging
-    implementation("io.github.microutils:kotlin-logging-jvm:2.0.6")
+    implementation("io.github.microutils:kotlin-logging-jvm:2.0.8")
 
     // JUnit test framework
     testImplementation(kotlin("test"))
