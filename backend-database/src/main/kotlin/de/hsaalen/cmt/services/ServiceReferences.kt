@@ -29,7 +29,7 @@ object ServiceReferences {
         val ref: Reference = newSuspendedTransaction {
             val creator = UserDao.find(UserTable.email eq creatorEmail)
                 .singleOrNull()
-                ?: throw IllegalStateException("User $creatorEmail not found!")
+                ?: throw SecurityException("User $creatorEmail not found!")
             val now = DateTime.now()
             val reference = ReferenceDao.new {
                 this.accessCode = "ACCESS_CODE"

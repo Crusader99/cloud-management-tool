@@ -3,6 +3,7 @@ package de.hsaalen.cmt.network.session
 import de.hsaalen.cmt.network.dto.server.ServerErrorDto
 import de.hsaalen.cmt.network.exceptions.ConnectException
 import de.hsaalen.cmt.network.exceptions.ServerException
+import de.hsaalen.cmt.network.exceptions.UnauthorizedException
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.features.*
@@ -41,7 +42,7 @@ internal object Client {
     suspend inline fun <reified RECEIVE> request(
         url: Url,
         json: Boolean = true,
-        timeout : Long = 5_000,
+        timeout: Long = 5_000,
         crossinline configure: HttpRequestBuilder.() -> Unit = {}
     ): RECEIVE {
         val response: HttpResponse = try {
@@ -80,10 +81,11 @@ internal object Client {
         } catch (t: Throwable) {
             val message = "Server-Error ($statusCode)"
             println(message)
-            if (statusCode == 504) { // 504 = Gateway timeout
-                throw ConnectException(message, t)
+            when (response.status) {
+                HttpStatusCode.GatewayTimeout -> throw ConnectException(message, t)
+                HttpStatusCode.Unauthorized -> throw UnauthorizedException(message, t)
+                else -> throw ServerException(statusCode, message, t)
             }
-            throw ServerException(statusCode, message, t)
         }
     }
 
