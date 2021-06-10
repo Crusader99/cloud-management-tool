@@ -7,12 +7,6 @@ plugins {
 
 application.mainClass.set("de.hsaalen.cmt.ServerBackendKt")
 
-kotlin.target {
-    compilations.all {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-}
-
 configurations.all {
     // Choose 'jvm' from disambiguating targets
     val attr = Attribute.of("de.crusader.targetAttribute", String::class.java)
@@ -33,10 +27,6 @@ dependencies {
     implementation("io.ktor:ktor-metrics-micrometer:1.6.0")
     implementation("io.ktor:ktor-auth:1.6.0")
     implementation("io.ktor:ktor-auth-jwt:1.6.0")
-
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.0") {
-        because("To override deprecated version form ktor")
-    }
 
     // Statistics & logging frameworks
     // See https://github.com/MicroUtils/kotlin-logging

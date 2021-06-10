@@ -5,7 +5,6 @@ plugins {
 repositories {
     maven(url = "https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven")
     maven(url = "https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-js-wrappers")
-    jcenter() // For muirwik-components
 }
 
 // Simplify declaration of kotlin wrapper modules
@@ -13,20 +12,20 @@ fun kotlinWrapper(module: String) = "org.jetbrains:kotlin-$module-pre.153-kotlin
 //fun kotlinWrapper(module: String) = "org.jetbrains.kotlin-wrappers:kotlin-$module-pre.204-kotlin-1.5.0"
 
 dependencies {
-//    modules {
-//        module("org.jetbrains:kotlin-react") {
-//            replacedBy("org.jetbrains.kotlin-wrappers:kotlin-react")
-//        }
-//        module("org.jetbrains:kotlin-react-dom") {
-//            replacedBy("org.jetbrains.kotlin-wrappers:kotlin-react-dom")
-//        }
-//        module("org.jetbrains:kotlin-css-js") {
-//            replacedBy("org.jetbrains.kotlin-wrappers:kotlin-css-js")
-//        }
-//        module("org.jetbrains:kotlin-extensions") {
-//            replacedBy("org.jetbrains.kotlin-wrappers:kotlin-extensions")
-//        }
-//    }
+    modules {
+        module("org.jetbrains:kotlin-react") {
+            replacedBy("org.jetbrains.kotlin-wrappers:kotlin-react")
+        }
+        module("org.jetbrains:kotlin-react-dom") {
+            replacedBy("org.jetbrains.kotlin-wrappers:kotlin-react-dom")
+        }
+        module("org.jetbrains:kotlin-css-js") {
+            replacedBy("org.jetbrains.kotlin-wrappers:kotlin-css-js")
+        }
+        module("org.jetbrains:kotlin-extensions") {
+            replacedBy("org.jetbrains.kotlin-wrappers:kotlin-extensions")
+        }
+    }
 
     implementation(project(":common"))
 
@@ -36,7 +35,7 @@ dependencies {
     implementation(kotlinWrapper("react-table:7.6.3")) // new: 7.7.0
     implementation(kotlinWrapper("styled:5.2.3")) // new: 5.3.0
 
-    implementation("com.ccfraser.muirwik:muirwik-components:0.6.7")
+    implementation("com.ccfraser.muirwik:muirwik-components:0.7.0")
 
     implementation("net.subroh0508.kotlinmaterialui:core:0.5.6")
     implementation("net.subroh0508.kotlinmaterialui:lab:0.5.6")
