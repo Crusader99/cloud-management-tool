@@ -15,6 +15,7 @@ import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 import react.*
+import react.dom.attrs
 import styled.css
 import styled.styledCanvas
 

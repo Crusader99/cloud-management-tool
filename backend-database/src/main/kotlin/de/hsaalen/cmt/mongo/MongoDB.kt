@@ -1,11 +1,13 @@
 package de.hsaalen.cmt.mongo
 
+import de.hsaalen.cmt.network.dto.objects.LineChangeMode.*
 import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
 import mu.KotlinLogging
+import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.coroutine
-import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.KMongo
+import java.util.ArrayList
 
 object MongoDB {
     private val logger = KotlinLogging.logger { }
@@ -32,13 +34,22 @@ object MongoDB {
     }
 
     suspend fun updateDocument(dto: DocumentChangeDto) {
-        replaceDocument(dto.uuid, dto.newTextEncrypted) // TODO: update only line update
+        val x = ArrayList<String>()
+        x.add(3, "")
+        val uuid = dto.uuid
+        val line = dto.lineContentEncrypted
+        when (dto.lineChangeMode) {
+            MODIFY -> collection?.updateOneById(uuid, set(TextDocument::lines.keyProjection(dto.lineNumber) setTo line))
+            DELETE -> collection?.updateOneById(uuid, unset(TextDocument::lines.keyProjection(dto.lineNumber)))
+//            ADD -> collection?.updateOneById(uuid, push(TextDocument::linesAsArray, line))
+        }
+
+//        replaceDocument(dto.uuid, dto.newTextEncrypted) // TODO: update only line update
     }
 
     suspend fun replaceDocument(uuid: String, content: String = "") {
-        val doc = findDocument(uuid)
         val newLines = content.lines()
-        doc.linesAsArray = newLines
+        val doc = TextDocument(uuid, newLines)
         collection?.updateOneById(uuid, doc)
     }
 

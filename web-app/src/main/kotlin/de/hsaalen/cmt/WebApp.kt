@@ -1,6 +1,7 @@
 package de.hsaalen.cmt
 
 import com.ccfraser.muirwik.components.lab.alert.MAlertSeverity
+import com.ccfraser.muirwik.components.mThemeProvider
 import de.hsaalen.cmt.components.ViewHeader
 import de.hsaalen.cmt.components.features.ViewSnackbar
 import de.hsaalen.cmt.components.features.loadingOverlay
@@ -16,7 +17,6 @@ import de.hsaalen.cmt.pages.LoginPage
 import de.hsaalen.cmt.pages.OverviewPage
 import de.hsaalen.cmt.support.SimpleNoteImportJson
 import kotlinx.coroutines.*
-import materialui.styles.themeprovider.themeProvider
 import react.*
 import react.dom.header
 
@@ -77,9 +77,9 @@ class WebApp : RComponent<RProps, WebApp.State>() {
      * Called whenever an update is required.
      */
     override fun RBuilder.render() {
-        themeProvider(Themes.LIGHT) {
+        mThemeProvider(Theme.LIGHT.toMuiTheme()) {
             header {
-                ViewHeader.styledComponent {
+                child(ViewHeader::class) {
                     attrs {
                         isLoggedIn = state.page.isLoggedIn
                         onLogout = ::onLogout

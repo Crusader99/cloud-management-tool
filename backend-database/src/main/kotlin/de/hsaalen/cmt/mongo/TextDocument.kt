@@ -22,7 +22,10 @@ internal data class TextDocument(
             lines = list.indices.zip(list).toMap()
         }
 
-    constructor(id: String, vararg lines: String) : this(id, emptyMap()) {
-        linesAsArray = lines.toList()
+    constructor(id: String, lines: List<String>) : this(id, emptyMap()) {
+        linesAsArray = lines
     }
+
+    constructor(id: String, vararg lines: String) : this(id, lines.toList())
+
 }

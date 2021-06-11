@@ -46,8 +46,9 @@ class DocumentEditPage : RComponent<DocumentEditPage.Props, DocumentEditPage.Sta
      */
     private fun onTextChanged(newText: String) {
         GlobalScope.launch {
-            val dto = DocumentChangeDto(props.reference.uuid, newText)
-            Session.instance?.liveTextEdit(dto)
+            // TODO: implement
+//            val dto = DocumentChangeDto(props.reference.uuid, newText)
+//            Session.instance?.liveTextEdit(dto)
         }
     }
 

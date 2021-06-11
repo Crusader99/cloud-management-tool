@@ -6,6 +6,7 @@ import react.RBuilder
 import react.RComponent
 import react.RProps
 import react.RState
+import react.dom.attrs
 import react.dom.form
 import react.dom.h3
 

@@ -13,6 +13,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.joda.time.DateTime
 import java.io.InputStream
+import java.util.*
 
 /**
  * Handles database operations for the reference and revision management.
@@ -69,6 +70,12 @@ object ServiceReferences {
 
     suspend fun downloadContent(uuid: String): InputStream {
         return MongoDB.getDocumentContent(uuid).inputStream()
+    }
+
+
+    suspend fun deleteReferences(uuid : String){
+        UserDao.findById(UUID.fromString(uuid))?.delete()
+
     }
 
 }

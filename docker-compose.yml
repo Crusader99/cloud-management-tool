@@ -37,7 +37,7 @@ services:
       ADMINER_DEFAULT_SERVER: postgres
     ports:
       - "${ADMINER_PORT}:8080"
-  prometheus:
+  prometheus: # Provides easy to use web interface to manage mongodb
     image: prom/prometheus:v2.26.0
     volumes:
       - ./docker-compose/prometheus/:/etc/prometheus/:z # Config files

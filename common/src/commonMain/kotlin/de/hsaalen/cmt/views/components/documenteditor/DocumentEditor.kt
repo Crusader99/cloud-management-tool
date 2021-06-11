@@ -24,8 +24,9 @@ class DocumentEditor(
 
     init {
         Session.instance?.registerListener { dto ->
-            println("Received " + dto.newTextEncrypted)
-            engine.text = dto.newTextEncrypted
+            // TODO: implement
+//            println("Received " + dto.newTextEncrypted)
+//            engine.text = dto.newTextEncrypted
         }
     }
 

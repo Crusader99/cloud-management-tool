@@ -7,6 +7,7 @@ import de.hsaalen.cmt.components.login.loginComponent
 import de.hsaalen.cmt.components.login.registerComponent
 import kotlinx.css.*
 import react.*
+import react.dom.attrs
 import react.dom.h2
 import styled.css
 import styled.styledDiv

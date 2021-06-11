@@ -1,15 +1,13 @@
 package de.hsaalen.cmt.components.login
 
-import kotlinx.html.CommonAttributeGroupFacade
+import com.ccfraser.muirwik.components.MTextFieldProps
+import com.ccfraser.muirwik.components.mTextField
 import kotlinx.html.InputType
-import kotlinx.html.js.onChangeFunction
-import materialui.components.textfield.textField
 import org.w3c.dom.HTMLInputElement
 import react.RBuilder
 import react.RComponent
 import react.RProps
 import react.RState
-import react.dom.a
 
 /**
  * Wrapper function to simplify creation of a simple login/password field.
@@ -47,16 +45,13 @@ class LoginField : RComponent<LoginField.Props, RState>() {
      * Called when this input field is rendered.
      */
     override fun RBuilder.render() {
-        textField {
+        val title = props.title
+        val isDisabled = !props.isEnabled
+        val passwordType = if (props.isPasswordField) InputType.password else InputType.text
+        val default = props.defaultText
+        mTextField(label = title, required = true, disabled = isDisabled, defaultValue = default, type = passwordType) {
             attrs {
-                label = a { +props.title }
-                required = true
-                disabled = !props.isEnabled
                 onTextChange(props.onTextChange)
-                defaultValue(props.defaultText)
-                if (props.isPasswordField) {
-                    type = InputType.password
-                }
             }
         }
     }
@@ -64,8 +59,8 @@ class LoginField : RComponent<LoginField.Props, RState>() {
     /**
      * Extension helper function to simplify the text change event listener.
      */
-    private fun CommonAttributeGroupFacade.onTextChange(event: (String) -> Unit) {
-        onChangeFunction = { e ->
+    private fun MTextFieldProps.onTextChange(event: (String) -> Unit) {
+        onChange = { e ->
             val input = e.target as? HTMLInputElement
             input?.value?.let { text ->
                 event(text)

@@ -3,11 +3,10 @@ package de.hsaalen.cmt.components
 import com.ccfraser.muirwik.components.MTypographyVariant
 import com.ccfraser.muirwik.components.button.mIconButton
 import com.ccfraser.muirwik.components.dialog.mDialog
+import com.ccfraser.muirwik.components.dialog.mDialogTitle
 import com.ccfraser.muirwik.components.mLink
 import com.ccfraser.muirwik.components.mTypography
 import kotlinx.css.*
-import materialui.components.dialogtitle.dialogTitle
-import materialui.components.typography.typography
 import react.RBuilder
 import react.RComponent
 import react.RProps
@@ -44,7 +43,7 @@ class ViewAboutDialog : RComponent<ViewAboutDialog.Props, RState>() {
      */
     override fun RBuilder.render() {
         mDialog(open = props.open, onClose = { _, _ -> props.onClose() }) {
-            dialogTitle {
+            mDialogTitle(text = "") {
                 attrs {
                     disableTypography = true
                 }
@@ -76,7 +75,7 @@ class ViewAboutDialog : RComponent<ViewAboutDialog.Props, RState>() {
             if (line.isBlank()) {
                 br {}
             } else {
-                typography {
+                mTypography {
                     if ("https://" in line) {
                         // Parse https link from text line
                         val link = "https://" + line.substringAfter("https://")
