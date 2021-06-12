@@ -21,7 +21,7 @@ kotlin {
             testTask {
                 timeout.set(Duration.ofSeconds(20L))
                 useKarma {
-                    useFirefox()
+                    useChromiumHeadless()
                 }
             }
         }
