@@ -13,8 +13,11 @@ services:
       POSTGRESQL_USER: ${POSTGRES_USER}
       POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRESQL_DB: ${POSTGRES_DB}
+      MONGO_HOST: mongodb
+      MONGO_USER: ${MONGO_USER}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
   postgres:
-    image: postgres
+    image: postgres:13.3-alpine
     restart: always
     volumes:
       - postgres:/var/lib/postgresql/data
@@ -25,11 +28,11 @@ services:
   mongodb: # For encrypted text documents to allow update only one line
     image: mongo:4.4
     restart: always
+    volumes:
+      - mongodb:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-    volumes:
-      - mongodb:/data/db
   adminer: # Provides easy to use web interface to manage databases
     image: adminer:4
     restart: always

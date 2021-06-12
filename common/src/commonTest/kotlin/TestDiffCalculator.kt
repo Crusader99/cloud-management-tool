@@ -9,7 +9,7 @@ class TestDiffCalculator {
     @Test
     fun test() {
         val calc = DiffCalculator(::onChangeLine)
-        calc.updateChangedLines("asd\n123\n123\nasd")
+        calc.findChangedLines("asd\n123\n123\nasd")
         println(changedLines)
     }
 

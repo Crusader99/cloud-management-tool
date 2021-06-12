@@ -37,9 +37,13 @@ dependencies {
     // Statistics & logging frameworks
     // See https://github.com/MicroUtils/kotlin-logging
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.8")
+    implementation("ch.qos.logback:logback-classic:1.2.3") {
+        because("Ktor depends on this library and has issues when missing")
+    }
 
     // JUnit test framework
     testImplementation(kotlin("test"))
+    testImplementation("io.mockk:mockk:1.11.0")
 }
 
 val dockerPostgres by tasks.registering(DockerRunTask::class) {
@@ -48,21 +52,34 @@ val dockerPostgres by tasks.registering(DockerRunTask::class) {
     environment["POSTGRES_DB"] = "postgres"
     addPort(freeHostSystemPort, 5432)
     args("-itd")
-    image("postgres")
+    image("postgres:13.3-alpine")
+}
+
+val dockerMongoDB by tasks.registering(DockerRunTask::class) {
+    environment["MONGO_INITDB_ROOT_USERNAME"] = "admin"
+    environment["MONGO_INITDB_ROOT_PASSWORD"] = "admin"
+    addPort(freeHostSystemPort, 27017)
+    args("-itd")
+    image("mongo:4.4")
 }
 
 val dockerStop by tasks.registering(DockerStopTask::class) {
     stopContainerFromTask(dockerPostgres)
+    stopContainerFromTask(dockerMongoDB)
 }
 
 tasks.test {
-    dependsOn(dockerPostgres)
+    dependsOn(dockerPostgres, dockerMongoDB)
     finalizedBy(dockerStop)
 
     environment["POSTGRESQL_USER"] = "admin"
     environment["POSTGRESQL_PASSWORD"] = "admin"
     environment["POSTGRESQL_DB"] = "postgres"
     environment["POSTGRESQL_PORT"] = dockerPostgres.firstPublishedPort
+
+    environment["MONGO_USER"] = "admin"
+    environment["MONGO_PASSWORD"] = "admin"
+    environment["MONGO_PORT"] = dockerMongoDB.firstPublishedPort
 
     useJUnitPlatform()
 }

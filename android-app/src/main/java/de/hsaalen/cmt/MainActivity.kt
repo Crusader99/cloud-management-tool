@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Set top status-bar color of the window
-        window.statusBarColor = Theme.primaryColor.argb
+        window.statusBarColor = Theme.LIGHT.primaryColor.argb
 
         // Assert loader to load local web content
         val assetLoader = WebViewAssetLoader.Builder()

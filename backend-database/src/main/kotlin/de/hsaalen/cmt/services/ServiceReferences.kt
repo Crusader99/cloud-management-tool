@@ -69,11 +69,11 @@ object ServiceReferences {
     }
 
     suspend fun downloadContent(uuid: String): InputStream {
-        return MongoDB.getDocumentContent(uuid).inputStream()
+        return MongoDB.getDocumentContent(uuid).byteInputStream()
     }
 
 
-    suspend fun deleteReferences(uuid : String){
+    suspend fun deleteReferences(uuid: String) {
         UserDao.findById(UUID.fromString(uuid))?.delete()
 
     }
