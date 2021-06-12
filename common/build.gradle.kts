@@ -1,3 +1,5 @@
+import java.time.Duration
+
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
@@ -17,6 +19,7 @@ kotlin {
         useCommonJs()
         browser {
             testTask {
+                timeout.set(Duration.ofSeconds(20L))
                 useKarma {
                     useFirefox()
                 }

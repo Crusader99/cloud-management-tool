@@ -1,3 +1,5 @@
+import java.time.Duration
+
 plugins {
     kotlin("jvm") // There are some bugs with Intellij older than 2021.1
     kotlin("plugin.serialization")
@@ -44,4 +46,5 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    timeout.set(Duration.ofSeconds(20L))
 }

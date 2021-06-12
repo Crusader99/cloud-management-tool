@@ -2,6 +2,7 @@ import com.github.gradledockertests.tasks.DockerRunTask
 import com.github.gradledockertests.tasks.DockerStopTask
 import com.github.gradledockertests.util.firstPublishedPort
 import com.github.gradledockertests.util.freeHostSystemPort
+import java.time.Duration
 
 plugins {
     kotlin("jvm") // There are some bugs with Intellij older than 2021.1
@@ -82,4 +83,5 @@ tasks.test {
     environment["MONGO_PORT"] = dockerMongoDB.firstPublishedPort
 
     useJUnitPlatform()
+    timeout.set(Duration.ofSeconds(20L))
 }
