@@ -36,7 +36,7 @@ class DiffCalculator(
         // Split the text document in lines
         val currentLines = newText.split("\n")
         try {
-            findChangedLines(newText)
+            findChangedLines(currentLines)
         } finally {
             // Update lines for next changes
             previousLines = currentLines
