@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.components.login
 
 import com.ccfraser.muirwik.components.MTextFieldProps
+import com.ccfraser.muirwik.components.form.MFormControlMargin
 import com.ccfraser.muirwik.components.mTextField
 import kotlinx.html.InputType
 import org.w3c.dom.HTMLInputElement
@@ -46,10 +47,11 @@ class LoginField : RComponent<LoginField.Props, RState>() {
      */
     override fun RBuilder.render() {
         val title = props.title
-        val isDisabled = !props.isEnabled
-        val passwordType = if (props.isPasswordField) InputType.password else InputType.text
+        val disable = !props.isEnabled
+        val type = if (props.isPasswordField) InputType.password else InputType.text
         val default = props.defaultText
-        mTextField(label = title, required = true, disabled = isDisabled, defaultValue = default, type = passwordType) {
+        val margin = MFormControlMargin.none
+        mTextField(title, required = true, disabled = disable, defaultValue = default, type = type, margin = margin) {
             attrs {
                 onTextChange(props.onTextChange)
             }
