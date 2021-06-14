@@ -45,9 +45,6 @@ class ViewHeader : RComponent<ViewHeader.Props, ViewHeader.State>() {
      */
     override fun RBuilder.render() {
         styledDiv {
-            css {
-                display = Display.flex
-            }
             mAppBar {
                 mToolbar {
                     mIconButton(iconName = "menu_icon", color = MColor.inherit, onClick = {
