@@ -3,6 +3,8 @@ package de.hsaalen.cmt.services
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.sql.schema.UserDao
 import de.hsaalen.cmt.sql.schema.UserTable
+import de.hsaalen.cmt.utils.validateEmailAndThrow
+import de.hsaalen.cmt.utils.validatePasswordAndThrow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.joda.time.DateTime
@@ -33,10 +35,12 @@ object ServiceUsers {
      * operation fails.
      */
     suspend fun register(fullName: String, email: String, passwordPlain: String): ServerUserInfoDto {
-        if ("@" !in email || "." !in email) {
-            throw SecurityException("Invalid email!")
-        } else if (passwordPlain.length < 8) {
-            throw SecurityException("Password to short! Minimum 8 characters required")
+        try {
+            // Check user input and throw exception when invalid.
+            email.validateEmailAndThrow()
+            passwordPlain.validatePasswordAndThrow()
+        } catch (ex: Exception) {
+            throw SecurityException(ex.message, ex)
         }
         val passwordHashed = hashPassword(passwordPlain)
         return newSuspendedTransaction {

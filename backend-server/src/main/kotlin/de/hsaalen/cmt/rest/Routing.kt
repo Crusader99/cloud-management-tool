@@ -40,8 +40,7 @@ fun Application.registerRoutes() = routing {
         post("/register") {
             val request: ClientRegisterDto = call.receive()
             println("Register: " + request.email)
-            val user =
-                ServiceUsers.register(request.fullName, request.email, request.passwordHashed)
+            val user = ServiceUsers.register(request.fullName, request.email, request.passwordHashed)
             call.response.updateJwtCookie(user.toJwtPayload())
             call.respond(user)
         }

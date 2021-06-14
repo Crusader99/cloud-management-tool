@@ -25,7 +25,7 @@ fun RBuilder.loginComponent(
 /**
  * A react component for displaying all fields and buttons required for user login.
  */
-open class LoginComponent(props: Props) : FormComponent(props) {
+open class LoginComponent(props: FormComponentProps) : FormComponent(props) {
 
     /**
      * Called when this form component is rendered by the super class component implementation.
@@ -36,6 +36,7 @@ open class LoginComponent(props: Props) : FormComponent(props) {
             isEnabled = props.isEnabled,
             defaultText = props.defaultCredentials.email,
             type = InputType.email,
+            autoFocus = true,
             onTextChange = { text ->
                 setState {
                     email = text

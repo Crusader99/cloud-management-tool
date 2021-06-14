@@ -49,9 +49,9 @@ private class LoginButton : RComponent<LoginButtonProps, RState>() {
      * Extension function for accessing button type.
      */
     private var MButtonProps.type: ButtonType
-        get() = asDynamic().type as ButtonType
+        get() = ButtonType.values().first { it.realValue == asDynamic().type.toString() }
         set(value) {
-            asDynamic().type = value
+            asDynamic().type = value.realValue
         }
 
 }
