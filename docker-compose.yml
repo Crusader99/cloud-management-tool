@@ -66,7 +66,7 @@ services:
   traefik: # https://hub.docker.com/_/traefik/
     image: traefik:v2.4.8
     volumes:
-      - ./docker-compose/traefik:/etc/traefik
+      - ./docker-compose/traefik:/etc/traefik:z
     depends_on:
       - backend-server
       - web-app
