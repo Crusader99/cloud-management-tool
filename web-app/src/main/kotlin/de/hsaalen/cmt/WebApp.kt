@@ -21,26 +21,30 @@ import react.*
 import react.dom.header
 
 /**
+ * React properties of the [WebApp] component.
+ */
+external interface WebAppState : RState {
+    var snackbar: ViewSnackbar.SnackbarInfo?
+    var page: EnumPageType
+    var reference: Reference?
+    var isLoading: Boolean
+}
+
+/**
  * The main app component.
  */
-class WebApp : RComponent<RProps, WebApp.State>() {
-    interface State : RState {
-        var snackbar: ViewSnackbar.SnackbarInfo?
-        var page: EnumPageType
-        var reference: Reference?
-        var isLoading: Boolean
-    }
+class WebApp : RComponent<RProps, WebAppState>() {
 
     /**
      * Called when this component is loaded.
      */
-    override fun State.init() = reconnect()
+    override fun WebAppState.init() = reconnect()
 
 
     /**
      * Configures the react state to open the connecting page.
      */
-    private fun State.reconnect() {
+    private fun WebAppState.reconnect() {
         Session.instance = null
         snackbar = null
         isLoading = true

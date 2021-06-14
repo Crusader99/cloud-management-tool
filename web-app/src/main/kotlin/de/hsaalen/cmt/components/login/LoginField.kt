@@ -30,17 +30,20 @@ fun RBuilder.loginField(
 }
 
 /**
+ * React properties of the [LoginField] component.
+ */
+private external interface PropsLoginField : RProps {
+    var title: String
+    var defaultText: String
+    var onTextChange: (String) -> Unit
+    var isEnabled: Boolean
+    var type: InputType
+}
+
+/**
  * A component for displaying a simple login/password field.
  */
-class LoginField : RComponent<LoginField.Props, RState>() {
-
-    interface Props : RProps {
-        var title: String
-        var defaultText: String
-        var onTextChange: (String) -> Unit
-        var isEnabled: Boolean
-        var type: InputType
-    }
+private class LoginField : RComponent<PropsLoginField, RState>() {
 
     /**
      * Called when this input field is rendered.

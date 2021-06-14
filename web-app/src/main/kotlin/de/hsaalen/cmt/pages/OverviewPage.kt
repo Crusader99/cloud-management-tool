@@ -1,10 +1,10 @@
 package de.hsaalen.cmt.pages
 
-import de.hsaalen.cmt.components.ViewReferenceList
-import de.hsaalen.cmt.network.session.Session
+import de.hsaalen.cmt.components.referenceList
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
+import de.hsaalen.cmt.network.session.Session
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import react.*
@@ -39,12 +39,7 @@ class OverviewPage : RComponent<OverviewPage.Props, OverviewPage.State>() {
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        child(ViewReferenceList::class) {
-            attrs {
-                dto = state.dto
-                onItemOpen = props.onItemOpen
-            }
-        }
+        referenceList(dto = state.dto, onItemOpen = props.onItemOpen)
     }
 
 }

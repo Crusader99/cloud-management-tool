@@ -28,15 +28,18 @@ fun RBuilder.aboutDialog(text: String, open: Boolean, onClose: () -> Unit) =
     }
 
 /**
+ * React properties of the [ViewAboutDialog] component.
+ */
+private external interface ViewAboutDialogProps : RProps {
+    var text: String
+    var open: Boolean
+    var onClose: () -> Unit
+}
+
+/**
  * A component for displaying a info dialog with links.
  */
-class ViewAboutDialog : RComponent<ViewAboutDialog.Props, RState>() {
-
-    interface Props : RProps {
-        var text: String
-        var open: Boolean
-        var onClose: () -> Unit
-    }
+private class ViewAboutDialog : RComponent<ViewAboutDialogProps, RState>() {
 
     /**
      * Called when this dialog is rendered.

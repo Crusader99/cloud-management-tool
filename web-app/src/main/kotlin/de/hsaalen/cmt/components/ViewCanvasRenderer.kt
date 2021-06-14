@@ -30,16 +30,20 @@ fun RBuilder.canvasRenderer(view: MPView) =
     }
 
 /**
+ * React properties of the [ViewCanvasRenderer] component.
+ */
+private external interface ViewCanvasRendererProps : RProps {
+    var view: MPView
+}
+
+/**
  * A React component for rendering canvas elements which supports multi-platform support.
  */
-class ViewCanvasRenderer : RComponent<ViewCanvasRenderer.Props, RState>() {
+private class ViewCanvasRenderer : RComponent<ViewCanvasRendererProps, RState>() {
     private var previousMouse: Point? = null
     private var refreshJob: Job? = null
     private var canvasRef = createRef<HTMLCanvasElement>()
 
-    interface Props : RProps {
-        var view: MPView
-    }
 
     /**
      * Called only once when component was created.
@@ -83,6 +87,9 @@ class ViewCanvasRenderer : RComponent<ViewCanvasRenderer.Props, RState>() {
         }
     }
 
+    /**
+     * Convert JS keyboard event to multiplatform keyboard event instance.
+     */
     private fun KeyboardEvent.toMultiPlatform() =
         MPKeyboardEvent(
             this.keyCode,
@@ -91,6 +98,9 @@ class ViewCanvasRenderer : RComponent<ViewCanvasRenderer.Props, RState>() {
             isShiftDown = false
         )
 
+    /**
+     * Convert JS mouse event to multiplatform mouse event instance.
+     */
     private fun MouseEvent.toMultiPlatform() =
         MPMouseEvent(this.position, this.position, MPMouseButton.LEFT, 1)
 
