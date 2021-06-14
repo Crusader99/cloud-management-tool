@@ -3,7 +3,7 @@ import java.time.Duration
 plugins {
     kotlin("jvm") // There are some bugs with Intellij older than 2021.1
     kotlin("plugin.serialization")
-    id("com.github.gelangweilte-studenten.gradle-docker-tests") version "1.1.1"
+    id("com.github.gelangweilte-studenten.gradle-docker-tests")
     application
 }
 

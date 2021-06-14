@@ -83,15 +83,19 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     attrs {
                         isLoggedIn = state.page.isLoggedIn
                         onLogout = ::onLogout
-                        drawerMenu = mapOf(
-                            "Create" to {
-                                GlobalScope.launch {
-                                    // TODO: implement input field for file name
-                                    Session.instance?.createReference("test")
-                                }
-                            },
-                            "Import" to { onImportData() },
-                        )
+                        drawerMenu = if (state.page.isLoggedIn) {
+                            mapOf(
+                                "Create" to {
+                                    GlobalScope.launch {
+                                        // TODO: implement input field for file name
+                                        Session.instance?.createReference("test")
+                                    }
+                                },
+                                "Import" to { onImportData() },
+                            )
+                        } else {
+                            emptyMap()
+                        }
                     }
                 }
             }
