@@ -59,8 +59,11 @@ Online management tool for files and documents
 * [x] Connect websocket to backend server
 * [x] Remove JWT cookie on logout
 * [x] Simplify debugging without complete rebuild
-* [x] Ensure session is restored after page reload
-* [x] Make frontend work on android
+* [x] Ensure session restored after page reload
+* [x] Make frontend work on Android
+* [x] Build Electron app for PC
+* [x] Implement mongodb data structure for text documents
+* [x] Implement algorithm for detecting changed lines in text
 * [ ] Implement text editor in frontend
 * [ ] Implement live sync for file edit
 * [ ] ...
@@ -83,6 +86,9 @@ sdk.dir=/opt/android
 
 Build all modules, including android:
 > gradlew build
+
+To skip the tests while Gradle build run:
+> gradlew build -x test
 
 Start backend using docker (opens reverse-proxy on port 80):
 > sudo docker-compose up --build
