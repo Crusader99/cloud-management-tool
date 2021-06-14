@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.components.login
 
+import kotlinx.html.InputType
 import react.RBuilder
 import react.dom.br
 import react.setState
@@ -34,6 +35,7 @@ open class LoginComponent(props: Props) : FormComponent(props) {
             title = "E-Mail",
             isEnabled = props.isEnabled,
             defaultText = props.defaultCredentials.email,
+            type = InputType.email,
             onTextChange = { text ->
                 setState {
                     email = text
@@ -44,7 +46,7 @@ open class LoginComponent(props: Props) : FormComponent(props) {
         loginField(
             title = "Password",
             isEnabled = props.isEnabled,
-            isPasswordField = true,
+            type = InputType.password,
             onTextChange = { text ->
                 setState {
                     password = text

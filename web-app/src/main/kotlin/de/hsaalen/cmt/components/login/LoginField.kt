@@ -18,14 +18,14 @@ fun RBuilder.loginField(
     defaultText: String = "",
     onTextChange: (String) -> Unit = {},
     isEnabled: Boolean = true,
-    isPasswordField: Boolean = false
+    type: InputType = InputType.text
 ) = child(LoginField::class) {
     attrs {
         this.title = title
         this.defaultText = defaultText
         this.onTextChange = onTextChange
         this.isEnabled = isEnabled
-        this.isPasswordField = isPasswordField
+        this.type = type
     }
 }
 
@@ -39,7 +39,7 @@ class LoginField : RComponent<LoginField.Props, RState>() {
         var defaultText: String
         var onTextChange: (String) -> Unit
         var isEnabled: Boolean
-        var isPasswordField: Boolean
+        var type: InputType
     }
 
     /**
@@ -48,7 +48,7 @@ class LoginField : RComponent<LoginField.Props, RState>() {
     override fun RBuilder.render() {
         val title = props.title
         val disable = !props.isEnabled
-        val type = if (props.isPasswordField) InputType.password else InputType.text
+        val type = props.type
         val default = props.defaultText
         val margin = MFormControlMargin.none
         mTextField(title, required = true, disabled = disable, defaultValue = default, type = type, margin = margin) {
