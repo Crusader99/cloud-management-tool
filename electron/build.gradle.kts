@@ -1,7 +1,8 @@
 import java.io.ByteArrayOutputStream
 
 plugins {
-    base
+    base // Basic plugin to provide clean tasks etc
+    application // The application plugin configures the source sets for the IDE
 }
 
 /**
@@ -17,32 +18,15 @@ val cleanupResources by tasks.registering {
 val copyResources by tasks.registering(Copy::class) {
     dependsOn(cleanupResources, ":web-app:build")
     from("../web-app/build/artifact-js")
+    from("src/main/resources")
     into("$buildDir/electron")
-}
-
-/**
- * Prepare the package.json file, required for npm/yarn.
- */
-val prepareFiles by tasks.registering {
-    dependsOn(copyResources)
-    doLast {
-        val packageJson = """{
-  "name": "electron",
-  "version": "1.0.0",
-  "description": "",
-  "main": "web-app.js",
-  "author": "Simon Forschner",
-  "license": "MIT"
-}"""
-        file("$buildDir/electron/package.json").writeText(packageJson)
-    }
 }
 
 /**
  * Build and execute docker image for building actual electron with related installers.
  */
 val dockerElectronBuilder by tasks.registering {
-    dependsOn(prepareFiles)
+    dependsOn(copyResources)
     doLast {
         val dockerImageId = ByteArrayOutputStream().apply {
             use { output ->
