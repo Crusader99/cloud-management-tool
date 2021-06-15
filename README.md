@@ -19,14 +19,15 @@ Online management tool for files and documents
 
 ## Technical background:
 
-* [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform.html) (share code between clients and backend)
-* [Kotlinx Coroutines](https://github.com/Kotlin/kotlinx.coroutines) (lightweight multithreading)
+* [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform.html) (share code between frontend and backend)
 * [Ktor](https://ktor.io/) (for client & server as network framework)
 * [Kotlinx Serialization](https://github.com/Kotlin/kotlinx.serialization) (for JSON in REST API)
-* [Exposed](https://github.com/JetBrains/Exposed) (ORM framework for Kotlin)
-* [React](https://kotlinlang.org/docs/js-get-started.html) (as frontend library with
-  wrappers: [#1](https://github.com/subroh0508/kotlin-material-ui) [#2](https://github.com/cfnz/muirwik))
-* [Material UI](https://material-ui.com/) (provides react components)
+* [Exposed](https://github.com/JetBrains/Exposed) (ORM framework for SQL in Kotlin)
+* [KMongo](https://litote.org/kmongo/) (ORM framework for MongoDB in Kotlin)
+* [Kotlinx Coroutines](https://github.com/Kotlin/kotlinx.coroutines) (non-blocking programming)
+* [React](https://kotlinlang.org/docs/js-get-started.html)
+  (as web-app frontend library, see [Kotlin/JS for React](https://kotlinlang.org/docs/js-get-started.html))
+* [Material UI](https://material-ui.com/) + [Muirwik](https://github.com/cfnz/muirwik) (provides react components)
 
 ## Databases:
 
