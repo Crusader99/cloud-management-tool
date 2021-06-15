@@ -8,6 +8,7 @@ import de.hsaalen.cmt.components.dialogs.createReferenceDialog
 import de.hsaalen.cmt.components.features.ViewSnackbar
 import de.hsaalen.cmt.components.features.loadingOverlay
 import de.hsaalen.cmt.components.login.Credentials
+import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.extensions.openFileSelector
 import de.hsaalen.cmt.extensions.readText
 import de.hsaalen.cmt.network.dto.objects.Reference
@@ -18,7 +19,10 @@ import de.hsaalen.cmt.pages.FallbackPage
 import de.hsaalen.cmt.pages.LoginPage
 import de.hsaalen.cmt.pages.OverviewPage
 import de.hsaalen.cmt.support.SimpleNoteImportJson
-import kotlinx.coroutines.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import react.*
 import react.dom.header
 
@@ -63,7 +67,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
         page = EnumPageType.CONNECTING
         reference = null
 
-        GlobalScope.launch {
+        coroutines.launch {
             try {
                 val restoredSession = Session.restore()
                 setState {
@@ -182,7 +186,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
      * Called when user had entered the username and password.
      */
     private fun onLogin(credentials: Credentials, isRegistration: Boolean) {
-        GlobalScope.launch {
+        coroutines.launch {
             try {
                 setState {
                     isLoading = true
@@ -206,7 +210,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                     page = EnumPageType.OVERVIEW
                     snackbar = ViewSnackbar.SnackbarInfo("Successfully logged in!", MAlertSeverity.success)
                 }
-                GlobalScope.launch {
+                launch {
                     try {
                         while (isActive) {
                             val client = Session.instance ?: break
@@ -238,7 +242,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
      * Disconnect client, forget secret keys and show login page.
      */
     private fun onLogout() {
-        GlobalScope.launch {
+        coroutines.launch {
             try {
                 setState {
                     isLoading = true
@@ -298,7 +302,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
             }
         }
 
-        GlobalScope.launch {
+        coroutines.launch {
             for (file in openFileSelector()) {
                 // TODO: remove debug messages
                 println("selected " + file.name)
@@ -315,7 +319,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
      * Create a new reference object on server.
      */
     private fun onCreateReference() {
-        GlobalScope.launch {
+        coroutines.launch {
             val displayName = refCreateReferenceDialog.current?.show() ?: return@launch
             println("Selected display name: $displayName")
             Session.instance?.createReference(displayName)

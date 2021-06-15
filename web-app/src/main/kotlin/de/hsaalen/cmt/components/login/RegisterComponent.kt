@@ -1,9 +1,9 @@
 package de.hsaalen.cmt.components.login
 
+import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.utils.validateEmailAndGetError
 import de.hsaalen.cmt.utils.validateFullNameAndGetError
 import de.hsaalen.cmt.utils.validatePasswordAndGetError
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.html.InputType
 import org.w3c.dom.events.Event
@@ -82,7 +82,7 @@ class RegisterComponent(props: FormComponentProps) : FormComponent(props) {
                 // Also correct error-state of the repeated password field when first password field is now correct.
                 repeatPasswordFieldRef.current?.also { repeatPasswordField ->
                     if (!repeatPasswordField.isInputTextValid()) {
-                        GlobalScope.launch {
+                        coroutines.launch {
                             repeatPasswordFieldRef.current?.handleValidation()
                         }
                     }

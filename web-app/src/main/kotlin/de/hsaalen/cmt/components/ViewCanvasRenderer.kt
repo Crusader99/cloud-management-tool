@@ -3,11 +3,15 @@ package de.hsaalen.cmt.components
 import de.crusader.objects.Point
 import de.crusader.objects.position
 import de.crusader.painter.draw
+import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.views.api.MPView
 import de.hsaalen.cmt.views.events.MPKeyboardEvent
 import de.hsaalen.cmt.views.events.MPMouseButton
 import de.hsaalen.cmt.views.events.MPMouseEvent
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.css.pct
 import kotlinx.css.width
 import kotlinx.html.tabIndex
@@ -55,7 +59,7 @@ private class ViewCanvasRenderer : RComponent<ViewCanvasRendererProps, RState>()
         canvasRef.current?.onmouseup = { props.view.onMouseUp(it.toMultiPlatform()) }
         canvasRef.current?.onkeydown = { props.view.onKeyDown(it.toMultiPlatform()) }
         canvasRef.current?.onkeyup = { props.view.onKeyUp(it.toMultiPlatform()) }
-        refreshJob = GlobalScope.launch {
+        refreshJob = coroutines.launch {
             while (isActive) {
                 delay(60)
                 canvasRef.current?.draw { p ->

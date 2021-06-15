@@ -1,11 +1,11 @@
 package de.hsaalen.cmt.pages
 
 import de.hsaalen.cmt.components.referenceList
+import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.network.session.Session
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import react.*
 
@@ -27,7 +27,9 @@ class OverviewPage : RComponent<OverviewPage.Props, OverviewPage.State>() {
     override fun State.init() {
         query = ClientReferenceQueryDto()
         dto = null
-        updateReferences()
+        coroutines.launch {
+            updateReferences()
+        }
     }
 
     /**
@@ -40,12 +42,10 @@ class OverviewPage : RComponent<OverviewPage.Props, OverviewPage.State>() {
     /**
      * Request a references update from server.
      */
-    fun updateReferences() {
-        GlobalScope.launch {
-            val received = props.session.listReferences(state.query)
-            setState {
-                dto = received
-            }
+    suspend fun updateReferences() {
+        val received = props.session.listReferences(state.query)
+        setState {
+            dto = received
         }
     }
 

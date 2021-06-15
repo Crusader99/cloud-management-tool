@@ -1,11 +1,10 @@
 package de.hsaalen.cmt.pages
 
 import de.hsaalen.cmt.components.canvasRenderer
+import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.network.dto.objects.Reference
-import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
 import de.hsaalen.cmt.network.session.Session
 import de.hsaalen.cmt.views.components.documenteditor.DocumentEditor
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import react.*
 
@@ -24,7 +23,7 @@ class DocumentEditPage : RComponent<DocumentEditPage.Props, DocumentEditPage.Sta
     }
 
     override fun State.init() {
-        GlobalScope.launch {
+        coroutines.launch {
             val text = Session.instance?.download(props.reference.uuid)
             setState {
                 defaultText = text
@@ -45,7 +44,7 @@ class DocumentEditPage : RComponent<DocumentEditPage.Props, DocumentEditPage.Sta
      * Called after every key the user pressed.
      */
     private fun onTextChanged(newText: String) {
-        GlobalScope.launch {
+        coroutines.launch {
             // TODO: implement
 //            val dto = DocumentChangeDto(props.reference.uuid, newText)
 //            Session.instance?.liveTextEdit(dto)
