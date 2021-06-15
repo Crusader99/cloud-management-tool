@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.components.login
 
+import kotlinx.html.InputType
 import react.RBuilder
 import react.dom.br
 import react.setState
@@ -24,7 +25,7 @@ fun RBuilder.loginComponent(
 /**
  * A react component for displaying all fields and buttons required for user login.
  */
-open class LoginComponent(props: Props) : FormComponent(props) {
+open class LoginComponent(props: FormComponentProps) : FormComponent(props) {
 
     /**
      * Called when this form component is rendered by the super class component implementation.
@@ -34,6 +35,8 @@ open class LoginComponent(props: Props) : FormComponent(props) {
             title = "E-Mail",
             isEnabled = props.isEnabled,
             defaultText = props.defaultCredentials.email,
+            type = InputType.email,
+            autoFocus = true,
             onTextChange = { text ->
                 setState {
                     email = text
@@ -44,7 +47,7 @@ open class LoginComponent(props: Props) : FormComponent(props) {
         loginField(
             title = "Password",
             isEnabled = props.isEnabled,
-            isPasswordField = true,
+            type = InputType.password,
             onTextChange = { text ->
                 setState {
                     password = text

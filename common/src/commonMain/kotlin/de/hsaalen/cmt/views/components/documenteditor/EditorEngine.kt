@@ -7,9 +7,9 @@ import de.crusader.extensions.EnumDirection
  */
 class EditorEngine(
     val isMultiLineAllowed: Boolean = true,
-    val defaultLine: Line,
+    defaultText: String
 ) {
-    val lines = mutableListOf(defaultLine)
+    val lines = defaultText.lineSequence().map { Line(it) }.toMutableList()
 
     val cursor = Cursor(CursorReference(this, CursorOwner(), 0), CursorPos(0, 0))
 
@@ -24,20 +24,21 @@ class EditorEngine(
 
     fun clear() {
         lines.clear()
-        lines += defaultLine // Only keep one empty line
+        lines += newEmptyLine() // Only keep one empty line
     }
 
-    class Line(defaultText: String) {
-        val items = mutableListOf<Char>()
+    private fun newEmptyLine() = Line(mutableListOf())
+
+    class Line(charItems: List<Char>) {
+        val items = charItems.toMutableList()
 
         val size: Int
             get() = items.size
 
-        init {
-            items.addAll(defaultText.toList())
-        }
+        constructor(defaultText: String) : this(defaultText.toMutableList())
 
         override fun toString() = items.toCharArray().concatToString()
+
     }
 
     class CursorOwner()
@@ -120,7 +121,8 @@ class EditorEngine(
         }
 
         fun newLine() {
-            ref.engine.lines.add(y, ref.engine.defaultLine)
+            ref.engine.lines.add(y + 1, ref.engine.newEmptyLine())
+            move(EnumDirection.DOWN)
         }
     }
 

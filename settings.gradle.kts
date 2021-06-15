@@ -21,6 +21,7 @@ include(":common")
 include(":backend-database")
 include(":backend-server")
 include(":web-app")
+//include(":electron") TODO: enable when electron build fixed on ci
 
 // File local.properties with "sdk.dir" required
 if (file("local.properties").exists()) {

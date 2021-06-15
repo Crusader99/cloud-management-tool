@@ -1,15 +1,10 @@
 package de.hsaalen.cmt.components.login
 
-import kotlinx.html.CommonAttributeGroupFacade
+import com.ccfraser.muirwik.components.form.MFormControlMargin
+import com.ccfraser.muirwik.components.mTextField
+import de.hsaalen.cmt.extensions.onTextChange
 import kotlinx.html.InputType
-import kotlinx.html.js.onChangeFunction
-import materialui.components.textfield.textField
-import org.w3c.dom.HTMLInputElement
-import react.RBuilder
-import react.RComponent
-import react.RProps
-import react.RState
-import react.dom.a
+import react.*
 
 /**
  * Wrapper function to simplify creation of a simple login/password field.
@@ -19,59 +14,112 @@ fun RBuilder.loginField(
     defaultText: String = "",
     onTextChange: (String) -> Unit = {},
     isEnabled: Boolean = true,
-    isPasswordField: Boolean = false
+    type: InputType = InputType.text,
+    onValidate: ValidateEvent = { null },
+    autoFocus: Boolean = false,
+    ref: RRef? = null
 ) = child(LoginField::class) {
     attrs {
         this.title = title
         this.defaultText = defaultText
         this.onTextChange = onTextChange
         this.isEnabled = isEnabled
-        this.isPasswordField = isPasswordField
+        this.type = type
+        this.onValidate = onValidate
+        this.autoFocus = autoFocus
+        if (ref != null) {
+            this.ref = ref
+        }
     }
+}
+
+/**
+ * Lambda that takes the value of the login field as parameter and should return an error message when any error exists.
+ * Otherwise null should be returned.
+ */
+typealias ValidateEvent = (String) -> String?
+
+/**
+ * React properties of the [LoginField] component.
+ */
+external interface LoginFieldProps : RProps {
+    var title: String
+    var defaultText: String
+    var onTextChange: (String) -> Unit
+    var isEnabled: Boolean
+    var type: InputType
+    var onValidate: ValidateEvent
+    var autoFocus: Boolean
+}
+
+/**
+ * React state of the [LoginField] component.
+ */
+external interface LoginFieldState : RState {
+    var currentInputText: String
+    var errorMessage: String?
 }
 
 /**
  * A component for displaying a simple login/password field.
  */
-class LoginField : RComponent<LoginField.Props, RState>() {
+class LoginField(props: LoginFieldProps) : RComponent<LoginFieldProps, LoginFieldState>(props) {
 
-    interface Props : RProps {
-        var title: String
-        var defaultText: String
-        var onTextChange: (String) -> Unit
-        var isEnabled: Boolean
-        var isPasswordField: Boolean
+    /**
+     * Initialize state of the [LoginField] which depends on the [LoginFieldProps].
+     */
+    override fun LoginFieldState.init(props: LoginFieldProps) {
+        currentInputText = props.defaultText
+        currentInputText = ""
     }
 
     /**
      * Called when this input field is rendered.
      */
     override fun RBuilder.render() {
-        textField {
+        mTextField(
+            label = props.title,
+            required = true,
+            disabled = !props.isEnabled,
+            defaultValue = props.defaultText,
+            type = props.type,
+            margin = MFormControlMargin.none,
+            error = state.errorMessage != null,
+            helperText = state.errorMessage,
+            autoFocus = props.autoFocus,
+        ) {
             attrs {
-                label = a { +props.title }
-                required = true
-                disabled = !props.isEnabled
-                onTextChange(props.onTextChange)
-                defaultValue(props.defaultText)
-                if (props.isPasswordField) {
-                    type = InputType.password
-                }
+                onTextChange(::handleTextChange)
+                onBlur = { handleValidation() }
             }
         }
     }
 
     /**
-     * Extension helper function to simplify the text change event listener.
+     * Called when ever the user input changes.
      */
-    private fun CommonAttributeGroupFacade.onTextChange(event: (String) -> Unit) {
-        onChangeFunction = { e ->
-            val input = e.target as? HTMLInputElement
-            input?.value?.let { text ->
-                event(text)
+    private fun handleTextChange(newText: String) {
+        setState {
+            this.currentInputText = newText
+            if (errorMessage != null) {
+                errorMessage = props.onValidate(newText)
             }
+        }
+        props.onTextChange(newText)
+    }
+
+    /**
+     * Calls the validation event to check the current user input
+     * and display an error when required.
+     */
+    fun handleValidation() {
+        setState {
+            errorMessage = props.onValidate(state.currentInputText)
         }
     }
 
-
+    /**
+     * Indicates weather the user typed a valid text. This is calculated by the [handleValidation] function.
+     */
+    fun isInputTextValid() = state.errorMessage == null
 }

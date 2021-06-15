@@ -30,7 +30,7 @@ class ReactAvailabilityTest {
         webServer = embeddedServer(CIO, freeHostSystemPort) {
             routing {
                 static {
-                    println("asdasdasssssssssssssssssssssssssssssssssssssssssssssssssss")
+                    println("Provided static folder")
                     staticRootFolder = webFolder
                     default(File(webFolder, "index.html"))
                 }
@@ -40,14 +40,14 @@ class ReactAvailabilityTest {
 
     @AfterTest
     fun stopWebServer() {
-      //  webServer?.stop(1000, 1000)
+        //  webServer?.stop(1000, 1000)
     }
 
     @Test
     @Disabled
     fun test() {
         WebScraper.selenium(URL("http://localhost:$freeHostSystemPort/")).use { browser ->
-            println("xxxxxxxxxxxxxxxxxxx" + browser.document.body.tag)
+            println("Connected")
         }
     }
 

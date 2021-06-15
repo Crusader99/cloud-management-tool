@@ -24,6 +24,14 @@ val POSTGRESQL_PASSWORD = env("POSTGRESQL_PASSWORD")
 
 val POSTGRESQL_DB = envOrDefault("POSTGRESQL_DB", "postgres")
 
+val MONGO_HOST = envOrDefault("MONGO_HOST", "localhost")
+
+val MONGO_PORT = envOrDefault("MONGO_PORT", 27017).toInt()
+
+val MONGO_USER = envOrDefault("MONGO_USER", "admin")
+
+val MONGO_PASSWORD = env("MONGO_PASSWORD")
+
 /**
  * Reads a system environment variable or throws an exception when not available.
  */

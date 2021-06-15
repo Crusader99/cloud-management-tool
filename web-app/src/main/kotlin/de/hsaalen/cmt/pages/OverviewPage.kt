@@ -1,37 +1,43 @@
 package de.hsaalen.cmt.pages
 
-import de.hsaalen.cmt.components.ViewReferenceList
-import de.hsaalen.cmt.network.session.Session
+import de.hsaalen.cmt.components.referenceList
+import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
-import kotlinx.coroutines.GlobalScope
+import de.hsaalen.cmt.network.session.Session
 import kotlinx.coroutines.launch
 import react.*
 
 /**
+ * React properties of the [OverviewPage] component.
+ */
+external interface OverviewPageProps : RProps {
+    var session: Session
+    var onItemOpen: (Reference) -> Unit
+}
+
+/**
+ * React state of the [OverviewPage] component.
+ */
+external interface OverviewPageState : RState {
+    var query: ClientReferenceQueryDto
+    var dto: ServerReferenceListDto?
+}
+
+/**
  * The overview app component for displaying results of the search.
  */
-class OverviewPage : RComponent<OverviewPage.Props, OverviewPage.State>() {
+class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
 
-    interface Props : RProps {
-        var session: Session
-        var onItemOpen: (Reference) -> Unit
-    }
-
-    interface State : RState {
-        var query: ClientReferenceQueryDto
-        var dto: ServerReferenceListDto?
-    }
-
-    override fun State.init() {
+    /**
+     * Initialize state of the [OverviewPage].
+     */
+    override fun OverviewPageState.init() {
         query = ClientReferenceQueryDto()
         dto = null
-        GlobalScope.launch {
-            val received = props.session.listReferences(query)
-            setState {
-                dto = received
-            }
+        coroutines.launch {
+            updateReferences()
         }
     }
 
@@ -39,11 +45,16 @@ class OverviewPage : RComponent<OverviewPage.Props, OverviewPage.State>() {
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        child(ViewReferenceList::class) {
-            attrs {
-                dto = state.dto
-                onItemOpen = props.onItemOpen
-            }
+        referenceList(dto = state.dto, onItemOpen = props.onItemOpen)
+    }
+
+    /**
+     * Request a references update from server.
+     */
+    suspend fun updateReferences() {
+        val received = props.session.listReferences(state.query)
+        setState {
+            dto = received
         }
     }
 

@@ -6,34 +6,43 @@ import react.RBuilder
 import react.RComponent
 import react.RProps
 import react.RState
+import react.dom.attrs
 import react.dom.form
 import react.dom.h3
 
 /**
+ * React properties of the [FormComponent] component.
+ */
+external interface FormComponentProps : RProps {
+    var defaultCredentials: Credentials
+    var onSubmit: (Credentials) -> Unit
+    var buttonTitle: String
+    var isEnabled: Boolean
+}
+
+/**
+ * React state of the [FormComponent] component.
+ */
+external interface FormComponentState : RState {
+    var fullName: String
+    var email: String
+    var password: String
+    var passwordRepeated: String
+}
+
+/**
  * A react component to simplify login/register forms.
  */
-abstract class FormComponent(props: Props) : RComponent<FormComponent.Props, FormComponent.State>(props) {
-
-    interface Props : RProps {
-        var defaultCredentials: Credentials
-        var onSubmit: (Credentials) -> Unit
-        var buttonTitle: String
-        var isEnabled: Boolean
-    }
-
-    interface State : RState {
-        var fullName: String
-        var email: String
-        var password: String
-    }
+abstract class FormComponent(props: FormComponentProps) : RComponent<FormComponentProps, FormComponentState>(props) {
 
     /**
      * Called when this component is loaded.
      */
-    override fun State.init(props: Props) {
+    override fun FormComponentState.init(props: FormComponentProps) {
         fullName = props.defaultCredentials.fullName
         email = props.defaultCredentials.email
         password = "" // Reset password
+        passwordRepeated = ""
     }
 
     /**
@@ -59,7 +68,7 @@ abstract class FormComponent(props: Props) : RComponent<FormComponent.Props, For
     /**
      * Called when user had entered the username and password.
      */
-    private fun onSubmit(event: Event) {
+    protected open fun onSubmit(event: Event) {
         event.preventDefault()
         props.onSubmit(Credentials(state.fullName, state.email, state.password))
     }

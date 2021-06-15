@@ -1,9 +1,10 @@
 package de.hsaalen.cmt.components.login
 
+import com.ccfraser.muirwik.components.MColor
+import com.ccfraser.muirwik.components.button.MButtonProps
+import com.ccfraser.muirwik.components.button.MButtonVariant
+import com.ccfraser.muirwik.components.button.mButton
 import kotlinx.html.ButtonType
-import materialui.components.button.button
-import materialui.components.button.enums.ButtonColor
-import materialui.components.button.enums.ButtonVariant
 import react.RBuilder
 import react.RComponent
 import react.RProps
@@ -21,27 +22,36 @@ fun RBuilder.loginButton(
 }
 
 /**
+ * React properties for this [LoginButton] component.
+ */
+private external interface LoginButtonProps : RProps {
+    var title: String
+}
+
+/**
  * A react component for displaying a simple login button which can be used in a form with submit event.
  */
-class LoginButton : RComponent<LoginButton.Props, RState>() {
-
-    interface Props : RProps {
-        var title: String
-    }
+private class LoginButton : RComponent<LoginButtonProps, RState>() {
 
     /**
      * Called when this button component is rendered.
      */
     override fun RBuilder.render() {
-        button {
-            +props.title
+        mButton(caption = props.title, variant = MButtonVariant.contained, color = MColor.primary) {
             attrs {
-                variant = ButtonVariant.contained
-                color = ButtonColor.primary
                 type = ButtonType.submit
                 fullWidth = true
             }
         }
     }
+
+    /**
+     * Extension function for accessing button type.
+     */
+    private var MButtonProps.type: ButtonType
+        get() = ButtonType.values().first { it.realValue == asDynamic().type.toString() }
+        set(value) {
+            asDynamic().type = value.realValue
+        }
 
 }

@@ -1,0 +1,16 @@
+// Manuel written mongo queries for line updating to test directly
+// Note: This file is not required by the project for building
+
+doc = {
+  "lines": ["1"]
+}
+db.docs.insertMany([doc])
+db.docs.find().pretty()
+
+db.docs.find({"_id": ObjectId("60c4329d4e43a98116a125be")}).pretty()
+
+db.docs.update({"_id": ObjectId("60c4329d4e43a98116a125be")}, { $set: { "lines.0": "2" } })
+
+db.docs.update({"_id": ObjectId("60c4329d4e43a98116a125be")}, { $unset: { "lines.0": "" } })
+
+db.docs.update({"_id": ObjectId("60c4329d4e43a98116a125be")}, { $pull: { "lines": "" } })

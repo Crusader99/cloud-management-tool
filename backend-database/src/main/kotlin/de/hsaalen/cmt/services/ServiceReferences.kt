@@ -13,6 +13,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.joda.time.DateTime
 import java.io.InputStream
+import java.util.*
 
 /**
  * Handles database operations for the reference and revision management.
@@ -29,7 +30,7 @@ object ServiceReferences {
         val ref: Reference = newSuspendedTransaction {
             val creator = UserDao.find(UserTable.email eq creatorEmail)
                 .singleOrNull()
-                ?: throw IllegalStateException("User $creatorEmail not found!")
+                ?: throw SecurityException("User $creatorEmail not found!")
             val now = DateTime.now()
             val reference = ReferenceDao.new {
                 this.accessCode = "ACCESS_CODE"
@@ -68,7 +69,13 @@ object ServiceReferences {
     }
 
     suspend fun downloadContent(uuid: String): InputStream {
-        return MongoDB.getDocumentContent(uuid).inputStream()
+        return MongoDB.getDocumentContent(uuid).byteInputStream()
+    }
+
+
+    suspend fun deleteReferences(uuid: String) {
+        UserDao.findById(UUID.fromString(uuid))?.delete()
+
     }
 
 }

@@ -58,53 +58,51 @@ class Session(val userInfo: ServerUserInfoDto) :
             // Should also work with tls encryption
             url = "ws" + url.removePrefix("http")
         }
-        GlobalScope.launch {
-            try {
-                Client.instance.ws(urlString = url) {
-                    println("Connected websocket")
+        try {
+            Client.instance.ws(urlString = url) {
+                println("Connected websocket")
 
-                    GlobalScope.launch {
-                        try {
-                            for (frame in webSocketSendingQueue) {
-                                if (isActive && isConnected) {
-                                    send(frame)
-                                } else {
-                                    throw IllegalStateException("Not connected with websocket")
-                                }
-                            }
-                        } catch (ex: Throwable) {
-                            isConnected = false
-                        }
-                    }
-
-                    while (isActive && isConnected) {
-                        println("Waiting for websocket receive")
-                        val frame = incoming.receive()
-                        val dto: DocumentChangeDto = if (frame is Frame.Text) {
-                            val jsonText = frame.readText()
-                            Json.decodeFromString(jsonText)
-                        } else {
-                            throw UnsupportedOperationException(frame::class.simpleName)
-                        }
-                        for (handler in webSocketListeners) {
-                            if (isConnected) {
-                                handler(dto)
+                launch {
+                    try {
+                        for (frame in webSocketSendingQueue) {
+                            if (isActive && isConnected) {
+                                send(frame)
                             } else {
                                 throw IllegalStateException("Not connected with websocket")
                             }
                         }
+                    } catch (ex: Throwable) {
+                        isConnected = false
+                    }
+                }
+
+                while (isActive && isConnected) {
+                    println("Waiting for websocket receive")
+                    val frame = incoming.receive()
+                    val dto: DocumentChangeDto = if (frame is Frame.Text) {
+                        val jsonText = frame.readText()
+                        Json.decodeFromString(jsonText)
+                    } else {
+                        throw UnsupportedOperationException(frame::class.simpleName)
+                    }
+                    for (handler in webSocketListeners) {
+                        if (isConnected) {
+                            handler(dto)
+                        } else {
+                            throw IllegalStateException("Not connected with websocket")
+                        }
+                    }
 //                        when (val frame = incoming.receive()) {
 //                            is Frame.Text -> println(frame.readText())
 //                            is Frame.Binary -> println(frame.readBytes())
 //                            else -> println("Unknown frame: " + frame.frameType.name)
 //                        }
-                    }
-                    println("Finished websocket")
                 }
-
-            } finally {
-                isConnected = false
+                println("Finished websocket")
             }
+
+        } finally {
+            isConnected = false
         }
     }
 

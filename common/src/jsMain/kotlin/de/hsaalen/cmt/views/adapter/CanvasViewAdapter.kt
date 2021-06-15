@@ -3,15 +3,13 @@ package de.hsaalen.cmt.views.adapter
 import de.crusader.objects.Point
 import de.crusader.objects.position
 import de.crusader.painter.draw
-import de.hsaalen.cmt.views.components.TestView
 import de.hsaalen.cmt.views.api.MPView
+import de.hsaalen.cmt.views.components.TestView
 import de.hsaalen.cmt.views.events.MPKeyboardEvent
 import de.hsaalen.cmt.views.events.MPMouseButton
 import de.hsaalen.cmt.views.events.MPMouseEvent
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import kotlinx.browser.window
+import kotlinx.coroutines.*
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
@@ -29,7 +27,7 @@ class CanvasViewAdapter(private val canvas: HTMLCanvasElement) {
         canvas.onmousedown = { view.onMouseDown(it.toMultiPlatform()) }
         canvas.onmouseup = { view.onMouseUp(it.toMultiPlatform()) }
 
-        GlobalScope.launch {
+        CoroutineScope(window.asCoroutineDispatcher()).launch {
             while (isActive) {
                 delay(200)
                 canvas.draw { p ->

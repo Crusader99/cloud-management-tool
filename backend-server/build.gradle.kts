@@ -1,17 +1,13 @@
+import java.time.Duration
+
 plugins {
     kotlin("jvm") // There are some bugs with Intellij older than 2021.1
     kotlin("plugin.serialization")
-    id("com.github.gelangweilte-studenten.gradle-docker-tests") version "1.1.1"
+    id("com.github.gelangweilte-studenten.gradle-docker-tests")
     application
 }
 
 application.mainClass.set("de.hsaalen.cmt.ServerBackendKt")
-
-kotlin.target {
-    compilations.all {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-}
 
 configurations.all {
     // Choose 'jvm' from disambiguating targets
@@ -34,13 +30,9 @@ dependencies {
     implementation("io.ktor:ktor-auth:1.6.0")
     implementation("io.ktor:ktor-auth-jwt:1.6.0")
 
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.0") {
-        because("To override deprecated version form ktor")
-    }
-
     // Statistics & logging frameworks
     // See https://github.com/MicroUtils/kotlin-logging
-    implementation("io.github.microutils:kotlin-logging-jvm:2.0.6")
+    implementation("io.github.microutils:kotlin-logging-jvm:2.0.8")
     implementation("ch.qos.logback:logback-classic:1.2.3") {
         because("Ktor depends on this library and has issues when missing")
     }
@@ -54,4 +46,5 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    timeout.set(Duration.ofSeconds(20L))
 }

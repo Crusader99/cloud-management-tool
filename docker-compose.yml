@@ -13,8 +13,11 @@ services:
       POSTGRESQL_USER: ${POSTGRES_USER}
       POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRESQL_DB: ${POSTGRES_DB}
+      MONGO_HOST: mongodb
+      MONGO_USER: ${MONGO_USER}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
   postgres:
-    image: postgres
+    image: postgres:13.3-alpine
     restart: always
     volumes:
       - postgres:/var/lib/postgresql/data
@@ -25,21 +28,19 @@ services:
   mongodb: # For encrypted text documents to allow update only one line
     image: mongo:4.4
     restart: always
+    volumes:
+      - mongodb:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-    volumes:
-      - mongodb:/data/db
-  phppgadmin: # Simplifies management of postgres
-    image: neimheadh/phppgadmin
+  adminer: # Provides easy to use web interface to manage databases
+    image: adminer:4
+    restart: always
     environment:
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASS: ${POSTGRES_PASSWORD}
+      ADMINER_DEFAULT_SERVER: postgres
     ports:
-      - "${PHPPGADMIN_PORT}:80"
-  prometheus:
+      - "${ADMINER_PORT}:8080"
+  prometheus: # Provides easy to use web interface to manage mongodb
     image: prom/prometheus:v2.26.0
     volumes:
       - ./docker-compose/prometheus/:/etc/prometheus/:z # Config files
@@ -65,7 +66,7 @@ services:
   traefik: # https://hub.docker.com/_/traefik/
     image: traefik:v2.4.8
     volumes:
-      - ./docker-compose/traefik:/etc/traefik
+      - ./docker-compose/traefik:/etc/traefik:z
     depends_on:
       - backend-server
       - web-app

@@ -11,18 +11,33 @@ import react.RBuilder
 import react.RComponent
 import react.RProps
 import react.RState
+import react.dom.attrs
 import react.dom.tr
 import styled.*
 
 /**
+ * Wrapper function to simplify creation of this react component.
+ */
+fun RBuilder.referenceList(dto: ServerReferenceListDto?, onItemOpen: (Reference) -> Unit) =
+    child(ViewReferenceList::class) {
+        attrs {
+            this.dto = dto
+            this.onItemOpen = onItemOpen
+        }
+    }
+
+/**
+ * React properties of the [ViewReferenceList] component.
+ */
+private external interface ViewReferenceListProps : RProps {
+    var dto: ServerReferenceListDto?
+    var onItemOpen: (Reference) -> Unit
+}
+
+/**
  * Intended to render a list of files that are found by tags from search component.
  */
-class ViewReferenceList : RComponent<ViewReferenceList.Props, RState>() {
-
-    interface Props : RProps {
-        var dto: ServerReferenceListDto?
-        var onItemOpen: (Reference) -> Unit
-    }
+private class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
 
     /**
      * Called when page is rendered.

@@ -17,6 +17,8 @@ private val logger = KotlinLogging.logger { }
  */
 fun main() {
     logger.info("Starting server backend...")
+    // Delay on startup to ensure databases have enough time to initialize
+    Thread.sleep(5_000)
 
     val engine = try {
         MongoDB.configure()

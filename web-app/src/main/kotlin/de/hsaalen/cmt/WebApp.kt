@@ -1,10 +1,15 @@
 package de.hsaalen.cmt
 
 import com.ccfraser.muirwik.components.lab.alert.MAlertSeverity
-import de.hsaalen.cmt.components.ViewHeader
+import com.ccfraser.muirwik.components.mThemeProvider
+import de.hsaalen.cmt.components.appBar
+import de.hsaalen.cmt.components.dialogs.DialogCreateReference
+import de.hsaalen.cmt.components.dialogs.renderReferenceDialog
 import de.hsaalen.cmt.components.features.ViewSnackbar
 import de.hsaalen.cmt.components.features.loadingOverlay
+import de.hsaalen.cmt.components.features.renderSnackbar
 import de.hsaalen.cmt.components.login.Credentials
+import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.extensions.openFileSelector
 import de.hsaalen.cmt.extensions.readText
 import de.hsaalen.cmt.network.dto.objects.Reference
@@ -15,39 +20,59 @@ import de.hsaalen.cmt.pages.FallbackPage
 import de.hsaalen.cmt.pages.LoginPage
 import de.hsaalen.cmt.pages.OverviewPage
 import de.hsaalen.cmt.support.SimpleNoteImportJson
-import kotlinx.coroutines.*
-import materialui.styles.themeprovider.themeProvider
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
+import org.w3c.dom.events.Event
 import react.*
 import react.dom.header
 
 /**
+ * React properties of the [WebApp] component.
+ */
+external interface WebAppState : RState {
+    var page: EnumPageType
+    var reference: Reference?
+    var isLoading: Boolean
+}
+
+/**
  * The main app component.
  */
-class WebApp : RComponent<RProps, WebApp.State>() {
-    interface State : RState {
-        var snackbar: ViewSnackbar.SnackbarInfo?
-        var page: EnumPageType
-        var reference: Reference?
-        var isLoading: Boolean
-    }
+class WebApp : RComponent<RProps, WebAppState>() {
+
+    /**
+     * Reference to overview page, required for refreshing references.
+     */
+    private var refOverview = createRef<OverviewPage>()
+
+    /**
+     * Reference to create dialog for requesting user to type a specific reference name.
+     */
+    private val refCreateReferenceDialog = createRef<DialogCreateReference>()
+
+    /**
+     * Reference to snack bar helper class required to send notifications etc.
+     */
+    private val refSnackBar = createRef<ViewSnackbar>()
 
     /**
      * Called when this component is loaded.
      */
-    override fun State.init() = reconnect()
+    override fun WebAppState.init() = reconnect()
 
 
     /**
      * Configures the react state to open the connecting page.
      */
-    private fun State.reconnect() {
+    private fun WebAppState.reconnect() {
         Session.instance = null
-        snackbar = null
         isLoading = true
         page = EnumPageType.CONNECTING
         reference = null
 
-        GlobalScope.launch {
+        coroutines.launch {
             try {
                 val restoredSession = Session.restore()
                 setState {
@@ -77,30 +102,11 @@ class WebApp : RComponent<RProps, WebApp.State>() {
      * Called whenever an update is required.
      */
     override fun RBuilder.render() {
-        themeProvider(Themes.LIGHT) {
-            header {
-                ViewHeader.styledComponent {
-                    attrs {
-                        isLoggedIn = state.page.isLoggedIn
-                        onLogout = ::onLogout
-                        drawerMenu = mapOf(
-                            "Create" to {
-                                GlobalScope.launch {
-                                    // TODO: implement input field for file name
-                                    Session.instance?.createReference("test")
-                                }
-                            },
-                            "Import" to { onImportData() },
-                        )
-                    }
-                }
-            }
+        mThemeProvider(Theme.LIGHT.toMuiTheme()) {
+            renderHeader()
 
-            child(ViewSnackbar::class) {
-                attrs {
-                    info = state.snackbar
-                }
-            }
+            renderReferenceDialog(refCreateReferenceDialog)
+            renderSnackbar(refSnackBar)
 
             when (state.page) {
                 EnumPageType.CONNECTING -> {
@@ -117,10 +123,8 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     // Allow user to login
                     child(LoginPage::class) {
                         attrs {
-                            onLogin =
-                                { credentials -> onLogin(credentials, isRegistration = false) }
-                            onRegister =
-                                { credentials -> onLogin(credentials, isRegistration = true) }
+                            onLogin = { credentials -> onLogin(credentials, isRegistration = false) }
+                            onRegister = { credentials -> onLogin(credentials, isRegistration = true) }
                             lastEmail = ""
                             isEnabled = !state.isLoading
                         }
@@ -138,6 +142,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                                     page = EnumPageType.EDIT_DOCUMENT
                                 }
                             }
+                            ref = refOverview
                         }
                     }
                 }
@@ -158,10 +163,31 @@ class WebApp : RComponent<RProps, WebApp.State>() {
     }
 
     /**
+     * Called every time when main render function is called. This method contains code for rendering the app header.
+     */
+    private fun RBuilder.renderHeader() = header {
+        val menuItems = linkedMapOf<String, (Event) -> Unit>()
+        if (state.page.isLoggedIn) {
+            if (state.page == EnumPageType.EDIT_DOCUMENT) {
+                menuItems["Back"] = {
+                    setState {
+                        page = EnumPageType.OVERVIEW
+                    }
+                }
+            }
+
+            menuItems["Create"] = { onCreateReference() }
+            menuItems["Import"] = { onImportData() }
+        }
+
+        appBar(isLoggedIn = state.page.isLoggedIn, onLogout = ::onLogout, drawerMenu = menuItems)
+    }
+
+    /**
      * Called when user had entered the username and password.
      */
     private fun onLogin(credentials: Credentials, isRegistration: Boolean) {
-        GlobalScope.launch {
+        coroutines.launch {
             try {
                 setState {
                     isLoading = true
@@ -183,9 +209,11 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     Session.instance = newSession // Equivalent to isLoggedIn = true
                     isLoading = false
                     page = EnumPageType.OVERVIEW
-                    snackbar = ViewSnackbar.SnackbarInfo("Successfully logged in!", MAlertSeverity.success)
                 }
-                GlobalScope.launch {
+                launch {
+                    refSnackBar.current?.show("Successfully logged in!", MAlertSeverity.success)
+                }
+                launch {
                     try {
                         while (isActive) {
                             val client = Session.instance ?: break
@@ -198,16 +226,19 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                                 Session.instance = null
                                 page = EnumPageType.UNAVAILABLE
                             }
-                            showSnackbar(t.message, MAlertSeverity.warning)
+                            val errorMessage = t.message ?: "Unknown error occurred"
+                            refSnackBar.current?.show(errorMessage, MAlertSeverity.warning)
                         }
                     }
                 }
             } catch (ex: Throwable) {
                 val failMessage = "Login failed: " + ex.message
                 println(failMessage)
-                showSnackbar(failMessage, MAlertSeverity.error)
                 setState {
                     isLoading = false
+                }
+                coroutines.launch {
+                    refSnackBar.current?.show(failMessage, MAlertSeverity.error)
                 }
             }
         }
@@ -217,7 +248,7 @@ class WebApp : RComponent<RProps, WebApp.State>() {
      * Disconnect client, forget secret keys and show login page.
      */
     private fun onLogout() {
-        GlobalScope.launch {
+        coroutines.launch {
             try {
                 setState {
                     isLoading = true
@@ -227,7 +258,9 @@ class WebApp : RComponent<RProps, WebApp.State>() {
                     Session.instance = null
                     page = EnumPageType.AUTHENTICATION
                 }
-                showSnackbar("Logged out", MAlertSeverity.success)
+                coroutines.launch {
+                    refSnackBar.current?.show("Logged out", MAlertSeverity.success)
+                }
                 delay(400)
             } finally {
                 setState {
@@ -249,18 +282,6 @@ class WebApp : RComponent<RProps, WebApp.State>() {
     }
 
     /**
-     * Show snackbar for 4 seconds.
-     */
-    private fun showSnackbar(message: String?, severity: MAlertSeverity) {
-        if (message == null) {
-            return
-        }
-        setState {
-            snackbar = ViewSnackbar.SnackbarInfo(message, severity)
-        }
-    }
-
-    /**
      * Import data from simplenote json format.
      */
     private fun onImportData() {
@@ -277,12 +298,28 @@ class WebApp : RComponent<RProps, WebApp.State>() {
             }
         }
 
-        GlobalScope.launch {
+        coroutines.launch {
             for (file in openFileSelector()) {
+                // TODO: remove debug messages
                 println("selected " + file.name)
                 val text = file.readText()
+                println("read file content")
                 import(file.name, text)
+                println("imported")
             }
+            refOverview.current?.updateReferences()
+        }
+    }
+
+    /**
+     * Create a new reference object on server.
+     */
+    private fun onCreateReference() {
+        coroutines.launch {
+            val displayName = refCreateReferenceDialog.current?.show() ?: return@launch
+            println("Selected display name: $displayName")
+            Session.instance?.createReference(displayName)
+            refOverview.current?.updateReferences()
         }
     }
 

@@ -1,3 +1,5 @@
+import java.time.Duration
+
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
@@ -17,8 +19,9 @@ kotlin {
         useCommonJs()
         browser {
             testTask {
+                timeout.set(Duration.ofSeconds(20L))
                 useKarma {
-                    useFirefox()
+                    useChromiumHeadless()
                 }
             }
         }
@@ -27,6 +30,10 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies { // Use api instead implementation to allow transitive access from modules
+                // Statistics & logging frameworks
+                // See https://github.com/MicroUtils/kotlin-logging
+                implementation("io.github.microutils:kotlin-logging:2.0.8")
+
                 api("de.crusader:kotlin-extensions:1.1.1")
                 api("de.crusader:library-objects:1.1.1")
 

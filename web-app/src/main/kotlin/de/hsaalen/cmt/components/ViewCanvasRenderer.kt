@@ -3,16 +3,27 @@ package de.hsaalen.cmt.components
 import de.crusader.objects.Point
 import de.crusader.objects.position
 import de.crusader.painter.draw
+import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.views.api.MPView
 import de.hsaalen.cmt.views.events.MPKeyboardEvent
 import de.hsaalen.cmt.views.events.MPMouseButton
 import de.hsaalen.cmt.views.events.MPMouseEvent
-import kotlinx.coroutines.*
+import kotlinx.browser.window
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.css.Position
+import kotlinx.css.pct
+import kotlinx.css.position
+import kotlinx.css.width
 import kotlinx.html.tabIndex
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 import react.*
+import react.dom.attrs
+import styled.css
 import styled.styledCanvas
 
 /**
@@ -26,16 +37,20 @@ fun RBuilder.canvasRenderer(view: MPView) =
     }
 
 /**
+ * React properties of the [ViewCanvasRenderer] component.
+ */
+private external interface ViewCanvasRendererProps : RProps {
+    var view: MPView
+}
+
+/**
  * A React component for rendering canvas elements which supports multi-platform support.
  */
-class ViewCanvasRenderer : RComponent<ViewCanvasRenderer.Props, RState>() {
+private class ViewCanvasRenderer : RComponent<ViewCanvasRendererProps, RState>() {
     private var previousMouse: Point? = null
     private var refreshJob: Job? = null
     private var canvasRef = createRef<HTMLCanvasElement>()
 
-    interface Props : RProps {
-        var view: MPView
-    }
 
     /**
      * Called only once when component was created.
@@ -47,7 +62,7 @@ class ViewCanvasRenderer : RComponent<ViewCanvasRenderer.Props, RState>() {
         canvasRef.current?.onmouseup = { props.view.onMouseUp(it.toMultiPlatform()) }
         canvasRef.current?.onkeydown = { props.view.onKeyDown(it.toMultiPlatform()) }
         canvasRef.current?.onkeyup = { props.view.onKeyUp(it.toMultiPlatform()) }
-        refreshJob = GlobalScope.launch {
+        refreshJob = coroutines.launch {
             while (isActive) {
                 delay(60)
                 canvasRef.current?.draw { p ->
@@ -71,11 +86,20 @@ class ViewCanvasRenderer : RComponent<ViewCanvasRenderer.Props, RState>() {
         styledCanvas {
             attrs {
                 ref = canvasRef
-                tabIndex = "1"
+                tabIndex = "1" // Required to receive key events
+                width = window.innerWidth.toString()
+                height = window.innerHeight.toString()
+            }
+            css {
+                width = 100.pct
+                position = Position.fixed
             }
         }
     }
 
+    /**
+     * Convert JS keyboard event to multiplatform keyboard event instance.
+     */
     private fun KeyboardEvent.toMultiPlatform() =
         MPKeyboardEvent(
             this.keyCode,
@@ -84,7 +108,9 @@ class ViewCanvasRenderer : RComponent<ViewCanvasRenderer.Props, RState>() {
             isShiftDown = false
         )
 
-    private fun MouseEvent.toMultiPlatform() =
-        MPMouseEvent(this.position, this.position, MPMouseButton.LEFT, 1)
+    /**
+     * Convert JS mouse event to multiplatform mouse event instance.
+     */
+    private fun MouseEvent.toMultiPlatform() = MPMouseEvent(this.position, this.position, MPMouseButton.LEFT, 1)
 
 }

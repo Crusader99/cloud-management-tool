@@ -1,28 +1,22 @@
 package de.hsaalen.cmt
 
+import com.ccfraser.muirwik.components.styles.ThemeOptions
+import com.ccfraser.muirwik.components.styles.createMuiTheme
+import kotlinext.js.jsObject
 import kotlinx.css.Color
-import materialui.styles.createMuiTheme
-import materialui.styles.muitheme.MuiTheme
-import materialui.styles.muitheme.options.palette
-import materialui.styles.palette.options.main
-import materialui.styles.palette.options.primary
+
 
 /**
- * Theme color schemes.
+ * Convert multiplatform theme to mui theme used in material ui frontend.
  */
-object Themes {
-
-    /**
-     * Defines the colors of the light theme.
-     */
-    val LIGHT: MuiTheme = createMuiTheme {
-        palette {
-            primary {
-                main = Theme.primaryColor.toCssColor()
-            }
+fun Theme.toMuiTheme(): com.ccfraser.muirwik.components.styles.Theme {
+    val options: ThemeOptions = jsObject {
+        palette = jsObject {
+            type = "light"
+            primary = jsObject { main = primaryColor.hex }
         }
     }
-
+    return createMuiTheme(options)
 }
 
 /**

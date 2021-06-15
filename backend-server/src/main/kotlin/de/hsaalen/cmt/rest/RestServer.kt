@@ -2,7 +2,6 @@ package de.hsaalen.cmt.rest
 
 import com.auth0.jwt.JWT
 import de.crusader.extensions.initialCause
-import de.crusader.extensions.toFullString
 import de.hsaalen.cmt.jwt.JwtCookie
 import de.hsaalen.cmt.jwt.toPayload
 import de.hsaalen.cmt.network.dto.server.ServerErrorDto
@@ -77,8 +76,12 @@ object RestServer {
             exception<Exception> { cause ->
                 // Handle unexpected errors occurred in server and send a valid json to client
                 val message = cause.message ?: cause.initialCause.message ?: "Unknown error occurred"
-                logger.warn("Exception occurred while handling request", cause)
-                call.respond(HttpStatusCode.InternalServerError, ServerErrorDto(message))
+                if (cause is SecurityException) {
+                    call.respond(HttpStatusCode.Unauthorized, ServerErrorDto(message))
+                } else {
+                    logger.warn("Exception occurred while handling request", cause)
+                    call.respond(HttpStatusCode.InternalServerError, ServerErrorDto(message))
+                }
             }
         }
         install(Authentication) {
