@@ -4,9 +4,10 @@ import com.ccfraser.muirwik.components.lab.alert.MAlertSeverity
 import com.ccfraser.muirwik.components.mThemeProvider
 import de.hsaalen.cmt.components.ViewHeader
 import de.hsaalen.cmt.components.dialogs.DialogCreateReference
-import de.hsaalen.cmt.components.dialogs.createReferenceDialog
+import de.hsaalen.cmt.components.dialogs.renderReferenceDialog
 import de.hsaalen.cmt.components.features.ViewSnackbar
 import de.hsaalen.cmt.components.features.loadingOverlay
+import de.hsaalen.cmt.components.features.renderSnackbar
 import de.hsaalen.cmt.components.login.Credentials
 import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.extensions.openFileSelector
@@ -30,7 +31,6 @@ import react.dom.header
  * React properties of the [WebApp] component.
  */
 external interface WebAppState : RState {
-    var snackbar: ViewSnackbar.SnackbarInfo?
     var page: EnumPageType
     var reference: Reference?
     var isLoading: Boolean
@@ -52,6 +52,11 @@ class WebApp : RComponent<RProps, WebAppState>() {
     private val refCreateReferenceDialog = createRef<DialogCreateReference>()
 
     /**
+     * Reference to snack bar helper class required to send notifications etc.
+     */
+    private val refSnackBar = createRef<ViewSnackbar>()
+
+    /**
      * Called when this component is loaded.
      */
     override fun WebAppState.init() = reconnect()
@@ -62,7 +67,6 @@ class WebApp : RComponent<RProps, WebAppState>() {
      */
     private fun WebAppState.reconnect() {
         Session.instance = null
-        snackbar = null
         isLoading = true
         page = EnumPageType.CONNECTING
         reference = null
@@ -100,13 +104,8 @@ class WebApp : RComponent<RProps, WebAppState>() {
         mThemeProvider(Theme.LIGHT.toMuiTheme()) {
             renderHeader()
 
-            createReferenceDialog(refCreateReferenceDialog)
-
-            child(ViewSnackbar::class) {
-                attrs {
-                    info = state.snackbar
-                }
-            }
+            renderReferenceDialog(refCreateReferenceDialog)
+            renderSnackbar(refSnackBar)
 
             when (state.page) {
                 EnumPageType.CONNECTING -> {
@@ -208,7 +207,9 @@ class WebApp : RComponent<RProps, WebAppState>() {
                     Session.instance = newSession // Equivalent to isLoggedIn = true
                     isLoading = false
                     page = EnumPageType.OVERVIEW
-                    snackbar = ViewSnackbar.SnackbarInfo("Successfully logged in!", MAlertSeverity.success)
+                }
+                launch {
+                    refSnackBar.current?.show("Successfully logged in!", MAlertSeverity.success)
                 }
                 launch {
                     try {
@@ -223,16 +224,19 @@ class WebApp : RComponent<RProps, WebAppState>() {
                                 Session.instance = null
                                 page = EnumPageType.UNAVAILABLE
                             }
-                            showSnackbar(t.message, MAlertSeverity.warning)
+                            val errorMessage = t.message ?: "Unknown error occurred"
+                            refSnackBar.current?.show(errorMessage, MAlertSeverity.warning)
                         }
                     }
                 }
             } catch (ex: Throwable) {
                 val failMessage = "Login failed: " + ex.message
                 println(failMessage)
-                showSnackbar(failMessage, MAlertSeverity.error)
                 setState {
                     isLoading = false
+                }
+                coroutines.launch {
+                    refSnackBar.current?.show(failMessage, MAlertSeverity.error)
                 }
             }
         }
@@ -252,7 +256,9 @@ class WebApp : RComponent<RProps, WebAppState>() {
                     Session.instance = null
                     page = EnumPageType.AUTHENTICATION
                 }
-                showSnackbar("Logged out", MAlertSeverity.success)
+                coroutines.launch {
+                    refSnackBar.current?.show("Logged out", MAlertSeverity.success)
+                }
                 delay(400)
             } finally {
                 setState {
@@ -270,18 +276,6 @@ class WebApp : RComponent<RProps, WebAppState>() {
     private fun onReconnect() {
         setState {
             reconnect()
-        }
-    }
-
-    /**
-     * Show snackbar for 4 seconds.
-     */
-    private fun showSnackbar(message: String?, severity: MAlertSeverity) {
-        if (message == null) {
-            return
-        }
-        setState {
-            snackbar = ViewSnackbar.SnackbarInfo(message, severity)
         }
     }
 

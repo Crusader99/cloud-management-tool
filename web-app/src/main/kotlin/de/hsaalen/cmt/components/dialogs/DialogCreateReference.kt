@@ -16,7 +16,7 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * Wrapper function to simplify creating of the [DialogCreateReference] dialog.
  */
-fun RBuilder.createReferenceDialog(ref: RRef) =
+fun RBuilder.renderReferenceDialog(ref: RReadableRef<DialogCreateReference>) =
     child(DialogCreateReference::class) {
         attrs {
             this.ref = ref
