@@ -27,12 +27,7 @@ class OverviewPage : RComponent<OverviewPage.Props, OverviewPage.State>() {
     override fun State.init() {
         query = ClientReferenceQueryDto()
         dto = null
-        GlobalScope.launch {
-            val received = props.session.listReferences(query)
-            setState {
-                dto = received
-            }
-        }
+        updateReferences()
     }
 
     /**
@@ -40,6 +35,18 @@ class OverviewPage : RComponent<OverviewPage.Props, OverviewPage.State>() {
      */
     override fun RBuilder.render() {
         referenceList(dto = state.dto, onItemOpen = props.onItemOpen)
+    }
+
+    /**
+     * Request a references update from server.
+     */
+    fun updateReferences() {
+        GlobalScope.launch {
+            val received = props.session.listReferences(state.query)
+            setState {
+                dto = received
+            }
+        }
     }
 
 }

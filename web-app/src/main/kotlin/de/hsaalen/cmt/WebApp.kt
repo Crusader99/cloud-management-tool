@@ -36,6 +36,11 @@ external interface WebAppState : RState {
 class WebApp : RComponent<RProps, WebAppState>() {
 
     /**
+     * Reference to overview page, required for refreshing references.
+     */
+    private var overviewRef = createRef<OverviewPage>()
+
+    /**
      * Called when this component is loaded.
      */
     override fun WebAppState.init() = reconnect()
@@ -124,6 +129,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                                     page = EnumPageType.EDIT_DOCUMENT
                                 }
                             }
+                            ref = overviewRef
                         }
                     }
                 }
@@ -292,6 +298,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                 import(file.name, text)
                 println("imported")
             }
+            overviewRef.current?.updateReferences()
         }
     }
 
@@ -302,6 +309,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
         GlobalScope.launch {
             // TODO: implement input field for file name
             Session.instance?.createReference("test")
+            overviewRef.current?.updateReferences()
         }
     }
 
