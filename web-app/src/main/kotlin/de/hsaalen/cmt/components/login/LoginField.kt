@@ -17,7 +17,8 @@ fun RBuilder.loginField(
     isEnabled: Boolean = true,
     type: InputType = InputType.text,
     onValidate: ValidateEvent = { null },
-    autoFocus: Boolean = false
+    autoFocus: Boolean = false,
+    ref: RRef? = null
 ) = child(LoginField::class) {
     attrs {
         this.title = title
@@ -27,6 +28,9 @@ fun RBuilder.loginField(
         this.type = type
         this.onValidate = onValidate
         this.autoFocus = autoFocus
+        if (ref != null) {
+            this.ref = ref
+        }
     }
 }
 
@@ -39,7 +43,7 @@ typealias ValidateEvent = (String) -> String?
 /**
  * React properties of the [LoginField] component.
  */
-private external interface LoginFieldProps : RProps {
+external interface LoginFieldProps : RProps {
     var title: String
     var defaultText: String
     var onTextChange: (String) -> Unit
@@ -52,7 +56,7 @@ private external interface LoginFieldProps : RProps {
 /**
  * React state of the [LoginField] component.
  */
-private external interface LoginFieldState : RState {
+external interface LoginFieldState : RState {
     var currentInputText: String
     var errorMessage: String?
 }
@@ -60,7 +64,7 @@ private external interface LoginFieldState : RState {
 /**
  * A component for displaying a simple login/password field.
  */
-private class LoginField(props: LoginFieldProps) : RComponent<LoginFieldProps, LoginFieldState>(props) {
+class LoginField(props: LoginFieldProps) : RComponent<LoginFieldProps, LoginFieldState>(props) {
 
     override fun LoginFieldState.init(props: LoginFieldProps) {
         currentInputText = props.defaultText
@@ -106,11 +110,16 @@ private class LoginField(props: LoginFieldProps) : RComponent<LoginFieldProps, L
      * Calls the validation event to check the current user input
      * and display an error when required.
      */
-    private fun handleValidation() {
+    fun handleValidation() {
         setState {
             errorMessage = props.onValidate(state.currentInputText)
         }
     }
+
+    /**
+     * Indicates weather the user typed a valid text. This is calculated by the [handleValidation] function.
+     */
+    fun isInputTextValid() = state.errorMessage == null
 }
 
 /**

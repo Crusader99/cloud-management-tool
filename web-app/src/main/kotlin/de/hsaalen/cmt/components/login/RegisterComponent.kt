@@ -3,9 +3,12 @@ package de.hsaalen.cmt.components.login
 import de.hsaalen.cmt.utils.validateEmailAndGetError
 import de.hsaalen.cmt.utils.validateFullNameAndGetError
 import de.hsaalen.cmt.utils.validatePasswordAndGetError
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.html.InputType
 import org.w3c.dom.events.Event
 import react.RBuilder
+import react.createRef
 import react.dom.br
 import react.setState
 
@@ -30,6 +33,12 @@ fun RBuilder.registerComponent(
  * A component for handling user registration.
  */
 class RegisterComponent(props: FormComponentProps) : FormComponent(props) {
+
+    /**
+     * Reference to repeated password field. Required to notify when first
+     * password field changed.
+     */
+    private val repeatPasswordFieldRef = createRef<LoginField>()
 
     /**
      * Called when this form component is rendered by the super class component implementation.
@@ -70,6 +79,14 @@ class RegisterComponent(props: FormComponentProps) : FormComponent(props) {
                 setState {
                     password = text
                 }
+                // Also correct error-state of the repeated password field when first password field is now correct.
+                repeatPasswordFieldRef.current?.also { repeatPasswordField ->
+                    if (!repeatPasswordField.isInputTextValid()) {
+                        GlobalScope.launch {
+                            repeatPasswordFieldRef.current?.handleValidation()
+                        }
+                    }
+                }
             })
         br {}
         loginField(
@@ -77,6 +94,7 @@ class RegisterComponent(props: FormComponentProps) : FormComponent(props) {
             isEnabled = props.isEnabled,
             type = InputType.password,
             onValidate = { if (it != state.password) "Password not equal" else null },
+            ref = repeatPasswordFieldRef,
             onTextChange = { text ->
                 setState {
                     passwordRepeated = text
