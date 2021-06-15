@@ -6,9 +6,8 @@ import com.ccfraser.muirwik.components.list.mList
 import com.ccfraser.muirwik.components.list.mListItem
 import com.ccfraser.muirwik.components.list.mListItemText
 import de.hsaalen.cmt.SoftwareInfo
-import kotlinx.css.Display
+import de.hsaalen.cmt.components.dialogs.aboutSoftwareDialog
 import kotlinx.css.FlexBasis
-import kotlinx.css.display
 import kotlinx.css.flex
 import org.w3c.dom.events.Event
 import react.*
@@ -97,7 +96,7 @@ class ViewHeader : RComponent<ViewHeader.Props, ViewHeader.State>() {
             }
         }
         h2 { br { } }
-        aboutDialog(
+        aboutSoftwareDialog(
             text = SoftwareInfo.description,
             open = state.isAboutDialogOpen,
             onClose = ::onCloseAboutDialog

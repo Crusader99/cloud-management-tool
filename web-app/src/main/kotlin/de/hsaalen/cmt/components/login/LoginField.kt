@@ -1,10 +1,9 @@
 package de.hsaalen.cmt.components.login
 
-import com.ccfraser.muirwik.components.MTextFieldProps
 import com.ccfraser.muirwik.components.form.MFormControlMargin
 import com.ccfraser.muirwik.components.mTextField
+import de.hsaalen.cmt.extensions.onTextChange
 import kotlinx.html.InputType
-import org.w3c.dom.HTMLInputElement
 import react.*
 
 /**
@@ -120,16 +119,4 @@ class LoginField(props: LoginFieldProps) : RComponent<LoginFieldProps, LoginFiel
      * Indicates weather the user typed a valid text. This is calculated by the [handleValidation] function.
      */
     fun isInputTextValid() = state.errorMessage == null
-}
-
-/**
- * Extension helper function to simplify the text change event listener.
- */
-private fun MTextFieldProps.onTextChange(event: (String) -> Unit) {
-    onChange = { e ->
-        val input = e.target as? HTMLInputElement
-        input?.value?.let { text ->
-            event(text)
-        }
-    }
 }

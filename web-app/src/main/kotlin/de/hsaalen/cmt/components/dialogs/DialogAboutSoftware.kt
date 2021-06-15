@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.components
+package de.hsaalen.cmt.components.dialogs
 
 import com.ccfraser.muirwik.components.MTypographyVariant
 import com.ccfraser.muirwik.components.button.mIconButton
@@ -16,10 +16,10 @@ import styled.css
 import styled.styledDiv
 
 /**
- * Wrapper function to simplify creating of the about dialog.
+ * Wrapper function to simplify creating of the [DialogAboutSoftware] dialog.
  */
-fun RBuilder.aboutDialog(text: String, open: Boolean, onClose: () -> Unit) =
-    child(ViewAboutDialog::class) {
+fun RBuilder.aboutSoftwareDialog(text: String, open: Boolean, onClose: () -> Unit) =
+    child(DialogAboutSoftware::class) {
         attrs {
             this.text = text
             this.open = open
@@ -28,9 +28,9 @@ fun RBuilder.aboutDialog(text: String, open: Boolean, onClose: () -> Unit) =
     }
 
 /**
- * React properties of the [ViewAboutDialog] component.
+ * React properties of the [DialogAboutSoftware] component.
  */
-private external interface ViewAboutDialogProps : RProps {
+private external interface DialogAboutSoftwareProps : RProps {
     var text: String
     var open: Boolean
     var onClose: () -> Unit
@@ -39,7 +39,7 @@ private external interface ViewAboutDialogProps : RProps {
 /**
  * A component for displaying a info dialog with links.
  */
-private class ViewAboutDialog : RComponent<ViewAboutDialogProps, RState>() {
+private class DialogAboutSoftware : RComponent<DialogAboutSoftwareProps, RState>() {
 
     /**
      * Called when this dialog is rendered.

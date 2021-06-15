@@ -3,6 +3,8 @@ package de.hsaalen.cmt
 import com.ccfraser.muirwik.components.lab.alert.MAlertSeverity
 import com.ccfraser.muirwik.components.mThemeProvider
 import de.hsaalen.cmt.components.ViewHeader
+import de.hsaalen.cmt.components.dialogs.DialogCreateReference
+import de.hsaalen.cmt.components.dialogs.createReferenceDialog
 import de.hsaalen.cmt.components.features.ViewSnackbar
 import de.hsaalen.cmt.components.features.loadingOverlay
 import de.hsaalen.cmt.components.login.Credentials
@@ -38,7 +40,12 @@ class WebApp : RComponent<RProps, WebAppState>() {
     /**
      * Reference to overview page, required for refreshing references.
      */
-    private var overviewRef = createRef<OverviewPage>()
+    private var refOverview = createRef<OverviewPage>()
+
+    /**
+     * Reference to create dialog for requesting user to type a specific reference name.
+     */
+    private val refCreateReferenceDialog = createRef<DialogCreateReference>()
 
     /**
      * Called when this component is loaded.
@@ -89,6 +96,8 @@ class WebApp : RComponent<RProps, WebAppState>() {
         mThemeProvider(Theme.LIGHT.toMuiTheme()) {
             renderHeader()
 
+            createReferenceDialog(refCreateReferenceDialog)
+
             child(ViewSnackbar::class) {
                 attrs {
                     info = state.snackbar
@@ -129,7 +138,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                                     page = EnumPageType.EDIT_DOCUMENT
                                 }
                             }
-                            ref = overviewRef
+                            ref = refOverview
                         }
                     }
                 }
@@ -298,7 +307,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                 import(file.name, text)
                 println("imported")
             }
-            overviewRef.current?.updateReferences()
+            refOverview.current?.updateReferences()
         }
     }
 
@@ -307,9 +316,10 @@ class WebApp : RComponent<RProps, WebAppState>() {
      */
     private fun onCreateReference() {
         GlobalScope.launch {
-            // TODO: implement input field for file name
-            Session.instance?.createReference("test")
-            overviewRef.current?.updateReferences()
+            val displayName = refCreateReferenceDialog.current?.show() ?: return@launch
+            println("Selected display name: $displayName")
+            Session.instance?.createReference(displayName)
+            refOverview.current?.updateReferences()
         }
     }
 
