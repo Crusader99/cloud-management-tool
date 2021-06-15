@@ -64,8 +64,11 @@ Online management tool for files and documents
 * [x] Build Electron app for PC
 * [x] Implement mongodb data structure for text documents
 * [x] Implement algorithm for detecting changed lines in text
+* [x] Implement live sync for document edit
 * [ ] Implement text editor in frontend
-* [ ] Implement live sync for file edit
+* [ ] Implement file upload / download
+* [ ] Fix bugs in Electron app
+* [ ] Allow offline access in Android app
 * [ ] ...
 * [x] Configure Grafana & Prometheus
 * [x] Provide statistics with Ktor: /metrics
