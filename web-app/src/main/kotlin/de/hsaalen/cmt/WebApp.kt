@@ -82,27 +82,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
      */
     override fun RBuilder.render() {
         mThemeProvider(Theme.LIGHT.toMuiTheme()) {
-            header {
-                child(ViewHeader::class) {
-                    attrs {
-                        isLoggedIn = state.page.isLoggedIn
-                        onLogout = ::onLogout
-                        drawerMenu = if (state.page.isLoggedIn) {
-                            mapOf(
-                                "Create" to {
-                                    GlobalScope.launch {
-                                        // TODO: implement input field for file name
-                                        Session.instance?.createReference("test")
-                                    }
-                                },
-                                "Import" to { onImportData() },
-                            )
-                        } else {
-                            emptyMap()
-                        }
-                    }
-                }
-            }
+            renderHeader()
 
             child(ViewSnackbar::class) {
                 attrs {
@@ -160,6 +140,26 @@ class WebApp : RComponent<RProps, WebAppState>() {
             }
 
             loadingOverlay(state.isLoading)
+        }
+    }
+
+    /**
+     * Called every time when main render function is called. This method contains code for rendering the app header.
+     */
+    private fun RBuilder.renderHeader() = header {
+        child(ViewHeader::class) {
+            attrs {
+                isLoggedIn = state.page.isLoggedIn
+                onLogout = ::onLogout
+                drawerMenu = if (state.page.isLoggedIn) {
+                    mapOf(
+                        "Create" to { onCreateReference() },
+                        "Import" to { onImportData() },
+                    )
+                } else {
+                    emptyMap()
+                }
+            }
         }
     }
 
@@ -292,6 +292,16 @@ class WebApp : RComponent<RProps, WebAppState>() {
                 import(file.name, text)
                 println("imported")
             }
+        }
+    }
+
+    /**
+     * Create a new reference object on server.
+     */
+    private fun onCreateReference() {
+        GlobalScope.launch {
+            // TODO: implement input field for file name
+            Session.instance?.createReference("test")
         }
     }
 
