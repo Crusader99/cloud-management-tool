@@ -20,7 +20,7 @@ class DocumentEditor(
     private val onTextChanged: (String) -> Unit
 ) : MPView() {
 
-    private val engine = EditorEngine(true, EditorEngine.Line(defaultText))
+    private val engine = EditorEngine(true, defaultText)
 
     init {
         Session.instance?.registerListener { dto ->
@@ -42,6 +42,7 @@ class DocumentEditor(
             e.isArrowDown -> engine.cursor.move(EnumDirection.DOWN)
             e.isBackspace -> engine.cursor.deletePreviousChar()
             e.isDelete -> engine.cursor.deleteFollowingChar()
+            e.isEnter -> engine.cursor.newLine()
             else -> engine.cursor.insert(char.toString())
         }
         onTextChanged(engine.text)
@@ -55,12 +56,6 @@ class DocumentEditor(
 
     override fun onRepaint(p: Painter) {
         val rec = Rectangle(Point(), p.size)
-
-        p.createRectangle()
-            .color(Color.GREEN)
-            .filled(true)
-            .size(p.size)
-            .draw()
         p.createRectangle()
             .color(Color.BLACK)
             .filled(true)
@@ -74,10 +69,10 @@ class DocumentEditor(
                 .color(Color.WHITE)
                 .text(line.toString())
                 .rectangle(p.rectangle.location(x, y).timesSize(animator.animation))
-                .size(34f)
+                .size(30f)
 
             drawString.draw()
-            y += drawString.y
+            y += drawString.textHeight
         }
 
 

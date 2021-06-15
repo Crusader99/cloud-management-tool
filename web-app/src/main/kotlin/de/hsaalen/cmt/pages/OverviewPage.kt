@@ -10,21 +10,30 @@ import kotlinx.coroutines.launch
 import react.*
 
 /**
+ * React properties of the [OverviewPage] component.
+ */
+external interface OverviewPageProps : RProps {
+    var session: Session
+    var onItemOpen: (Reference) -> Unit
+}
+
+/**
+ * React state of the [OverviewPage] component.
+ */
+external interface OverviewPageState : RState {
+    var query: ClientReferenceQueryDto
+    var dto: ServerReferenceListDto?
+}
+
+/**
  * The overview app component for displaying results of the search.
  */
-class OverviewPage : RComponent<OverviewPage.Props, OverviewPage.State>() {
+class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
 
-    interface Props : RProps {
-        var session: Session
-        var onItemOpen: (Reference) -> Unit
-    }
-
-    interface State : RState {
-        var query: ClientReferenceQueryDto
-        var dto: ServerReferenceListDto?
-    }
-
-    override fun State.init() {
+    /**
+     * Initialize state of the [OverviewPage].
+     */
+    override fun OverviewPageState.init() {
         query = ClientReferenceQueryDto()
         dto = null
         coroutines.launch {

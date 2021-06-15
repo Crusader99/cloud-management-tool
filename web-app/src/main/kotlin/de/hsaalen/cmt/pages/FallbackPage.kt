@@ -14,13 +14,16 @@ import react.RProps
 import react.RState
 
 /**
+ * React properties of the [FallbackPage] component.
+ */
+external interface FallbackPageProps : RProps {
+    var onRetry: () -> Unit
+}
+
+/**
  * Fallback page when backend is not available.
  */
-class FallbackPage : RComponent<FallbackPage.Props, RState>() {
-
-    interface Props : RProps {
-        var onRetry: () -> Unit
-    }
+class FallbackPage : RComponent<FallbackPageProps, RState>() {
 
     /**
      * Called when page is rendered.

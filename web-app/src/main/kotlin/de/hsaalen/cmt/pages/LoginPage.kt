@@ -13,23 +13,32 @@ import styled.css
 import styled.styledDiv
 
 /**
+ * React properties of the [LoginPage] component.
+ */
+external interface LoginPageProps : RProps {
+    var onLogin: (Credentials) -> Unit
+    var onRegister: (Credentials) -> Unit
+    var isEnabled: Boolean
+    var lastEmail: String
+}
+
+/**
+ * React state of the [LoginPage] component.
+ */
+external interface LoginPageState : RState {
+    var showRegistration: Boolean
+    var defaultCredentials: Credentials
+}
+
+/**
  * Page for user authentication
  */
-class LoginPage(props: Props) : RComponent<LoginPage.Props, LoginPage.State>(props) {
+class LoginPage(props: LoginPageProps) : RComponent<LoginPageProps, LoginPageState>(props) {
 
-    interface Props : RProps {
-        var onLogin: (Credentials) -> Unit
-        var onRegister: (Credentials) -> Unit
-        var isEnabled: Boolean
-        var lastEmail: String
-    }
-
-    interface State : RState {
-        var showRegistration: Boolean
-        var defaultCredentials: Credentials
-    }
-
-    override fun State.init(props: Props) {
+    /**
+     * Initialize state of the [LoginPage].
+     */
+    override fun LoginPageState.init(props: LoginPageProps) {
         showRegistration = false
         defaultCredentials = Credentials(email = props.lastEmail)
     }

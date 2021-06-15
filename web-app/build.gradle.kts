@@ -13,6 +13,8 @@ dependencies {
     implementation(kotlinWrapper("react-dom:17.0.2"))
     implementation(kotlinWrapper("styled:5.3.0"))
 
+    // Wrapper for material ui components
+    // See https://material-ui.com and https://github.com/cfnz/muirwik
     implementation("com.ccfraser.muirwik:muirwik-components:0.8.0")
 
     // Test framework on javascript platform

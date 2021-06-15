@@ -44,6 +44,13 @@ class DiffCalculator(
     }
 
     /**
+     * Function to set current text without detecting changes.
+     */
+    fun setText(overwriteText: String) {
+        previousLines = overwriteText.lines()
+    }
+
+    /**
      * Algorithm to detect changes, inserts or deletion in a text document. This is used for text documents to improve
      * performance when sending changes to server/mongo-database.
      */
