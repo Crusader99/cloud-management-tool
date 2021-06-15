@@ -65,6 +65,9 @@ external interface LoginFieldState : RState {
  */
 class LoginField(props: LoginFieldProps) : RComponent<LoginFieldProps, LoginFieldState>(props) {
 
+    /**
+     * Initialize state of the [LoginField] which depends on the [LoginFieldProps].
+     */
     override fun LoginFieldState.init(props: LoginFieldProps) {
         currentInputText = props.defaultText
         currentInputText = ""

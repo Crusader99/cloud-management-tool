@@ -32,12 +32,24 @@ external interface DialogCreateReferenceState : RState {
 }
 
 /**
+ * Type alias for the event lambda without any parameters.
+ */
+private typealias Event = () -> Unit
+
+/**
  * A dialog for requesting a new reference name from user.
  */
 class DialogCreateReference : RComponent<RProps, DialogCreateReferenceState>() {
 
-    private var onCloseHandler: (() -> Unit)? = null
-    private var onCreateHandler: (() -> Unit)? = null
+    /**
+     * Optional handler for close dialog [Event].
+     */
+    private var onCloseHandler: Event? = null
+
+    /**
+     * Optional handler for create-button clicked [Event].
+     */
+    private var onCreateHandler: Event? = null
 
     /**
      * Called the first time when this component is created. Note: The dialog can be shown

@@ -19,22 +19,46 @@ import styled.css
 import styled.styledDiv
 
 /**
+ * Wrapper function to simplify creation of this [ViewAppBar] react component.
+ */
+fun RBuilder.appBar(
+    onLogout: () -> Unit,
+    isLoggedIn: Boolean,
+    drawerMenu: Map<String, (Event) -> Unit>,
+) = child(ViewAppBar::class) {
+    attrs {
+        this.onLogout = onLogout
+        this.isLoggedIn = isLoggedIn
+        this.drawerMenu = drawerMenu
+    }
+}
+
+/**
+ * React props of the [ViewAppBar] component.
+ */
+private external interface ViewAppBarProps : RProps {
+    var onLogout: () -> Unit
+    var isLoggedIn: Boolean
+    var drawerMenu: Map<String, (Event) -> Unit>
+}
+
+/**
+ * React state of the [ViewAppBar] component.
+ */
+private external interface ViewAppBarState : RState {
+    var isDrawerVisible: Boolean
+    var isAboutDialogOpen: Boolean
+}
+
+/**
  * Defines the header of the app which also includes a search box and a button with menu options.
  */
-class ViewHeader : RComponent<ViewHeader.Props, ViewHeader.State>() {
+private class ViewAppBar : RComponent<ViewAppBarProps, ViewAppBarState>() {
 
-    interface Props : RProps {
-        var onLogout: () -> Unit
-        var isLoggedIn: Boolean
-        var drawerMenu: Map<String, (Event) -> Unit>
-    }
-
-    interface State : RState {
-        var isDrawerVisible: Boolean
-        var isAboutDialogOpen: Boolean
-    }
-
-    override fun State.init() {
+    /**
+     * Initialize state of the [ViewAppBar].
+     */
+    override fun ViewAppBarState.init() {
         isDrawerVisible = false
         isAboutDialogOpen = false
     }

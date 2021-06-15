@@ -21,13 +21,16 @@ fun RBuilder.loadingOverlay(
 }
 
 /**
+ * React properties of the [LoadingOverlay] component.
+ */
+private external interface LoadingOverlayProps : RProps {
+    var isLoading: Boolean
+}
+
+/**
  * A overlay component for a loading animation.
  */
-class LoadingOverlay : RComponent<LoadingOverlay.Props, RState>() {
-
-    interface Props : RProps {
-        var isLoading: Boolean
-    }
+private class LoadingOverlay : RComponent<LoadingOverlayProps, RState>() {
 
     /**
      * Called when this overlay component is rendered.

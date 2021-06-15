@@ -2,7 +2,7 @@ package de.hsaalen.cmt
 
 import com.ccfraser.muirwik.components.lab.alert.MAlertSeverity
 import com.ccfraser.muirwik.components.mThemeProvider
-import de.hsaalen.cmt.components.ViewHeader
+import de.hsaalen.cmt.components.appBar
 import de.hsaalen.cmt.components.dialogs.DialogCreateReference
 import de.hsaalen.cmt.components.dialogs.renderReferenceDialog
 import de.hsaalen.cmt.components.features.ViewSnackbar
@@ -24,6 +24,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import org.w3c.dom.events.Event
 import react.*
 import react.dom.header
 
@@ -165,20 +166,21 @@ class WebApp : RComponent<RProps, WebAppState>() {
      * Called every time when main render function is called. This method contains code for rendering the app header.
      */
     private fun RBuilder.renderHeader() = header {
-        child(ViewHeader::class) {
-            attrs {
-                isLoggedIn = state.page.isLoggedIn
-                onLogout = ::onLogout
-                drawerMenu = if (state.page.isLoggedIn) {
-                    mapOf(
-                        "Create" to { onCreateReference() },
-                        "Import" to { onImportData() },
-                    )
-                } else {
-                    emptyMap()
+        val menuItems = linkedMapOf<String, (Event) -> Unit>()
+        if (state.page.isLoggedIn) {
+            if (state.page == EnumPageType.EDIT_DOCUMENT) {
+                menuItems["Back"] = {
+                    setState {
+                        page = EnumPageType.OVERVIEW
+                    }
                 }
             }
+
+            menuItems["Create"] = { onCreateReference() }
+            menuItems["Import"] = { onImportData() }
         }
+
+        appBar(isLoggedIn = state.page.isLoggedIn, onLogout = ::onLogout, drawerMenu = menuItems)
     }
 
     /**
