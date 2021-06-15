@@ -8,11 +8,14 @@ import de.hsaalen.cmt.views.api.MPView
 import de.hsaalen.cmt.views.events.MPKeyboardEvent
 import de.hsaalen.cmt.views.events.MPMouseButton
 import de.hsaalen.cmt.views.events.MPMouseEvent
+import kotlinx.browser.window
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.css.Position
 import kotlinx.css.pct
+import kotlinx.css.position
 import kotlinx.css.width
 import kotlinx.html.tabIndex
 import org.w3c.dom.HTMLCanvasElement
@@ -83,10 +86,13 @@ private class ViewCanvasRenderer : RComponent<ViewCanvasRendererProps, RState>()
         styledCanvas {
             attrs {
                 ref = canvasRef
-                tabIndex = "1"
+                tabIndex = "1" // Required to receive key events
+                width = window.innerWidth.toString()
+                height = window.innerHeight.toString()
             }
             css {
                 width = 100.pct
+                position = Position.fixed
             }
         }
     }
@@ -105,7 +111,6 @@ private class ViewCanvasRenderer : RComponent<ViewCanvasRendererProps, RState>()
     /**
      * Convert JS mouse event to multiplatform mouse event instance.
      */
-    private fun MouseEvent.toMultiPlatform() =
-        MPMouseEvent(this.position, this.position, MPMouseButton.LEFT, 1)
+    private fun MouseEvent.toMultiPlatform() = MPMouseEvent(this.position, this.position, MPMouseButton.LEFT, 1)
 
 }
