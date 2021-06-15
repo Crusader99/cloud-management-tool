@@ -15,3 +15,16 @@ fun MTextFieldProps.onTextChange(event: (String) -> Unit) {
         }
     }
 }
+
+/**
+ * Extension helper function to simplify handling enter key down.
+ */
+fun MTextFieldProps.onEnterKey(event: () -> Unit) {
+    val superEvent = onKeyPress
+    onKeyPress = { e ->
+        superEvent?.invoke(e)
+        if (e.key == "Enter") {
+            event.invoke()
+        }
+    }
+}

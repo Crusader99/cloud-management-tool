@@ -7,6 +7,7 @@ import com.ccfraser.muirwik.components.dialog.mDialogContent
 import com.ccfraser.muirwik.components.dialog.mDialogTitle
 import com.ccfraser.muirwik.components.form.MFormControlMargin
 import com.ccfraser.muirwik.components.mTextField
+import de.hsaalen.cmt.extensions.onEnterKey
 import de.hsaalen.cmt.extensions.onTextChange
 import react.*
 import kotlin.coroutines.resume
@@ -57,6 +58,7 @@ class DialogCreateReference : RComponent<RProps, DialogCreateReferenceState>() {
                 mTextField("Display name", autoFocus = true, margin = MFormControlMargin.none, fullWidth = true) {
                     attrs {
                         onTextChange(::onTextChangeHandler)
+                        onEnterKey { onCreateHandler?.invoke() }
                     }
                 }
             }
