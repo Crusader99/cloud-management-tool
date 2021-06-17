@@ -51,7 +51,16 @@ object BackendLocator {
      * Find the default path to REST API.
      */
     val defaultBackend: String
-        get() = window.location.toString().removeSuffix("/") + "/" + RestPaths.base
+        get() {
+            val frontendURL = window.location.toString()
+            return if (frontendURL.startsWith("file://")) {
+                // This is the official default backend server
+                // It can be changed using the "switch backend"-button
+                "https://provider.ddnss.de/se-project/" + RestPaths.base
+            } else {
+                frontendURL.removeSuffix("/") + "/" + RestPaths.base
+            }
+        }
 
     /**
      * Set / read current configured path to REST API.
