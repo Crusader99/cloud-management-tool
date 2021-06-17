@@ -73,7 +73,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
         page = EnumPageType.CONNECTING
         reference = null
         Session.instance = null
-        RestPaths.apiEndpoint = window.location.pathname.removeSuffix("/") + "/" + RestPaths.base
+        RestPaths.apiEndpoint = window.location.toString().removeSuffix("/") + "/" + RestPaths.base
         println("REST API endpoint: " + RestPaths.base)
 
         coroutines.launch {
