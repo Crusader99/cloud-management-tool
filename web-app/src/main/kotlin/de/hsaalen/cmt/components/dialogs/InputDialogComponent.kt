@@ -74,8 +74,11 @@ class InputDialogComponent : RComponent<RProps, InputDialogComponentState>() {
         mDialog(open = state.isOpen, onClose = { _, _ -> onCloseHandler?.invoke() }) {
             mDialogTitle(text = state.title)
             mDialogContent {
-                if (state.message != null) {
-                    mTypography(state.message)
+                val message = state.message
+                if (message != null) {
+                    for (line in message.lineSequence()) {
+                        mTypography(line)
+                    }
                     br {}
                 }
                 mTextField(state.placeholder, autoFocus = true, margin = MFormControlMargin.none, fullWidth = true) {

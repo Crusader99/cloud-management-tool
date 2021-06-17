@@ -10,18 +10,20 @@ import kotlinx.coroutines.launch
  */
 fun InputDialogComponent.handleSwitchBackendDialog() {
     coroutines.launch {
-        val message = """
-            Default API-Endpoint: ${BackendLocator.getDefaultBackend()}
-            Current API-Endpoint: ${RestPaths.apiEndpoint}
-        """.trimIndent()
+        val messages = mutableListOf<String>()
+        messages += "Default API-Endpoint: " + BackendLocator.defaultBackend
+        if (BackendLocator.defaultBackend != BackendLocator.configuredBackend) {
+            messages += "Current API-Endpoint: " + BackendLocator.configuredBackend
+        }
         val newURL = show(
             title = "Define URL to REST API backend:",
-            message = message,
+            message = messages.joinToString("\n"),
             placeholder = "New API-Endpoint",
             button = "Switch"
         ) ?: return@launch
-        println("New URL: $newURL")
-        RestPaths.apiEndpoint = newURL
+        println("Selected new API-Endpoint: $newURL")
+        BackendLocator.configuredBackend = newURL
+        window.location.reload()
     }
 }
 
@@ -29,20 +31,36 @@ fun InputDialogComponent.handleSwitchBackendDialog() {
  * Singleton class utils to configure backend path for REST-API
  */
 object BackendLocator {
+    private const val KEY_API_ENDPOINT = "API_ENDPOINT"
 
     /**
      * Calculate default backend and configure path for client.
      */
     fun execute() {
-        RestPaths.apiEndpoint = getDefaultBackend()
-        println("REST API endpoint: " + RestPaths.apiEndpoint)
+        val customApiEndpoint = window.sessionStorage.getItem(KEY_API_ENDPOINT)
+        if (customApiEndpoint == null) {
+            RestPaths.apiEndpoint = defaultBackend
+            println("Using default REST API endpoint: $configuredBackend")
+        } else {
+            RestPaths.apiEndpoint = customApiEndpoint
+            println("Using configured REST API endpoint: $configuredBackend")
+        }
     }
 
     /**
      * Find the default path to REST API.
      */
-    fun getDefaultBackend(): String {
-        return window.location.toString().removeSuffix("/") + "/" + RestPaths.base
-    }
+    val defaultBackend: String
+        get() = window.location.toString().removeSuffix("/") + "/" + RestPaths.base
+
+    /**
+     * Set / read current configured path to REST API.
+     */
+    var configuredBackend: String
+        get() = RestPaths.apiEndpoint
+        set(value) {
+            RestPaths.apiEndpoint = value
+            window.sessionStorage.setItem(KEY_API_ENDPOINT, value)
+        }
 
 }
