@@ -16,9 +16,9 @@ import styled.css
 import styled.styledDiv
 
 /**
- * React properties of the [LoginPage] component.
+ * React properties of the [AuthenticationPage] component.
  */
-external interface LoginPageProps : RProps {
+external interface AuthenticationPageProps : RProps {
     var onLogin: (Credentials) -> Unit
     var onRegister: (Credentials) -> Unit
     var isEnabled: Boolean
@@ -26,9 +26,9 @@ external interface LoginPageProps : RProps {
 }
 
 /**
- * React state of the [LoginPage] component.
+ * React state of the [AuthenticationPage] component.
  */
-external interface LoginPageState : RState {
+external interface AuthenticationPageState : RState {
     var showRegistration: Boolean
     var defaultCredentials: Credentials
 }
@@ -36,7 +36,8 @@ external interface LoginPageState : RState {
 /**
  * Page for user authentication
  */
-class LoginPage(props: LoginPageProps) : RComponent<LoginPageProps, LoginPageState>(props) {
+class AuthenticationPage(props: AuthenticationPageProps) :
+    RComponent<AuthenticationPageProps, AuthenticationPageState>(props) {
 
     /**
      * Reference to create dialog for switching backend a specific url.
@@ -44,9 +45,9 @@ class LoginPage(props: LoginPageProps) : RComponent<LoginPageProps, LoginPageSta
     private val refSwitchBackendDialog = createRef<InputDialogComponent>()
 
     /**
-     * Initialize state of the [LoginPage].
+     * Initialize state of the [AuthenticationPage].
      */
-    override fun LoginPageState.init(props: LoginPageProps) {
+    override fun AuthenticationPageState.init(props: AuthenticationPageProps) {
         showRegistration = false
         defaultCredentials = Credentials(email = props.lastEmail)
     }

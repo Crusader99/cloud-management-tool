@@ -12,16 +12,14 @@ import de.hsaalen.cmt.components.login.Credentials
 import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.extensions.openFileSelector
 import de.hsaalen.cmt.extensions.readText
-import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.exceptions.ConnectException
 import de.hsaalen.cmt.network.session.Session
+import de.hsaalen.cmt.pages.AuthenticationPage
 import de.hsaalen.cmt.pages.DocumentEditPage
 import de.hsaalen.cmt.pages.FallbackPage
-import de.hsaalen.cmt.pages.LoginPage
 import de.hsaalen.cmt.pages.OverviewPage
 import de.hsaalen.cmt.support.SimpleNoteImportJson
-import kotlinx.browser.window
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -123,7 +121,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                 }
                 EnumPageType.AUTHENTICATION -> {
                     // Allow user to login
-                    child(LoginPage::class) {
+                    child(AuthenticationPage::class) {
                         attrs {
                             onLogin = { credentials -> onLogin(credentials, isRegistration = false) }
                             onRegister = { credentials -> onLogin(credentials, isRegistration = true) }
@@ -174,10 +172,10 @@ class WebApp : RComponent<RProps, WebAppState>() {
                         page = EnumPageType.OVERVIEW
                     }
                 }
+            } else if (state.page == EnumPageType.OVERVIEW) {
+                menuItems["Create"] = { onCreateReference() }
+                menuItems["Import"] = { onImportData() }
             }
-
-            menuItems["Create"] = { onCreateReference() }
-            menuItems["Import"] = { onImportData() }
         }
 
         appBar(isLoggedIn = state.page.isLoggedIn, onLogout = ::onLogout, drawerMenu = menuItems)
