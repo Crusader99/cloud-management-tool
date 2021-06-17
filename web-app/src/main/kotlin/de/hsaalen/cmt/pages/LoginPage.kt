@@ -2,9 +2,12 @@ package de.hsaalen.cmt.pages
 
 import com.ccfraser.muirwik.components.MLinkUnderline
 import com.ccfraser.muirwik.components.mLink
+import de.hsaalen.cmt.components.dialogs.InputDialogComponent
+import de.hsaalen.cmt.components.dialogs.renderInputDialog
 import de.hsaalen.cmt.components.login.Credentials
 import de.hsaalen.cmt.components.login.loginComponent
 import de.hsaalen.cmt.components.login.registerComponent
+import de.hsaalen.cmt.extensions.handleSwitchBackendDialog
 import kotlinx.css.*
 import react.*
 import react.dom.attrs
@@ -34,6 +37,11 @@ external interface LoginPageState : RState {
  * Page for user authentication
  */
 class LoginPage(props: LoginPageProps) : RComponent<LoginPageProps, LoginPageState>(props) {
+
+    /**
+     * Reference to create dialog for switching backend a specific url.
+     */
+    private val refSwitchBackendDialog = createRef<InputDialogComponent>()
 
     /**
      * Initialize state of the [LoginPage].
@@ -76,6 +84,7 @@ class LoginPage(props: LoginPageProps) : RComponent<LoginPageProps, LoginPageSta
             }
         }
         renderLink()
+        renderInputDialog(ref = refSwitchBackendDialog)
     }
 
     /**
@@ -85,25 +94,34 @@ class LoginPage(props: LoginPageProps) : RComponent<LoginPageProps, LoginPageSta
         styledDiv {
             attrs {
                 css {
-                    display = Display.flex
-                    flexDirection = FlexDirection.column
-                    alignItems = Align.flexEnd
-                    justifyContent = JustifyContent.right
+                    width = 100.pct
                 }
             }
-            val displayText = if (state.showRegistration) "Use existing account" else "Create new account"
-            mLink(text = displayText, underline = MLinkUnderline.always) {
+            mLink(text = "Switch backend server", underline = MLinkUnderline.always) {
                 attrs {
+                    css {
+                        cursor = Cursor.pointer
+                        float = Float.left
+                    }
+                    onClick = { refSwitchBackendDialog.current?.handleSwitchBackendDialog() }
+                }
+            }
+
+            val switchPage = if (state.showRegistration) "Use existing account" else "Create new account"
+            mLink(text = switchPage, underline = MLinkUnderline.always) {
+                attrs {
+                    css {
+                        cursor = Cursor.pointer
+                        float = Float.right
+                    }
                     onClick = {
                         setState {
                             showRegistration = !showRegistration
                         }
                     }
-                    css {
-                        cursor = Cursor.pointer
-                    }
                 }
             }
+
         }
     }
 

@@ -3,8 +3,8 @@ package de.hsaalen.cmt
 import com.ccfraser.muirwik.components.lab.alert.MAlertSeverity
 import com.ccfraser.muirwik.components.mThemeProvider
 import de.hsaalen.cmt.components.appBar
-import de.hsaalen.cmt.components.dialogs.DialogCreateReference
-import de.hsaalen.cmt.components.dialogs.renderReferenceDialog
+import de.hsaalen.cmt.components.dialogs.InputDialogComponent
+import de.hsaalen.cmt.components.dialogs.renderInputDialog
 import de.hsaalen.cmt.components.features.ViewSnackbar
 import de.hsaalen.cmt.components.features.loadingOverlay
 import de.hsaalen.cmt.components.features.renderSnackbar
@@ -52,7 +52,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
     /**
      * Reference to create dialog for requesting user to type a specific reference name.
      */
-    private val refCreateReferenceDialog = createRef<DialogCreateReference>()
+    private val refCreateReferenceDialog = createRef<InputDialogComponent>()
 
     /**
      * Reference to snack bar helper class required to send notifications etc.
@@ -73,8 +73,6 @@ class WebApp : RComponent<RProps, WebAppState>() {
         page = EnumPageType.CONNECTING
         reference = null
         Session.instance = null
-        RestPaths.apiEndpoint = window.location.toString().removeSuffix("/") + "/" + RestPaths.base
-        println("REST API endpoint: " + RestPaths.base)
 
         coroutines.launch {
             try {
@@ -108,9 +106,9 @@ class WebApp : RComponent<RProps, WebAppState>() {
     override fun RBuilder.render() {
         mThemeProvider(Theme.LIGHT.toMuiTheme()) {
             renderHeader()
-
-            renderReferenceDialog(refCreateReferenceDialog)
+            renderInputDialog(refCreateReferenceDialog)
             renderSnackbar(refSnackBar)
+            loadingOverlay(state.isLoading)
 
             when (state.page) {
                 EnumPageType.CONNECTING -> {
@@ -161,8 +159,6 @@ class WebApp : RComponent<RProps, WebAppState>() {
                     }
                 }
             }
-
-            loadingOverlay(state.isLoading)
         }
     }
 
@@ -320,7 +316,11 @@ class WebApp : RComponent<RProps, WebAppState>() {
      */
     private fun onCreateReference() {
         coroutines.launch {
-            val displayName = refCreateReferenceDialog.current?.show() ?: return@launch
+            val displayName = refCreateReferenceDialog.current?.show(
+                title = "Name for new reference",
+                placeholder = "Display name",
+                button = "Create"
+            ) ?: return@launch
             println("Selected display name: $displayName")
             Session.instance?.createReference(displayName)
             refOverview.current?.updateReferences()

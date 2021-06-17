@@ -7,28 +7,35 @@ import com.ccfraser.muirwik.components.dialog.mDialogContent
 import com.ccfraser.muirwik.components.dialog.mDialogTitle
 import com.ccfraser.muirwik.components.form.MFormControlMargin
 import com.ccfraser.muirwik.components.mTextField
+import com.ccfraser.muirwik.components.mTypography
 import de.hsaalen.cmt.extensions.onEnterKey
 import de.hsaalen.cmt.extensions.onTextChange
 import react.*
+import react.dom.br
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 /**
- * Wrapper function to simplify creating of the [DialogCreateReference] dialog.
+ * Wrapper function to simplify creating of the [InputDialogComponent] dialog.
  */
-fun RBuilder.renderReferenceDialog(ref: RReadableRef<DialogCreateReference>) =
-    child(DialogCreateReference::class) {
+fun RBuilder.renderInputDialog(ref: RReadableRef<InputDialogComponent>) =
+    child(InputDialogComponent::class) {
         attrs {
             this.ref = ref
         }
     }
 
 /**
- * React state of the [DialogCreateReference] component.
+ * React state of the [InputDialogComponent] component.
  */
-external interface DialogCreateReferenceState : RState {
+external interface InputDialogComponentState : RState {
+    var title: String
+    var message: String?
+    var placeholder: String
+    var button: String
+
     var isOpen: Boolean
-    var referenceName: String
+    var userInput: String
 }
 
 /**
@@ -37,9 +44,9 @@ external interface DialogCreateReferenceState : RState {
 private typealias Event = () -> Unit
 
 /**
- * A dialog for requesting a new reference name from user.
+ * A dialog for requesting a text from user.
  */
-class DialogCreateReference : RComponent<RProps, DialogCreateReferenceState>() {
+class InputDialogComponent : RComponent<RProps, InputDialogComponentState>() {
 
     /**
      * Optional handler for close dialog [Event].
@@ -55,9 +62,9 @@ class DialogCreateReference : RComponent<RProps, DialogCreateReferenceState>() {
      * Called the first time when this component is created. Note: The dialog can be shown
      * multiple times using same component.
      */
-    override fun DialogCreateReferenceState.init() {
+    override fun InputDialogComponentState.init() {
         isOpen = false
-        referenceName = ""
+        userInput = ""
     }
 
     /**
@@ -65,9 +72,13 @@ class DialogCreateReference : RComponent<RProps, DialogCreateReferenceState>() {
      */
     override fun RBuilder.render() {
         mDialog(open = state.isOpen, onClose = { _, _ -> onCloseHandler?.invoke() }) {
-            mDialogTitle(text = "Name for new Reference")
+            mDialogTitle(text = state.title)
             mDialogContent {
-                mTextField("Display name", autoFocus = true, margin = MFormControlMargin.none, fullWidth = true) {
+                if (state.message != null) {
+                    mTypography(state.message)
+                    br {}
+                }
+                mTextField(state.placeholder, autoFocus = true, margin = MFormControlMargin.none, fullWidth = true) {
                     attrs {
                         onTextChange(::onTextChangeHandler)
                         onEnterKey { onCreateHandler?.invoke() }
@@ -75,7 +86,7 @@ class DialogCreateReference : RComponent<RProps, DialogCreateReferenceState>() {
                 }
             }
             mDialogActions {
-                mButton(caption = "Create", onClick = { onCreateHandler?.invoke() })
+                mButton(caption = state.button, onClick = { onCreateHandler?.invoke() })
             }
         }
     }
@@ -85,23 +96,34 @@ class DialogCreateReference : RComponent<RProps, DialogCreateReferenceState>() {
      */
     private fun onTextChangeHandler(newText: String) {
         setState {
-            referenceName = newText
+            userInput = newText
         }
     }
 
     /**
-     * Opens the dialog and suspends until user cancels operation or new display name for the reference is created. This
+     * Opens the dialog and suspends until user cancels operation or the user typed in a text. This
      * function will return null when the user cancelled the action otherwise the typed value is returned.
      */
-    suspend fun show(): String? {
+    suspend fun show(
+        title: String,
+        message: String? = null,
+        placeholder: String = "",
+        button: String = "OK"
+    ): String? {
         val newName: String? = suspendCoroutine { continuation ->
             onCloseHandler = { continuation.resume(null) }
-            onCreateHandler = { continuation.resume(state.referenceName) }
-            setState { isOpen = true }
+            onCreateHandler = { continuation.resume(state.userInput) }
+            setState {
+                this.title = title
+                this.message = message
+                this.placeholder = placeholder
+                this.button = button
+                this.isOpen = true
+            }
         }
         setState {
             isOpen = false
-            referenceName = ""
+            userInput = ""
         }
         return newName
     }
