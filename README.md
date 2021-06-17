@@ -1,6 +1,7 @@
 # se-project
 
-Online management tool for files and documents
+Online management tool for files and documents. The web-app is [hosted online](https://provider.ddnss.de/se-project/)
+for testing proposes.
 
 ## Conventions:
 
@@ -63,6 +64,7 @@ Online management tool for files and documents
 * [x] Ensure session restored after page reload
 * [x] Make frontend work on Android
 * [x] Build Electron app for PC
+* [x] Provide hosted web-app online
 * [x] Implement mongodb data structure for text documents
 * [x] Implement algorithm for detecting changed lines in text
 * [x] Implement live sync for document edit
