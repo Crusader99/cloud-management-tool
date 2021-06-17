@@ -79,8 +79,7 @@ internal object Client {
             println("Server-Error ($statusCode): $statusDescription: $errorMessage")
             throw ServerException(statusCode, errorMessage)
         } catch (t: Throwable) {
-            val message = "Server-Error ($statusCode)"
-            println(message)
+            val message = t.message.takeIf { it?.length in 3..100 } ?: "Server-Error ($statusCode)"
             when (response.status) {
                 HttpStatusCode.GatewayTimeout -> throw ConnectException(message, t)
                 HttpStatusCode.Unauthorized -> throw UnauthorizedException(message, t)
