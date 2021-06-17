@@ -19,7 +19,7 @@ kotlin {
         useCommonJs()
         browser {
             testTask {
-                timeout.set(Duration.ofSeconds(20L))
+                timeout.set(Duration.ofSeconds(60L))
                 useKarma {
                     useChromiumHeadless()
                 }

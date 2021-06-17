@@ -46,5 +46,5 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
-    timeout.set(Duration.ofSeconds(20L))
+    timeout.set(Duration.ofSeconds(60L))
 }

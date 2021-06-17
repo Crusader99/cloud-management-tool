@@ -52,7 +52,7 @@ class Session(val userInfo: ServerUserInfoDto) :
      * Connect to server with websocket for live synchronization.
      */
     private suspend fun connectWebSocket() {
-        var url = "${RestPaths.base}/websocket"
+        var url = "${RestPaths.apiEndpoint}/websocket"
         if (url.startsWith("http")) {
             // Replace http protocol with ws protocol
             // Should also work with tls encryption

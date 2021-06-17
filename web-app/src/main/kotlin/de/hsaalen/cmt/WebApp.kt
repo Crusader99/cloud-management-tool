@@ -12,6 +12,7 @@ import de.hsaalen.cmt.components.login.Credentials
 import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.extensions.openFileSelector
 import de.hsaalen.cmt.extensions.readText
+import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.exceptions.ConnectException
 import de.hsaalen.cmt.network.session.Session
@@ -20,6 +21,7 @@ import de.hsaalen.cmt.pages.FallbackPage
 import de.hsaalen.cmt.pages.LoginPage
 import de.hsaalen.cmt.pages.OverviewPage
 import de.hsaalen.cmt.support.SimpleNoteImportJson
+import kotlinx.browser.window
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -67,10 +69,12 @@ class WebApp : RComponent<RProps, WebAppState>() {
      * Configures the react state to open the connecting page.
      */
     private fun WebAppState.reconnect() {
-        Session.instance = null
         isLoading = true
         page = EnumPageType.CONNECTING
         reference = null
+        Session.instance = null
+        RestPaths.apiEndpoint = window.location.toString().removeSuffix("/") + "/" + RestPaths.base
+        println("REST API endpoint: " + RestPaths.base)
 
         coroutines.launch {
             try {
