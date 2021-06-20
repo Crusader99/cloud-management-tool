@@ -4,7 +4,6 @@ MAINTAINER Simon Forschner
 # Configure environment variables
 ENV TZ=Europe/Berlin
 ENV DIR=/server-backend
-ENV JAVA_TOOL_OPTIONS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8686
 
 RUN mkdir $DIR
 # ADD command will automatically extract the tar file
