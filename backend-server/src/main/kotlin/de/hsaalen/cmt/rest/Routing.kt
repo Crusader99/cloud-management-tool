@@ -56,6 +56,10 @@ fun Application.registerRoutes() = routing {
         authenticate {
             get("/restore") { // Check is authorization cookie is set and refresh jwt token when already logged in
                 val payload = call.request.readJwtCookie()
+                val email = payload.email
+                if (!ServiceUsers.isRegistered(payload.email)) {
+                    throw SecurityException("User with email '$email' is not registered")
+                }
                 call.response.updateJwtCookie(payload)
                 call.respond(payload.toServerUserInfoDto())
             }
@@ -116,4 +120,7 @@ fun Application.registerRoutes() = routing {
     }
 }
 
+/**
+ * Generate JWT payload based on [ServerUserInfoDto].
+ */
 private fun ServerUserInfoDto.toJwtPayload() = JwtPayload(fullName, email)

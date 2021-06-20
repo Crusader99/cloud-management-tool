@@ -42,26 +42,29 @@ object ServiceUsers {
         } catch (ex: Exception) {
             throw SecurityException(ex.message, ex)
         }
+        if (isRegistered(email)) {
+            throw IllegalArgumentException("User with email '$email' already registered")
+        }
         val passwordHashed = hashPassword(passwordPlain)
         return newSuspendedTransaction {
-            try {
-                val now = DateTime.now()
-                UserDao.new {
-                    this.email = email
-                    this.passwordHashed = passwordHashed
-                    this.fullName = fullName
-                    this.dateLastLogin = now
-                    this.dateFirstLogin = now
-                    this.datePasswordChange = now
-                    this.totalLogins = 1
-                }.toServerUserInfoDto()
-            } catch (ex: Exception) {
-                if (UserDao.count(UserTable.email eq email) > 0) {
-                    throw IllegalArgumentException("User with email '$email' already registered")
-                }
-                throw ex
-            }
+            val now = DateTime.now()
+            UserDao.new {
+                this.email = email
+                this.passwordHashed = passwordHashed
+                this.fullName = fullName
+                this.dateLastLogin = now
+                this.dateFirstLogin = now
+                this.datePasswordChange = now
+                this.totalLogins = 1
+            }.toServerUserInfoDto()
         }
+    }
+
+    /**
+     * Check if user email already registered in database.
+     */
+    suspend fun isRegistered(email: String) = newSuspendedTransaction {
+        UserDao.count(UserTable.email eq email) > 0
     }
 
     /**
