@@ -6,20 +6,13 @@ plugins {
 }
 
 /**
- * Cleanup previous builder files.
- */
-val cleanupResources by tasks.registering {
-    delete("$buildDir/electron")
-}
-
-/**
  * Copy compiled web-app to build folder.
  */
 val copyResources by tasks.registering(Copy::class) {
-    dependsOn(cleanupResources, ":web-app:build")
+    dependsOn(":web-app:build")
     from("../web-app/build/artifact-js")
     from("src/main/resources")
-    into("$buildDir/electron")
+    into("$buildDir/electron-source")
 }
 
 /**
@@ -40,11 +33,18 @@ val dockerElectronBuilder by tasks.registering {
         println("Built docker image: $dockerImageId")
         exec {
             workingDir(buildDir)
-            commandLine("docker", "run", "-v", "./electron:/project:z", "-it", dockerImageId)
+            commandLine("docker", "run", "-v", "./electron-source:/project:z", "-it", dockerImageId)
         }
     }
 }
 
-tasks.build {
+/**
+ * Generate electron app and copy binaries to build/electron.
+ */
+val generateElectron by tasks.registering(Copy::class) {
     dependsOn(dockerElectronBuilder)
+    from("$buildDir/electron-source/dist/")
+    include("*.AppImage")
+    include("*.snap")
+    into("$buildDir/electron")
 }

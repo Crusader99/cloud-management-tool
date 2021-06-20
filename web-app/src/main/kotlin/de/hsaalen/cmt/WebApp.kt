@@ -3,8 +3,8 @@ package de.hsaalen.cmt
 import com.ccfraser.muirwik.components.lab.alert.MAlertSeverity
 import com.ccfraser.muirwik.components.mThemeProvider
 import de.hsaalen.cmt.components.appBar
-import de.hsaalen.cmt.components.dialogs.DialogCreateReference
-import de.hsaalen.cmt.components.dialogs.renderReferenceDialog
+import de.hsaalen.cmt.components.dialogs.InputDialogComponent
+import de.hsaalen.cmt.components.dialogs.renderInputDialog
 import de.hsaalen.cmt.components.features.ViewSnackbar
 import de.hsaalen.cmt.components.features.loadingOverlay
 import de.hsaalen.cmt.components.features.renderSnackbar
@@ -12,16 +12,14 @@ import de.hsaalen.cmt.components.login.Credentials
 import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.extensions.openFileSelector
 import de.hsaalen.cmt.extensions.readText
-import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.exceptions.ConnectException
 import de.hsaalen.cmt.network.session.Session
+import de.hsaalen.cmt.pages.AuthenticationPage
 import de.hsaalen.cmt.pages.DocumentEditPage
 import de.hsaalen.cmt.pages.FallbackPage
-import de.hsaalen.cmt.pages.LoginPage
 import de.hsaalen.cmt.pages.OverviewPage
 import de.hsaalen.cmt.support.SimpleNoteImportJson
-import kotlinx.browser.window
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -52,7 +50,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
     /**
      * Reference to create dialog for requesting user to type a specific reference name.
      */
-    private val refCreateReferenceDialog = createRef<DialogCreateReference>()
+    private val refCreateReferenceDialog = createRef<InputDialogComponent>()
 
     /**
      * Reference to snack bar helper class required to send notifications etc.
@@ -73,8 +71,6 @@ class WebApp : RComponent<RProps, WebAppState>() {
         page = EnumPageType.CONNECTING
         reference = null
         Session.instance = null
-        RestPaths.apiEndpoint = window.location.toString().removeSuffix("/") + "/" + RestPaths.base
-        println("REST API endpoint: " + RestPaths.base)
 
         coroutines.launch {
             try {
@@ -108,9 +104,9 @@ class WebApp : RComponent<RProps, WebAppState>() {
     override fun RBuilder.render() {
         mThemeProvider(Theme.LIGHT.toMuiTheme()) {
             renderHeader()
-
-            renderReferenceDialog(refCreateReferenceDialog)
+            renderInputDialog(refCreateReferenceDialog)
             renderSnackbar(refSnackBar)
+            loadingOverlay(state.isLoading)
 
             when (state.page) {
                 EnumPageType.CONNECTING -> {
@@ -125,7 +121,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                 }
                 EnumPageType.AUTHENTICATION -> {
                     // Allow user to login
-                    child(LoginPage::class) {
+                    child(AuthenticationPage::class) {
                         attrs {
                             onLogin = { credentials -> onLogin(credentials, isRegistration = false) }
                             onRegister = { credentials -> onLogin(credentials, isRegistration = true) }
@@ -161,8 +157,6 @@ class WebApp : RComponent<RProps, WebAppState>() {
                     }
                 }
             }
-
-            loadingOverlay(state.isLoading)
         }
     }
 
@@ -178,10 +172,10 @@ class WebApp : RComponent<RProps, WebAppState>() {
                         page = EnumPageType.OVERVIEW
                     }
                 }
+            } else if (state.page == EnumPageType.OVERVIEW) {
+                menuItems["Create"] = { onCreateReference() }
+                menuItems["Import"] = { onImportData() }
             }
-
-            menuItems["Create"] = { onCreateReference() }
-            menuItems["Import"] = { onImportData() }
         }
 
         appBar(isLoggedIn = state.page.isLoggedIn, onLogout = ::onLogout, drawerMenu = menuItems)
@@ -320,7 +314,11 @@ class WebApp : RComponent<RProps, WebAppState>() {
      */
     private fun onCreateReference() {
         coroutines.launch {
-            val displayName = refCreateReferenceDialog.current?.show() ?: return@launch
+            val displayName = refCreateReferenceDialog.current?.show(
+                title = "Name for new reference",
+                placeholder = "Display name",
+                button = "Create"
+            ) ?: return@launch
             println("Selected display name: $displayName")
             Session.instance?.createReference(displayName)
             refOverview.current?.updateReferences()

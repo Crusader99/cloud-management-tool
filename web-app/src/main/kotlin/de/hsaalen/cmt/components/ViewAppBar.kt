@@ -70,32 +70,16 @@ private class ViewAppBar : RComponent<ViewAppBarProps, ViewAppBarState>() {
         styledDiv {
             mAppBar {
                 mToolbar {
-                    mIconButton(iconName = "menu_icon", color = MColor.inherit, onClick = {
-                        setState {
-                            // Show drawer on side
-                            isDrawerVisible = true
-                        }
-                    })
+                    mTooltip("Menu") {
+                        mIconButton(iconName = "menu_icon", color = MColor.inherit, onClick = {
+                            setState {
+                                // Show drawer on side
+                                isDrawerVisible = true
+                            }
+                        })
+                    }
                     mTypography(text = "Cloud Management Tool", variant = MTypographyVariant.h6)
                     if (props.isLoggedIn) {
-                        // TODO: fix or remove
-//                    tabs {
-//                        tab {
-//                            attrs {
-//                                label = a { +"Search results" }
-//                            }
-//                        }
-//                        tab {
-//                            attrs {
-//                                label = a { +"File info" }
-//                            }
-//                        }
-//                        tab {
-//                            attrs {
-//                                label = a { +"File content" }
-//                            }
-//                        }
-//                    }
                         styledDiv {
                             css {
                                 flex(1.0, 1.0, FlexBasis.auto)

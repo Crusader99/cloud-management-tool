@@ -70,7 +70,6 @@ class LoginField(props: LoginFieldProps) : RComponent<LoginFieldProps, LoginFiel
      */
     override fun LoginFieldState.init(props: LoginFieldProps) {
         currentInputText = props.defaultText
-        currentInputText = ""
     }
 
     /**
