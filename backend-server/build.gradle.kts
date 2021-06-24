@@ -36,7 +36,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.3") {
         because("Ktor depends on this library and has issues when missing")
     }
-    implementation("io.micrometer:micrometer-registry-prometheus:1.7.0")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.7.1")
 
     // JUnit test framework
     testImplementation(kotlin("test"))

@@ -13,7 +13,7 @@ allprojects {
 }
 
 plugins {
-    kotlin("multiplatform") version "1.5.10" apply false // Allows common projects
+    kotlin("multiplatform") version "1.5.20" apply false // Allows common projects
     kotlin("plugin.serialization") version "1.5.10" apply false // Support for json serialization
 
     // Gradle plugin for android development
