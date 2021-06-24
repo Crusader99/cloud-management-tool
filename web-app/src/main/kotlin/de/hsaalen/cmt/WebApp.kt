@@ -283,29 +283,33 @@ class WebApp : RComponent<RProps, WebAppState>() {
      * Import data from simplenote json format.
      */
     private fun onImportData() {
-        suspend fun import(fileName: String, fileContent: String) {
+        suspend fun importFile(name: String, content: String) {
             println("importing...")
-            if (fileName == "notes.json") {
-                for (imported in SimpleNoteImportJson.import(json = fileContent)) {
-                    Session.instance!!.createReference(imported)
-                }
-            } else if (fileName.endsWith(".txt", true)) {
-                Session.instance!!.createReference(fileName, fileContent)
-            } else {
-                throw UnsupportedOperationException("File format unsupported: $fileName")
+            val session = Session.instance!!
+            when {
+                name == "notes.json" -> SimpleNoteImportJson.import(content).forEach { session.createReference(it) }
+                name.endsWith(".txt", true) -> session.createReference(name, content)
+                else -> throw UnsupportedOperationException("File format unsupported: $name")
             }
         }
 
         coroutines.launch {
-            for (file in openFileSelector()) {
-                // TODO: remove debug messages
-                println("selected " + file.name)
-                val text = file.readText()
-                println("read file content")
-                import(file.name, text)
-                println("imported")
+            try {
+                setState {
+                    isLoading = true
+                }
+                for (file in openFileSelector()) {
+                    println("Importing " + file.name + "...")
+                    val text = file.readText()
+                    importFile(file.name, text)
+                    println(file.name + " successfully imported")
+                }
+                refOverview.current?.updateReferences()
+            } finally {
+                setState {
+                    isLoading = false
+                }
             }
-            refOverview.current?.updateReferences()
         }
     }
 
