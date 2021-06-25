@@ -28,7 +28,7 @@ for testing proposes.
 * [Kotlinx Coroutines](https://github.com/Kotlin/kotlinx.coroutines) (non-blocking programming)
 * [React](https://kotlinlang.org/docs/js-get-started.html)
   (as web-app frontend library, see [Kotlin/JS for React](https://kotlinlang.org/docs/js-get-started.html))
-* [Material UI](https://material-ui.com/) + [Muirwik](https://github.com/cfnz/muirwik) (provides react components)
+* [Material UI](https://material-ui.com/) + [Muirwik](https://github.com/cfnz/muirwik) (provide react components)
 
 ## Databases:
 
@@ -70,7 +70,6 @@ for testing proposes.
 * [x] Implement live sync for document edit
 * [ ] Implement text editor in frontend
 * [ ] Implement file upload / download
-* [ ] Fix bugs in Electron app
 * [ ] Allow offline access in Android app
 * [ ] ...
 * [x] Configure Grafana & Prometheus

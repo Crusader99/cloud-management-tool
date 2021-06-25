@@ -13,10 +13,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.css.Position
-import kotlinx.css.pct
-import kotlinx.css.position
-import kotlinx.css.width
+import kotlinx.css.*
 import kotlinx.html.tabIndex
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.events.KeyboardEvent
@@ -29,12 +26,11 @@ import styled.styledCanvas
 /**
  * Wrapper function to simplify creation of this react component.
  */
-fun RBuilder.canvasRenderer(view: MPView) =
-    child(ViewCanvasRenderer::class) {
-        attrs {
-            this.view = view
-        }
+fun RBuilder.canvasRenderer(view: MPView) = child(ViewCanvasRenderer::class) {
+    attrs {
+        this.view = view
     }
+}
 
 /**
  * React properties of the [ViewCanvasRenderer] component.
@@ -65,6 +61,8 @@ private class ViewCanvasRenderer : RComponent<ViewCanvasRendererProps, RState>()
         refreshJob = coroutines.launch {
             while (isActive) {
                 delay(60)
+                canvasRef.current?.width = window.innerWidth
+                canvasRef.current?.height = window.innerHeight
                 canvasRef.current?.draw { p ->
                     props.view.onRepaint(p)
                 }
@@ -92,7 +90,9 @@ private class ViewCanvasRenderer : RComponent<ViewCanvasRendererProps, RState>()
             }
             css {
                 width = 100.pct
+                left = 0.px
                 position = Position.fixed
+                cursor = Cursor.text
             }
         }
     }

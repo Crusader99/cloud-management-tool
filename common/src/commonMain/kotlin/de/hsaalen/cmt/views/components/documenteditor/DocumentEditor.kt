@@ -3,10 +3,10 @@ package de.hsaalen.cmt.views.components.documenteditor
 import de.crusader.extensions.EnumDirection
 import de.crusader.objects.Point
 import de.crusader.objects.Rectangle
-import de.crusader.objects.color.Color
 import de.crusader.painter.Painter
 import de.crusader.painter.animation.Animator
 import de.crusader.painter.animation.EnumInterpolator
+import de.hsaalen.cmt.Theme
 import de.hsaalen.cmt.views.api.MPView
 import de.hsaalen.cmt.views.events.MPKeyboardEvent
 import de.hsaalen.cmt.views.events.MPMouseEvent
@@ -38,24 +38,23 @@ class DocumentEditor(
     }
 
     // Helper for creating animations
-    private val animator = Animator.withFloat(0f, 5000L, EnumInterpolator.ACCELERATE_DECELERATE)
-        .apply {
-            value = 1f
-        }
+    private val animator = Animator.withFloat(0f, 5000L, EnumInterpolator.ACCELERATE_DECELERATE).apply {
+        value = 1f
+    }
 
     override fun onRepaint(p: Painter) {
         val rec = Rectangle(Point(), p.size)
         p.createRectangle()
-            .color(Color.BLACK)
+            .color(Theme.current.backgroundColor)
             .filled(true)
             .rectangle(rec.reduce(12))
             .draw()
 
         val x = 5
-        var y = 0
+        var y = 5
         for (line in engine.lines) {
             val drawString = p.createString()
-                .color(Color.WHITE)
+                .color(Theme.current.textColor)
                 .text(line.toString())
                 .rectangle(p.rectangle.location(x, y).timesSize(animator.animation))
                 .size(30f)
