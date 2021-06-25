@@ -8,6 +8,7 @@ import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
 import de.hsaalen.cmt.network.session.Session
 import de.hsaalen.cmt.views.components.documenteditor.DiffCalculator
 import de.hsaalen.cmt.views.components.documenteditor.DocumentEditor
+import de.hsaalen.cmt.views.components.documenteditor.EditorEngine
 import kotlinx.coroutines.launch
 import react.*
 
@@ -33,7 +34,12 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
     /**
      * Algorithm that detects changes in document
      */
-    private var diffCalculator = DiffCalculator(::onLineChanged)
+    private var diffCalculator = DiffCalculator(::onDocumentChangedLocal)
+
+    /**
+     * The engine for handling text changes.
+     */
+    private val engine = EditorEngine(true)
 
     /**
      * Initialize state of the [DocumentEditPage].
@@ -42,9 +48,12 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
         coroutines.launch {
             val text = Session.instance?.download(props.reference.uuid) ?: return@launch
             diffCalculator.setText(text)
+            engine.text = text
             setState {
                 defaultText = text
             }
+
+            Session.instance?.registerListener(::onDocumentChangedRemote)
         }
     }
 
@@ -52,8 +61,7 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        val text = state.defaultText ?: "Loading..."
-        canvasRenderer(DocumentEditor(text, ::onTextChanged))
+        canvasRenderer(DocumentEditor(engine, ::onTextChanged))
     }
 
     /**
@@ -66,10 +74,27 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
     /**
      * Called when any line change detected that has to be transmitted to server.
      */
-    private fun onLineChanged(lineNumber: Int, lineContent: String, changeMode: LineChangeMode) {
+    private fun onDocumentChangedLocal(lineNumber: Int, lineContent: String, changeMode: LineChangeMode) {
         val dto = DocumentChangeDto(props.reference.uuid, lineNumber, lineContent, changeMode)
         coroutines.launch {
             Session.instance?.liveTextEdit(dto)
+        }
+    }
+
+    /**
+     * Called when the document has been changed from another client instance
+     * and has to be synchronized with the local client.
+     */
+    private fun onDocumentChangedRemote(dto: DocumentChangeDto) {
+        if (dto.uuid != props.reference.uuid) {
+            return
+        }
+        println("Received text change: $dto")
+        val lineContentDecrypted = dto.lineContentEncrypted
+        when (dto.lineChangeMode) {
+            LineChangeMode.MODIFY -> engine.modifyLine(dto.lineNumber, lineContentDecrypted)
+            LineChangeMode.ADD -> engine.addLine(dto.lineNumber, lineContentDecrypted)
+            LineChangeMode.DELETE -> engine.deleteLine(dto.lineNumber)
         }
     }
 

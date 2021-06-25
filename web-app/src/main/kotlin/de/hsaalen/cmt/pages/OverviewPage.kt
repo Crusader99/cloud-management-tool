@@ -45,7 +45,7 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        referenceList(dto = state.dto, onItemOpen = props.onItemOpen)
+        referenceList(dto = state.dto, onItemOpen = props.onItemOpen, onItemDelete = ::onItemDelete)
     }
 
     /**
@@ -55,6 +55,16 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
         val received = props.session.listReferences(state.query)
         setState {
             dto = received
+        }
+    }
+
+    /**
+     * Request server to delete a reference.
+     */
+    private fun onItemDelete(ref: Reference) {
+        coroutines.launch {
+            Session.instance?.deleteReference(ref)
+            updateReferences()
         }
     }
 

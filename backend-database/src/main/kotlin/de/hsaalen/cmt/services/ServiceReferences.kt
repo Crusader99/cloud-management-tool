@@ -63,6 +63,7 @@ object ServiceReferences {
 
     suspend fun listReferences(query: ClientReferenceQueryDto): ServerReferenceListDto {
         val refs = newSuspendedTransaction {
+            // TODO: filter only files that user owns
             ReferenceDao.all().map { it.toReference() }
         }
         return ServerReferenceListDto(refs)
@@ -72,10 +73,15 @@ object ServiceReferences {
         return MongoDB.getDocumentContent(uuid).byteInputStream()
     }
 
-
+    /**
+     * Delete a reference by the given reference uuid.
+     */
     suspend fun deleteReferences(uuid: String) {
-        UserDao.findById(UUID.fromString(uuid))?.delete()
-
+        newSuspendedTransaction {
+            ReferenceDao.findById(UUID.fromString(uuid))
+                ?.delete()
+                ?: throw IllegalArgumentException("No reference with uuid=$uuid found!")
+        }
     }
 
 }

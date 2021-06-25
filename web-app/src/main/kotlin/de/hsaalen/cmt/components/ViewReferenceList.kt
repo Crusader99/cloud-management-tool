@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.components
 
+import com.ccfraser.muirwik.components.button.mIconButton
 import de.crusader.extensions.toDate
 import de.crusader.objects.color.Color
 import de.hsaalen.cmt.network.dto.objects.Reference
@@ -18,13 +19,17 @@ import styled.*
 /**
  * Wrapper function to simplify creation of this react component.
  */
-fun RBuilder.referenceList(dto: ServerReferenceListDto?, onItemOpen: (Reference) -> Unit) =
-    child(ViewReferenceList::class) {
-        attrs {
-            this.dto = dto
-            this.onItemOpen = onItemOpen
-        }
+fun RBuilder.referenceList(
+    dto: ServerReferenceListDto?,
+    onItemOpen: (Reference) -> Unit,
+    onItemDelete: (Reference) -> Unit
+) = child(ViewReferenceList::class) {
+    attrs {
+        this.dto = dto
+        this.onItemOpen = onItemOpen
+        this.onItemDelete = onItemDelete
     }
+}
 
 /**
  * React properties of the [ViewReferenceList] component.
@@ -32,6 +37,7 @@ fun RBuilder.referenceList(dto: ServerReferenceListDto?, onItemOpen: (Reference)
 private external interface ViewReferenceListProps : RProps {
     var dto: ServerReferenceListDto?
     var onItemOpen: (Reference) -> Unit
+    var onItemDelete: (Reference) -> Unit
 }
 
 /**
@@ -63,7 +69,7 @@ private class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
             fontSize = 15.px
         }
 
-        val columns = arrayOf("Display Name", "Labels", "Last Access")
+        val columns = arrayOf("Display Name", "Labels", "Last Access", "")
         tr {
             for (column in columns) {
                 styledTh {
@@ -102,12 +108,6 @@ private class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
      * Called when the only a single row of the table body should be rendered.
      */
     private fun RBuilder.renderTableBodyRow(ref: Reference?) = styledTr {
-        val columns = if (ref == null) arrayOf("Loading...") else arrayOf(
-            ref.displayName,
-            ref.labels.joinToString(),
-            ref.dateLastAccess.toDate().toDateString(),
-        )
-
         css {
             fontSize = 15.px
             cursor = Cursor.pointer
@@ -121,13 +121,29 @@ private class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
                 onClickFunction = { props.onItemOpen(ref) }
             }
         }
-        for (column in columns) {
-            styledTd {
-                css {
-                    padding(14.px, 14.px)
-                }
-                +column
-            }
+        if (ref == null) {
+            renderTableBodyColumn("Loading...")
+            return@styledTr
         }
+
+        renderTableBodyColumn(ref.displayName)
+        renderTableBodyColumn(ref.labels.joinToString())
+        renderTableBodyColumn(ref.dateLastAccess.toDate().toDateString())
+        styledTd {
+            mIconButton("delete", onClick = {
+                it.stopPropagation() // Prevent parent element to receive onClick event, which would open the reference
+                props.onItemDelete(ref)
+            })
+        }
+    }
+
+    /**
+     * Render the text of a single table column.
+     */
+    private fun RBuilder.renderTableBodyColumn(text: String) = styledTd {
+        css {
+            padding(14.px, 14.px)
+        }
+        +text
     }
 }

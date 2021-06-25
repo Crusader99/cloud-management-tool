@@ -34,7 +34,10 @@ kotlin {
                 cssSupport.enabled = true
             }
             runTask {
-                val proxyTable = mutableMapOf<String, Any>("/api" to "http://localhost:80")
+                val settings = mutableMapOf<String, Any>()
+                settings["target"] = "http://localhost:80"
+                settings["ws"] = true // Enable websocket support
+                val proxyTable = mutableMapOf<String, Any>("/api" to settings)
                 devServer = devServer?.copy(port = 8081, proxy = proxyTable)
             }
         }

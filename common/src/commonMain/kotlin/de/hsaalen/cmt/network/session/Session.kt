@@ -1,13 +1,11 @@
 package de.hsaalen.cmt.network.session
 
 import de.hsaalen.cmt.network.RestPaths
+import de.hsaalen.cmt.network.apiPathWebSocket
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
 import de.hsaalen.cmt.network.exceptions.ConnectException
-import de.hsaalen.cmt.network.requests.RequestAuthentication
-import de.hsaalen.cmt.network.requests.RequestCreateReferences
-import de.hsaalen.cmt.network.requests.RequestDownload
-import de.hsaalen.cmt.network.requests.RequestListReferences
+import de.hsaalen.cmt.network.requests.*
 import io.ktor.client.features.websocket.*
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.GlobalScope
@@ -25,7 +23,8 @@ typealias Listener = (DocumentChangeDto) -> Unit
  */
 class Session(val userInfo: ServerUserInfoDto) :
     RequestListReferences,
-    RequestCreateReferences,
+    RequestCreateReference,
+    RequestDeleteReference,
     RequestDownload {
 
     // True while the websocket is connected to the server
@@ -52,7 +51,7 @@ class Session(val userInfo: ServerUserInfoDto) :
      * Connect to server with websocket for live synchronization.
      */
     private suspend fun connectWebSocket() {
-        var url = "${RestPaths.apiEndpoint}/websocket"
+        var url = "${RestPaths.apiEndpoint}$apiPathWebSocket"
         if (url.startsWith("http")) {
             // Replace http protocol with ws protocol
             // Should also work with tls encryption
