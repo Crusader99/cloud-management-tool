@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.network.requests
 
+import de.hsaalen.cmt.network.apiPathImport
 import de.hsaalen.cmt.network.session.Client
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
@@ -8,7 +9,7 @@ import io.ktor.http.*
 internal interface RequestImport : Request {
 
     suspend fun import(fileName: String, fileContent: ByteArray): String {
-        val url = Url("$apiEndpoint/import")
+        val url = Url("$apiEndpoint$apiPathImport")
         val parts = formData {
             val headersBuilder = HeadersBuilder()
             headersBuilder[HttpHeaders.ContentDisposition] = "filename=$fileName"

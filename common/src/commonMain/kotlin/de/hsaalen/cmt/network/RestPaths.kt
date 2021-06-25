@@ -16,3 +16,21 @@ object RestPaths {
     var apiEndpoint = base
 
 }
+
+const val apiPathDeleteReference = "/deleteReference"
+
+const val apiPathCreateReference = "/createReference"
+
+const val apiPathListReferences = "/listReferences"
+
+const val apiPathImport = "/import"
+
+const val apiPathAuthRestore = "/restore"
+
+const val apiPathAuthLogin = "/login"
+
+const val apiPathAuthLogout = "/logout"
+
+const val apiPathAuthRegister = "/register"
+
+const val apiPathWebSocket = "/websocket"

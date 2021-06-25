@@ -4,11 +4,8 @@ import de.hsaalen.cmt.jwt.JwtCookie
 import de.hsaalen.cmt.jwt.JwtPayload
 import de.hsaalen.cmt.jwt.readJwtCookie
 import de.hsaalen.cmt.jwt.updateJwtCookie
-import de.hsaalen.cmt.network.RestPaths
-import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
-import de.hsaalen.cmt.network.dto.client.ClientLoginDto
-import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
-import de.hsaalen.cmt.network.dto.client.ClientRegisterDto
+import de.hsaalen.cmt.network.*
+import de.hsaalen.cmt.network.dto.client.*
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.services.ServiceReferences
 import de.hsaalen.cmt.services.ServiceUsers
@@ -30,21 +27,21 @@ fun Application.registerRoutes() = routing {
         get {
             call.respondText("Hello world from backend! :-)")
         }
-        post("/login") {
+        post(apiPathAuthLogin) {
             val request: ClientLoginDto = call.receive()
-            println("Login: " + request.email)
+            println("Login request with e-mail=" + request.email)
             val user = ServiceUsers.login(request.email, request.passwordHashed)
             call.response.updateJwtCookie(user.toJwtPayload())
             call.respond(user)
         }
-        post("/register") {
+        post(apiPathAuthRegister) {
             val request: ClientRegisterDto = call.receive()
-            println("Register: " + request.email)
+            println("Register new account with e-mail= " + request.email)
             val user = ServiceUsers.register(request.fullName, request.email, request.passwordHashed)
             call.response.updateJwtCookie(user.toJwtPayload())
             call.respond(user)
         }
-        post("/logout") {
+        post(apiPathAuthLogout) {
             // Reset cookie using http header
             call.response.cookies.appendExpired(
                 name = JwtCookie.cookieName,
@@ -54,7 +51,7 @@ fun Application.registerRoutes() = routing {
             call.respond(Unit)
         }
         authenticate {
-            get("/restore") { // Check is authorization cookie is set and refresh jwt token when already logged in
+            get(apiPathAuthRestore) { // Check is authorization cookie is set and refresh jwt token when already logged in
                 val payload = call.request.readJwtCookie()
                 val email = payload.email
                 if (!ServiceUsers.isRegistered(payload.email)) {
@@ -63,27 +60,30 @@ fun Application.registerRoutes() = routing {
                 call.response.updateJwtCookie(payload)
                 call.respond(payload.toServerUserInfoDto())
             }
-            get("/listReferences") {
+            get(apiPathListReferences) {
                 val query = ClientReferenceQueryDto()
                 val result = ServiceReferences.listReferences(query)
                 call.respond(result)
             }
-            post("/listReferences") {
+            post(apiPathListReferences) {
                 val query: ClientReferenceQueryDto = call.receive()
                 val result = ServiceReferences.listReferences(query)
                 call.respond(result)
             }
-            get("/listReferences") {
+            get(apiPathListReferences) {
                 throw IllegalArgumentException("Expected POST request!")
             }
-            post("/createReference") {
+            post(apiPathCreateReference) {
                 val info: ClientCreateReferenceDto = call.receive()
                 val email = call.request.readJwtCookie().email
                 val result = ServiceReferences.createItem(info, email)
                 call.respond(result)
             }
-            get("/create") {
-                call.respondText("Upload")
+            post(apiPathDeleteReference) {
+                val info: ClientDeleteReferenceDto = call.receive()
+                // TODO: check for access permissions to this file
+                val result = ServiceReferences.deleteReferences(info.uuid)
+                call.respond(result)
             }
             get("/upload") {
                 call.respondText("Upload")
@@ -96,7 +96,7 @@ fun Application.registerRoutes() = routing {
                     stream.copyTo(this)
                 }
             }
-            post("/import") { // TODO: update or remove
+            post(apiPathImport) { // TODO: update or remove
                 val multipart = call.receiveMultipart()
                 val email = call.request.readJwtCookie().email
                 multipart.forEachPart { part ->

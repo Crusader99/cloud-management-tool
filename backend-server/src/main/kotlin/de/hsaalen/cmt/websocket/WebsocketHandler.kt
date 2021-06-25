@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.websocket
 
 import de.hsaalen.cmt.mongo.MongoDB
+import de.hsaalen.cmt.network.apiPathWebSocket
 import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
 import io.ktor.http.cio.websocket.*
 import io.ktor.routing.*
@@ -17,7 +18,7 @@ private val connections = mutableListOf<WebSocketSession>()
 /**
  * Handler for web-sockets that are used for live synchronisation of cloud data, e.g. file edit.
  */
-fun Route.handleWebSocket() = webSocket("/websocket") {
+fun Route.handleWebSocket() = webSocket(apiPathWebSocket) {
     println("websocket connected!")
     try {
         connections += this

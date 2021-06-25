@@ -19,13 +19,17 @@ import styled.*
 /**
  * Wrapper function to simplify creation of this react component.
  */
-fun RBuilder.referenceList(dto: ServerReferenceListDto?, onItemOpen: (Reference) -> Unit) =
-    child(ViewReferenceList::class) {
-        attrs {
-            this.dto = dto
-            this.onItemOpen = onItemOpen
-        }
+fun RBuilder.referenceList(
+    dto: ServerReferenceListDto?,
+    onItemOpen: (Reference) -> Unit,
+    onItemDelete: (Reference) -> Unit
+) = child(ViewReferenceList::class) {
+    attrs {
+        this.dto = dto
+        this.onItemOpen = onItemOpen
+        this.onItemDelete = onItemDelete
     }
+}
 
 /**
  * React properties of the [ViewReferenceList] component.
@@ -33,6 +37,7 @@ fun RBuilder.referenceList(dto: ServerReferenceListDto?, onItemOpen: (Reference)
 private external interface ViewReferenceListProps : RProps {
     var dto: ServerReferenceListDto?
     var onItemOpen: (Reference) -> Unit
+    var onItemDelete: (Reference) -> Unit
 }
 
 /**
@@ -125,7 +130,10 @@ private class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
         renderTableBodyColumn(ref.labels.joinToString())
         renderTableBodyColumn(ref.dateLastAccess.toDate().toDateString())
         styledTd {
-            mIconButton("delete")
+            mIconButton("delete", onClick = {
+                it.stopPropagation() // Prevent parent element to receive onClick event, which would open the reference
+                props.onItemDelete(ref)
+            })
         }
     }
 
