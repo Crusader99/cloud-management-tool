@@ -7,7 +7,6 @@ import de.crusader.objects.color.Color
 import de.crusader.painter.Painter
 import de.crusader.painter.animation.Animator
 import de.crusader.painter.animation.EnumInterpolator
-import de.hsaalen.cmt.network.session.Session
 import de.hsaalen.cmt.views.api.MPView
 import de.hsaalen.cmt.views.events.MPKeyboardEvent
 import de.hsaalen.cmt.views.events.MPMouseEvent
@@ -16,19 +15,9 @@ import de.hsaalen.cmt.views.events.MPMouseEvent
  * Document editor, implemented in multi-platform code to support multiple targets.
  */
 class DocumentEditor(
-    defaultText: String = "",
-    private val onTextChanged: (String) -> Unit
+    private val engine: EditorEngine,
+    private val onTextChanged: (String) -> Unit,
 ) : MPView() {
-
-    private val engine = EditorEngine(true, defaultText)
-
-    init {
-        Session.instance?.registerListener { dto ->
-            // TODO: implement
-//            println("Received " + dto.newTextEncrypted)
-//            engine.text = dto.newTextEncrypted
-        }
-    }
 
     override fun onMouseDown(e: MPMouseEvent) {
     }

@@ -6,10 +6,9 @@ import de.crusader.extensions.EnumDirection
  * Backend system for modifying the text content with multiple cursors in live mode.
  */
 class EditorEngine(
-    val isMultiLineAllowed: Boolean = true,
-    defaultText: String
+    val isMultiLineAllowed: Boolean = true
 ) {
-    val lines = defaultText.lineSequence().map { Line(it) }.toMutableList()
+    val lines = mutableListOf<Line>()
 
     val cursor = Cursor(CursorReference(this, CursorOwner(), 0), CursorPos(0, 0))
 
@@ -39,6 +38,30 @@ class EditorEngine(
 
         override fun toString() = items.toCharArray().concatToString()
 
+    }
+
+    fun modifyLine(lineNumber: Int, newContent: String) {
+//        val line = lines[lineNumber] // TODO: enable for other cursors
+//        for(index in line.items.indices){
+//            val oldChar = line.items[index]
+//            val newChar = newContent.getOrNull(index)
+//        }
+
+        lines[lineNumber] = Line(newContent)
+    }
+
+    fun addLine(lineNumber: Int, lineContent: String) {
+        lines.add(lineNumber, Line(lineContent))
+//        if (cursor.y >= lineNumber) { // TODO: enable for other cursors
+//            cursor.move(EnumDirection.DOWN, 1)
+//        }
+    }
+
+    fun deleteLine(lineNumber: Int) {
+        lines.removeAt(lineNumber)
+//        if (cursor.y > lineNumber) { // TODO: enable for other cursors
+//            cursor.move(EnumDirection.UP, 1)
+//        }
     }
 
     class CursorOwner()
