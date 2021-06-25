@@ -53,7 +53,8 @@ object BackendLocator {
     val defaultBackend: String
         get() {
             val frontendURL = window.location.toString()
-            return if (frontendURL.startsWith("file://")) {
+            val frontendHost = window.location.host
+            return if (frontendURL.startsWith("file://") || frontendHost == "appassets.androidplatform.net") {
                 // This is the official default backend server
                 // It can be changed using the "switch backend"-button
                 "https://provider.ddnss.de/se-project/" + RestPaths.base

@@ -24,9 +24,11 @@ class MainActivity : AppCompatActivity() {
     private val webView
         get() = findViewById<WebView>(R.id.webView)
 
-    // https://appassets.androidplatform.net/assets/www/index.html
-    private val endpointWebAsserts = "http://10.0.2.2/"
-    private val endpointRestApi = "http://10.0.2.2/"
+    /**
+     * Path to assets. Note that the appassets.androidplatform.net host is the
+     * Android default for local assets access.
+     */
+    private val endpointWebAsserts = "https://appassets.androidplatform.net/assets/www/index.html"
 
     fun isLocalWebAsset(url: String): Boolean {
         return url.startsWith(endpointWebAsserts)
@@ -44,14 +46,14 @@ class MainActivity : AppCompatActivity() {
             .addPathHandler("/assets/", AssetsPathHandler(this))
             .build()
 
+
         // Webclient providing correct handlers for web content
         webView.webViewClient = object : WebViewClientCompat() {
             override fun shouldInterceptRequest(
                 view: WebView,
                 request: WebResourceRequest
             ): WebResourceResponse? {
-                // return assetLoader.shouldInterceptRequest(request.url)
-                return null
+                return assetLoader.shouldInterceptRequest(request.url)
             }
 
             override fun shouldOverrideUrlLoading(

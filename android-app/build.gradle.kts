@@ -38,8 +38,11 @@ configurations.all {
     attributes.attribute(attr, "android")
 }
 
+// Copy web-app to local cache
 val websiteCopy by tasks.registering(Copy::class) {
-    // TODO: copy website to local cache
+    dependsOn(":web-app:build")
+    from("../web-app/build/artifact-js")
+    into("src/main/assets/www")
 }
 
 tasks.assemble.dependsOn(websiteCopy)
