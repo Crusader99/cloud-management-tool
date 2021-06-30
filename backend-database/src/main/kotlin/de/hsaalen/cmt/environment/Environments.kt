@@ -12,7 +12,15 @@ private val logger = KotlinLogging.logger { }.apply {
     info("Initialize environment variables")
 }
 
+/**
+ * Port to be used for REST API server.
+ */
 val REST_PORT = envOrDefault("REST_PORT", 80).toInt()
+
+/**
+ * Hash passwords with this salt before storing in SQL database.
+ */
+val PASSWORD_SALT = env("PASSWORD_SALT")
 
 val POSTGRESQL_HOST = envOrDefault("POSTGRESQL_HOST", "localhost")
 

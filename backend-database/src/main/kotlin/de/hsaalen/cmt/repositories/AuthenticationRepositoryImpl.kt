@@ -1,5 +1,7 @@
 package de.hsaalen.cmt.repositories
 
+import com.soywiz.krypto.SHA256
+import de.hsaalen.cmt.environment.PASSWORD_SALT
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.repository.AuthenticationRepository
 import de.hsaalen.cmt.sql.schema.UserDao
@@ -13,7 +15,7 @@ import org.joda.time.DateTime
 /**
  * Repository layer for providing user authentication functionality.
  */
-object RepositoryUsers : AuthenticationRepository {
+object AuthenticationRepositoryImpl : AuthenticationRepository {
 
     /**
      * Handles register request and provides a ServerUserInfoDto when successfully logged in or throws an exception when
@@ -89,7 +91,14 @@ object RepositoryUsers : AuthenticationRepository {
      * Salt and hash the given password parameter.
      */
     private fun hashPassword(password: String): String {
-        return password // TODO: implement
+        // Salt password with system environment variable
+        val saltedPassword = password + PASSWORD_SALT
+
+        // Encode salted password to byte array
+        val rawByteInput = saltedPassword.encodeToByteArray()
+
+        // Hash salted password and convert to hex string
+        return SHA256.digest(rawByteInput).hex
     }
 
 }
