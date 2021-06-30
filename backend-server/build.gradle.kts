@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") // There are some bugs with Intellij older than 2021.1
     kotlin("plugin.serialization")
     id("com.github.gelangweilte-studenten.gradle-docker-tests")
+    id("io.gitlab.arturbosch.detekt") version "1.17.1" // Code quality analyze tool
     application
 }
 
@@ -47,4 +48,11 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
     timeout.set(Duration.ofSeconds(60L))
+}
+
+// Configure detekt code analyze tool to generate HTML report
+detekt {
+    reports {
+        html.enabled = true
+    }
 }
