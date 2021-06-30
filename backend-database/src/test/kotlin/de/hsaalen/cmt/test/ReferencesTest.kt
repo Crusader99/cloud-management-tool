@@ -5,7 +5,7 @@ import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode.*
 import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
 import de.hsaalen.cmt.repositories.RepositoryReferences
-import de.hsaalen.cmt.repositories.RepositoryUsers
+import de.hsaalen.cmt.repositories.AuthenticationRepositoryImpl
 import de.hsaalen.cmt.sql.Postgresql
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -39,7 +39,7 @@ class ReferencesTest {
             delay(5_000)
             Postgresql.configure()
             MongoDB.configure()
-            RepositoryUsers.register("Simon", userMail, "12345678")
+            AuthenticationRepositoryImpl.register("Simon", userMail, "12345678")
         }
     }
 

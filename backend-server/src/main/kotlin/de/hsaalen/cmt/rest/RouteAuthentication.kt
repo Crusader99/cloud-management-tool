@@ -6,7 +6,7 @@ import de.hsaalen.cmt.jwt.updateJwtCookie
 import de.hsaalen.cmt.network.*
 import de.hsaalen.cmt.network.dto.client.ClientLoginDto
 import de.hsaalen.cmt.network.dto.client.ClientRegisterDto
-import de.hsaalen.cmt.repositories.RepositoryUsers
+import de.hsaalen.cmt.repositories.AuthenticationRepositoryImpl
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.request.*
@@ -20,14 +20,14 @@ fun Routing.routeAuthentication() = route("/" + RestPaths.base) {
     post(apiPathAuthLogin) {
         val request: ClientLoginDto = call.receive()
         println("Login request with e-mail=" + request.email)
-        val user = RepositoryUsers.login(request.email, request.passwordHashed)
+        val user = AuthenticationRepositoryImpl.login(request.email, request.passwordHashed)
         call.response.updateJwtCookie(user.toJwtPayload())
         call.respond(user)
     }
     post(apiPathAuthRegister) {
         val request: ClientRegisterDto = call.receive()
         println("Register new account with e-mail= " + request.email)
-        val user = RepositoryUsers.register(request.fullName, request.email, request.passwordHashed)
+        val user = AuthenticationRepositoryImpl.register(request.fullName, request.email, request.passwordHashed)
         call.response.updateJwtCookie(user.toJwtPayload())
         call.respond(user)
     }
@@ -43,7 +43,7 @@ fun Routing.routeAuthentication() = route("/" + RestPaths.base) {
     authenticate {
         get(apiPathAuthRestore) { // Check is authorization cookie is set and refresh JWT token when logged in
             val payload = call.request.readJwtCookie()
-            val user = RepositoryUsers.restore(payload.email)
+            val user = AuthenticationRepositoryImpl.restore(payload.email)
             call.response.updateJwtCookie(user.toJwtPayload())
             call.respond(user)
         }

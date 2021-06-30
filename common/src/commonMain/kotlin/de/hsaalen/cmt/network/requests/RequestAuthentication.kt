@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.network.requests
 
+import com.soywiz.krypto.SHA256
 import de.hsaalen.cmt.network.apiPathAuthLogin
 import de.hsaalen.cmt.network.apiPathAuthLogout
 import de.hsaalen.cmt.network.apiPathAuthRegister
@@ -25,7 +26,7 @@ internal object RequestAuthentication : Request, AuthenticationRepository {
         email: String,
         passwordPlain: String
     ): ServerUserInfoDto {
-        val passwordHashed = passwordPlain // TODO: hash password
+        val passwordHashed = hashPassword(passwordPlain)
         val url = Url("$apiEndpoint$apiPathAuthRegister")
         return Client.request(url) {
             method = HttpMethod.Post
@@ -37,7 +38,7 @@ internal object RequestAuthentication : Request, AuthenticationRepository {
      * Send login request to the server.
      */
     override suspend fun login(email: String, passwordPlain: String): ServerUserInfoDto {
-        val passwordHashed = passwordPlain // TODO: hash password
+        val passwordHashed = hashPassword(passwordPlain)
         val url = Url("$apiEndpoint$apiPathAuthLogin")
         return Client.request(url) {
             method = HttpMethod.Post
@@ -63,6 +64,19 @@ internal object RequestAuthentication : Request, AuthenticationRepository {
         return Client.request(url) {
             method = HttpMethod.Get
         }
+    }
+
+    /**
+     * Hash the given password parameter WITHOUT salting.
+     *
+     * Note: Salting only happens on server side and a specific salt is defined by setting a environment variable.
+     */
+    private fun hashPassword(password: String): String {
+        // Encode raw password to byte array
+        val rawByteInput = password.encodeToByteArray()
+
+        // Hash password and convert to hex string
+        return SHA256.digest(rawByteInput).hex
     }
 
 }

@@ -73,6 +73,8 @@ tasks.test {
     dependsOn(dockerPostgres, dockerMongoDB)
     finalizedBy(dockerStop)
 
+    environment["PASSWORD_SALT"] = "salt"
+
     environment["POSTGRESQL_USER"] = "admin"
     environment["POSTGRESQL_PASSWORD"] = "admin"
     environment["POSTGRESQL_DB"] = "postgres"
