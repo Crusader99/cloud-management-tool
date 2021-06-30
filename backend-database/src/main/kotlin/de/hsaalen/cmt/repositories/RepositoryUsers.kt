@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.services
+package de.hsaalen.cmt.repositories
 
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.sql.schema.UserDao
@@ -12,7 +12,7 @@ import org.joda.time.DateTime
 /**
  * Service layer for providing user authentication functionality.
  */
-object ServiceUsers {
+object RepositoryUsers {
 
     /**
      * Handles login request and provides a ServerUserInfoDto when successfully logged in or throws an exception when

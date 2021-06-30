@@ -5,7 +5,7 @@ import de.hsaalen.cmt.network.*
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientDeleteReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
-import de.hsaalen.cmt.services.ServiceReferences
+import de.hsaalen.cmt.repositories.RepositoryReferences
 import de.hsaalen.cmt.websocket.handleWebSocket
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -23,12 +23,12 @@ fun Routing.routeReferences() = route("/" + RestPaths.base) {
     authenticate {
         get(apiPathListReferences) {
             val query = ClientReferenceQueryDto()
-            val result = ServiceReferences.listReferences(query)
+            val result = RepositoryReferences.listReferences(query)
             call.respond(result)
         }
         post(apiPathListReferences) {
             val query: ClientReferenceQueryDto = call.receive()
-            val result = ServiceReferences.listReferences(query)
+            val result = RepositoryReferences.listReferences(query)
             call.respond(result)
         }
         get(apiPathListReferences) {
@@ -37,13 +37,13 @@ fun Routing.routeReferences() = route("/" + RestPaths.base) {
         post(apiPathCreateReference) {
             val info: ClientCreateReferenceDto = call.receive()
             val email = call.request.readJwtCookie().email
-            val result = ServiceReferences.createItem(info, email)
+            val result = RepositoryReferences.createItem(info, email)
             call.respond(result)
         }
         post(apiPathDeleteReference) {
             val info: ClientDeleteReferenceDto = call.receive()
             // TODO: check for access permissions to this file
-            val result = ServiceReferences.deleteReferences(info.uuid)
+            val result = RepositoryReferences.deleteReferences(info.uuid)
             call.respond(result)
         }
         get("/upload") {
@@ -51,7 +51,7 @@ fun Routing.routeReferences() = route("/" + RestPaths.base) {
         }
         get("/download/{uuid}") {
             val uuid: String by call.parameters
-            val stream = ServiceReferences.downloadContent(uuid)
+            val stream = RepositoryReferences.downloadContent(uuid)
             call.response.header(HttpHeaders.ContentDisposition, "attachment")
             call.respondOutputStream {
                 stream.copyTo(this)

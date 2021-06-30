@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.services
+package de.hsaalen.cmt.repositories
 
 import de.hsaalen.cmt.mongo.MongoDB
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
@@ -18,7 +18,7 @@ import java.util.*
 /**
  * Handles database operations for the reference and revision management.
  */
-object ServiceReferences {
+object RepositoryReferences {
 
     /**
      * Create a new reference to a first revision.
