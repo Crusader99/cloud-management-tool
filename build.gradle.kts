@@ -27,6 +27,9 @@ plugins {
     // This plugin was written because of issues in the existing docker gradle plugins available
     id("com.github.gelangweilte-studenten.gradle-docker-tests") version "1.2.6" apply false
 
+    // Code quality analyze tool
+    id("io.gitlab.arturbosch.detekt") version "1.17.1" apply false
+
     // Register plugins for better IDE support
     eclipse
     idea
