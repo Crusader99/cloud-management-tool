@@ -135,8 +135,7 @@ class Session(val userInfo: ServerUserInfoDto) :
          * Send login request to the server.
          */
         suspend fun login(email: String, passwordPlain: String): Session {
-            val passwordHashed = passwordPlain // TODO: hash password
-            val userInfo = RequestAuthentication.login(email, passwordHashed)
+            val userInfo = RequestAuthentication.login(email, passwordPlain)
             println("Logged in as: " + userInfo.email)
             return Session(userInfo)
         }
@@ -145,8 +144,7 @@ class Session(val userInfo: ServerUserInfoDto) :
          * Send register request to the server.
          */
         suspend fun register(firstName: String, email: String, passwordPlain: String): Session {
-            val passwordHashed = passwordPlain // TODO: hash password
-            val userInfo = RequestAuthentication.register(firstName, email, passwordHashed)
+            val userInfo = RequestAuthentication.register(firstName, email, passwordPlain)
             println("Logged in as: " + userInfo.email)
             return Session(userInfo)
         }
@@ -155,11 +153,11 @@ class Session(val userInfo: ServerUserInfoDto) :
          * Request server to restore user session. Session can only restored when JWT cookie is still valid.
          *
          * @return Session instance when session has been restored or null when it can't be restored.
-         * @throws ConnectException when no connection to backend de.hsaalen.cmt.services was possible.
+         * @throws ConnectException when no connection to backend services was possible.
          */
         suspend fun restore(): Session? {
             return try {
-                val userInfo = RequestAuthentication.restore()
+                val userInfo = RequestAuthentication.restore() // No email passed: not known yet, determined by server
                 println("Restored session for: " + userInfo.email)
                 Session(userInfo)
             } catch (t: Exception) {
