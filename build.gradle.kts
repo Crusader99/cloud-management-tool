@@ -14,7 +14,7 @@ allprojects {
 
 plugins {
     kotlin("multiplatform") version "1.5.20" apply false // Allows common projects
-    kotlin("plugin.serialization") version "1.5.10" apply false // Support for json serialization
+    kotlin("plugin.serialization") version "1.5.20" apply false // Support for json serialization
 
     // Gradle plugin for android development
     id("com.android.application") version "4.1.3" apply false
@@ -25,7 +25,7 @@ plugins {
 
     // Self written plugin (not part of this project) which is used to execute docker containers while gradle build
     // This plugin was written because of issues in the existing docker gradle plugins available
-    id("com.github.gelangweilte-studenten.gradle-docker-tests") version "1.1.1" apply false
+    id("com.github.gelangweilte-studenten.gradle-docker-tests") version "1.2.6" apply false
 
     // Register plugins for better IDE support
     eclipse
