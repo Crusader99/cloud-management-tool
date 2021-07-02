@@ -2,6 +2,7 @@ package de.hsaalen.cmt.rest
 
 import com.auth0.jwt.JWT
 import de.crusader.extensions.initialCause
+import de.hsaalen.cmt.Databases
 import de.hsaalen.cmt.jwt.JwtCookie
 import de.hsaalen.cmt.jwt.toPayload
 import de.hsaalen.cmt.network.dto.server.ServerErrorDto
@@ -22,6 +23,8 @@ import io.ktor.websocket.*
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import mu.KotlinLogging
+import org.koin.ktor.ext.Koin
+import org.koin.logger.SLF4JLogger
 import org.slf4j.event.Level
 import java.time.Duration
 
@@ -40,6 +43,10 @@ object RestServer {
      * Configure an embedded HTTP server for providing a REST API.
      */
     fun configure(port: Int) = embeddedServer(CIO, port) {
+        install(Koin) { // Dependency injection
+            SLF4JLogger()
+            modules(Databases.dependencies) // Inject database repositories
+        }
         install(CallLogging) {
             // Configure default logging level
             level = Level.INFO

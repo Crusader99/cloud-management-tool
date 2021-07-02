@@ -34,6 +34,9 @@ kotlin {
                 // See https://github.com/MicroUtils/kotlin-logging
                 implementation("io.github.microutils:kotlin-logging:2.0.8")
 
+                // Use Koin as dependency injection framework
+                api("io.insert-koin:koin-core:3.1.2")
+
                 api("de.crusader:kotlin-extensions:1.1.1")
                 api("de.crusader:library-objects:1.1.1")
 

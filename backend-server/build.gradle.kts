@@ -38,6 +38,10 @@ dependencies {
         because("Ktor depends on this library and has issues when missing")
     }
     implementation("io.micrometer:micrometer-registry-prometheus:1.7.1")
+    implementation("io.insert-koin:koin-logger-slf4j:3.1.2")
+
+    // Use Koin as dependency injection framework
+    implementation("io.insert-koin:koin-ktor:3.1.2")
 
     // JUnit test framework
     testImplementation(kotlin("test"))

@@ -6,7 +6,7 @@ import de.hsaalen.cmt.rest.RestServer
 import mu.KotlinLogging
 
 /**
- * The local logging instance
+ * The local logging instance.
  */
 private val logger = KotlinLogging.logger { }
 
