@@ -12,4 +12,4 @@ data class DocumentChangeDto(
     val lineNumber: Int,
     val lineContentEncrypted: String,
     val lineChangeMode: LineChangeMode,
-) : LiveDto
+) : LiveDto()

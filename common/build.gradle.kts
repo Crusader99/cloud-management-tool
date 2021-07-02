@@ -45,12 +45,12 @@ kotlin {
                 }
 
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
-                implementation("io.ktor:ktor-client-core:1.6.0")
-                implementation("io.ktor:ktor-client-serialization:1.6.0")
-                implementation("io.ktor:ktor-client-websockets:1.6.0")
+                implementation("io.ktor:ktor-client-core:1.6.1")
+                implementation("io.ktor:ktor-client-serialization:1.6.1")
+                implementation("io.ktor:ktor-client-websockets:1.6.1")
 
                 // Kotlin crypto library for password hashing
-                api("com.soywiz.korlibs.krypto:krypto:2.2.0")
+//                api("com.soywiz.korlibs.krypto:krypto:2.2.0") // TODO fix crypto-error on js
             }
         }
         val commonTest by getting {

@@ -21,15 +21,15 @@ dependencies {
     implementation(project(":common"))
 
     // Network framework
-    implementation("io.ktor:ktor-server-core:1.6.0")
-    implementation("io.ktor:ktor-server-cio:1.6.0") {
+    implementation("io.ktor:ktor-server-core:1.6.1")
+    implementation("io.ktor:ktor-server-cio:1.6.1") {
         because("Known issues with netty & jetty")
     }
-    implementation("io.ktor:ktor-serialization:1.6.0")
-    implementation("io.ktor:ktor-websockets:1.6.0")
-    implementation("io.ktor:ktor-metrics-micrometer:1.6.0")
-    implementation("io.ktor:ktor-auth:1.6.0")
-    implementation("io.ktor:ktor-auth-jwt:1.6.0")
+    implementation("io.ktor:ktor-serialization:1.6.1")
+    implementation("io.ktor:ktor-websockets:1.6.1")
+    implementation("io.ktor:ktor-metrics-micrometer:1.6.1")
+    implementation("io.ktor:ktor-auth:1.6.1")
+    implementation("io.ktor:ktor-auth-jwt:1.6.1")
 
     // Statistics & logging frameworks
     // See https://github.com/MicroUtils/kotlin-logging
@@ -51,10 +51,18 @@ tasks.test {
 }
 
 // Configure detekt code analyze tool to generate HTML report
-// TODO: check how to fix out-of-memory in github actions
 //detekt {
 //    ignoreFailures = true // Currently only print warning
 //    reports {
 //        html.enabled = true
 //    }
+//}
+//
+// The detekt analyze plugin caused out-of-memory in GitHub Actions.
+// This is a workaround to disable detekt directly on build.
+// (For mor information see https://github.com/detekt/detekt/issues/1894)
+//tasks.getByName("check") {
+//    this.setDependsOn(this.dependsOn.filterNot {
+//        it is TaskProvider<*> && it.name == "detekt"
+//    })
 //}

@@ -4,7 +4,7 @@ import de.hsaalen.cmt.mongo.MongoDB
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode.*
 import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
-import de.hsaalen.cmt.repositories.RepositoryReferences
+import de.hsaalen.cmt.repositories.ReferencesRepositoryImpl
 import de.hsaalen.cmt.repositories.AuthenticationRepositoryImpl
 import de.hsaalen.cmt.sql.Postgresql
 import kotlinx.coroutines.delay
@@ -52,7 +52,7 @@ class ReferencesTest {
         runBlocking {
             withTimeout(5000) {
                 val info = ClientCreateReferenceDto("test")
-                val ref = RepositoryReferences.createItem(info, creatorEmail = userMail)
+                val ref = ReferencesRepositoryImpl.createItem(info, creatorEmail = userMail)
                 assertEquals(info.displayName, ref.displayName)
                 assertEquals("", MongoDB.getDocumentContent(ref.uuid))
 

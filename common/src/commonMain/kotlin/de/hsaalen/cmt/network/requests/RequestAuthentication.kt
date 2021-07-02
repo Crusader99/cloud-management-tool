@@ -1,6 +1,5 @@
 package de.hsaalen.cmt.network.requests
 
-import com.soywiz.krypto.SHA256
 import de.hsaalen.cmt.network.apiPathAuthLogin
 import de.hsaalen.cmt.network.apiPathAuthLogout
 import de.hsaalen.cmt.network.apiPathAuthRegister
@@ -76,7 +75,8 @@ internal object RequestAuthentication : Request, AuthenticationRepository {
         val rawByteInput = password.encodeToByteArray()
 
         // Hash password and convert to hex string
-        return SHA256.digest(rawByteInput).hex
+//        return SHA256.digest(rawByteInput).hex // TODO enable
+        return password
     }
 
 }

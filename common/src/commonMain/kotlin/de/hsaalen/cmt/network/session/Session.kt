@@ -4,19 +4,18 @@ import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.apiPathWebSocket
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
+import de.hsaalen.cmt.network.dto.websocket.LiveDto
 import de.hsaalen.cmt.network.exceptions.ConnectException
 import de.hsaalen.cmt.network.requests.*
+import de.hsaalen.cmt.utils.JsonHelper
 import io.ktor.client.features.websocket.*
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
-typealias Listener = (DocumentChangeDto) -> Unit
+typealias Listener<Event> = (Event) -> Unit
 
 /**
  * Client session with websocket connection to server backend.
@@ -32,7 +31,7 @@ class Session(val userInfo: ServerUserInfoDto) :
         private set
 
     private var webSocketSendingQueue = Channel<Frame>()
-    private val webSocketListeners = mutableListOf<Listener>()
+    val webSocketListeners = mutableListOf<Listener<LiveDto>>()
 
     init {
         GlobalScope.launch {
@@ -43,8 +42,12 @@ class Session(val userInfo: ServerUserInfoDto) :
     /**
      * Add listener for handling received DTOs.
      */
-    fun registerListener(packetListener: Listener) {
-        webSocketListeners += packetListener
+    inline fun <reified Event : LiveDto> registerListener(crossinline packetListener: Listener<Event>) {
+        webSocketListeners += {
+            if (it is Event) {
+                packetListener(it)
+            }
+        }
     }
 
     /**
@@ -78,9 +81,8 @@ class Session(val userInfo: ServerUserInfoDto) :
                 while (isActive && isConnected) {
                     println("Waiting for websocket receive")
                     val frame = incoming.receive()
-                    val dto: DocumentChangeDto = if (frame is Frame.Text) {
-                        val jsonText = frame.readText()
-                        Json.decodeFromString(jsonText)
+                    val dto: LiveDto = if (frame is Frame.Text) {
+                        JsonHelper.decode(frame.readText())
                     } else {
                         throw UnsupportedOperationException(frame::class.simpleName)
                     }
@@ -109,7 +111,7 @@ class Session(val userInfo: ServerUserInfoDto) :
      * Send to text edit DTO to server and other clients.
      */
     suspend fun liveTextEdit(dto: DocumentChangeDto) {
-        val jsonText = Json.encodeToString(dto)
+        val jsonText = JsonHelper.encode(dto)
         webSocketSendingQueue.send(Frame.Text(jsonText))
     }
 

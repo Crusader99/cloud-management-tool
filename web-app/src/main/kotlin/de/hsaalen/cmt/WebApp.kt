@@ -304,7 +304,6 @@ class WebApp : RComponent<RProps, WebAppState>() {
                     importFile(file.name, text)
                     println(file.name + " successfully imported")
                 }
-                refOverview.current?.updateReferences()
             } finally {
                 setState {
                     isLoading = false
@@ -325,7 +324,6 @@ class WebApp : RComponent<RProps, WebAppState>() {
             ) ?: return@launch
             println("Selected display name: $displayName")
             Session.instance?.createReference(displayName)
-            refOverview.current?.updateReferences()
         }
     }
 

@@ -2,9 +2,7 @@ package de.hsaalen.cmt
 
 import de.hsaalen.cmt.environment.REST_PORT
 import de.hsaalen.cmt.exceptions.ConfigurationException
-import de.hsaalen.cmt.mongo.MongoDB
 import de.hsaalen.cmt.rest.RestServer
-import de.hsaalen.cmt.sql.Postgresql
 import mu.KotlinLogging
 
 /**
@@ -21,8 +19,7 @@ fun main() {
     Thread.sleep(5_000)
 
     val engine = try {
-        MongoDB.configure()
-        Postgresql.configure()
+        Databases.init()
         RestServer.configure(REST_PORT)
     } catch (ex: Throwable) {
         throw ConfigurationException(ex)

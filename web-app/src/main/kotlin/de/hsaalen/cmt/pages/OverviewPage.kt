@@ -5,6 +5,8 @@ import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
+import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateAddDto
+import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateRemoveDto
 import de.hsaalen.cmt.network.session.Session
 import kotlinx.coroutines.launch
 import react.*
@@ -39,6 +41,8 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
         coroutines.launch {
             updateReferences()
         }
+        Session.instance?.registerListener(::onAddedReference)
+        Session.instance?.registerListener(::onRemovedReference)
     }
 
     /**
@@ -51,7 +55,7 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
     /**
      * Request a references update from server.
      */
-    suspend fun updateReferences() {
+    private suspend fun updateReferences() {
         val received = props.session.listReferences(state.query)
         setState {
             dto = received
@@ -64,7 +68,27 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
     private fun onItemDelete(ref: Reference) {
         coroutines.launch {
             Session.instance?.deleteReference(ref)
-            updateReferences()
+        }
+    }
+
+    /**
+     * Event called by server after new reference added.
+     */
+    private fun onAddedReference(ref: ReferenceUpdateAddDto) {
+        setState {
+            val new = listOf(ref.reference)
+            val old = dto?.references ?: emptyList()
+            dto = ServerReferenceListDto(new + old)
+        }
+    }
+
+    /**
+     * Event called by server after a reference got deleted.
+     */
+    private fun onRemovedReference(ref: ReferenceUpdateRemoveDto) {
+        setState {
+            val old = dto?.references ?: emptyList()
+            dto = ServerReferenceListDto(old.filter { it.uuid != ref.uuid })
         }
     }
 

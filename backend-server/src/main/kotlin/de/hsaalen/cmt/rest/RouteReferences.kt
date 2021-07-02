@@ -5,8 +5,7 @@ import de.hsaalen.cmt.network.*
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientDeleteReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
-import de.hsaalen.cmt.repositories.RepositoryReferences
-import de.hsaalen.cmt.websocket.handleWebSocket
+import de.hsaalen.cmt.repositories.ReferencesRepositoryImpl
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
@@ -23,12 +22,12 @@ fun Routing.routeReferences() = route("/" + RestPaths.base) {
     authenticate {
         get(apiPathListReferences) {
             val query = ClientReferenceQueryDto()
-            val result = RepositoryReferences.listReferences(query)
+            val result = ReferencesRepositoryImpl.listReferences(query)
             call.respond(result)
         }
         post(apiPathListReferences) {
             val query: ClientReferenceQueryDto = call.receive()
-            val result = RepositoryReferences.listReferences(query)
+            val result = ReferencesRepositoryImpl.listReferences(query)
             call.respond(result)
         }
         get(apiPathListReferences) {
@@ -37,13 +36,13 @@ fun Routing.routeReferences() = route("/" + RestPaths.base) {
         post(apiPathCreateReference) {
             val info: ClientCreateReferenceDto = call.receive()
             val email = call.request.readJwtCookie().email
-            val result = RepositoryReferences.createItem(info, email)
+            val result = ReferencesRepositoryImpl.createItem(info, email)
             call.respond(result)
         }
         post(apiPathDeleteReference) {
             val info: ClientDeleteReferenceDto = call.receive()
             // TODO: check for access permissions to this file
-            val result = RepositoryReferences.deleteReferences(info.uuid)
+            val result = ReferencesRepositoryImpl.deleteReferences(info.uuid)
             call.respond(result)
         }
         get("/upload") {
@@ -51,7 +50,7 @@ fun Routing.routeReferences() = route("/" + RestPaths.base) {
         }
         get("/download/{uuid}") {
             val uuid: String by call.parameters
-            val stream = RepositoryReferences.downloadContent(uuid)
+            val stream = ReferencesRepositoryImpl.downloadContent(uuid)
             call.response.header(HttpHeaders.ContentDisposition, "attachment")
             call.respondOutputStream {
                 stream.copyTo(this)
@@ -72,6 +71,5 @@ fun Routing.routeReferences() = route("/" + RestPaths.base) {
             }
             call.respondText("Imported")
         }
-        handleWebSocket()
     }
 }

@@ -18,6 +18,7 @@ fun Application.registerRoutes() = routing {
     this@routing.routeAuthentication()
     this@routing.routeReferences()
     this@routing.routeMetrics()
+    this@routing.routeWebSockets()
 }
 
 /**

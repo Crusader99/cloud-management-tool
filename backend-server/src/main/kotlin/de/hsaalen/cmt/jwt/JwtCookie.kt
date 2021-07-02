@@ -2,13 +2,11 @@ package de.hsaalen.cmt.jwt
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import de.hsaalen.cmt.utils.JsonHelper
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
 import io.ktor.request.*
 import io.ktor.response.*
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import java.util.*
 
 /**
@@ -32,7 +30,7 @@ object JwtCookie {
     fun generateToken(payload: JwtPayload): String = JWT.create()
         .withSubject(cookieName)
         .withIssuer(issuer)
-        .withClaim(claimName, Json.encodeToString(payload))
+        .withClaim(claimName, JsonHelper.encode(payload))
         .withExpiresAt(Date(System.currentTimeMillis() + maxAgeMs))
         .sign(algorithm)
 }
@@ -40,7 +38,7 @@ object JwtCookie {
 /**
  * Extension method to extract the payload object from JWT credentials.
  */
-fun JWTCredential.toPayload(): JwtPayload = Json.decodeFromString(payload.getClaim(JwtCookie.claimName).asString())
+fun JWTCredential.toPayload(): JwtPayload = JsonHelper.decode(payload.getClaim(JwtCookie.claimName).asString())
 
 /**
  * Extension method to read to JWT payload from a JWT HTTP cookie.
