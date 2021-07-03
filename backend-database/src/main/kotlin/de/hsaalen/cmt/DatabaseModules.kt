@@ -1,16 +1,15 @@
 package de.hsaalen.cmt
 
 import de.hsaalen.cmt.mongo.MongoDB
-import de.hsaalen.cmt.repositories.AuthenticationRepositoryImpl
-import de.hsaalen.cmt.repository.AuthenticationRepository
+import de.hsaalen.cmt.repository.*
 import de.hsaalen.cmt.sql.Postgresql
 import org.koin.dsl.module
 
 /**
- * Initialize helper that is accessible from layers above.
- * TODO: may replaced with DI later
+ * Initialize helper that is accessible from layers above. Contains a module
+ * configuration for the koin dependency injection framework.
  */
-object Databases {
+object DatabaseModules {
 
     /**
      * Initialize all used database connections.
@@ -29,6 +28,8 @@ object Databases {
      */
     val dependencies = module {
         single<AuthenticationRepository> { AuthenticationRepositoryImpl }
+        factory<ReferencesRepository> { (userEmail: String) -> ReferencesRepositoryImpl(userEmail) }
+        single<DocumentRepository> { DocumentRepositoryImpl }
     }
 
 

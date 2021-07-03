@@ -19,7 +19,7 @@ import de.hsaalen.cmt.pages.AuthenticationPage
 import de.hsaalen.cmt.pages.DocumentEditPage
 import de.hsaalen.cmt.pages.FallbackPage
 import de.hsaalen.cmt.pages.OverviewPage
-import de.hsaalen.cmt.support.SimpleNoteImportJson
+import de.hsaalen.cmt.utils.SimpleNoteImportJson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch

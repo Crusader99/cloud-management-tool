@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.pages
 
 import de.hsaalen.cmt.components.referenceList
+import de.hsaalen.cmt.events.GlobalEventDispatcher
 import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.Reference
@@ -41,8 +42,15 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
         coroutines.launch {
             updateReferences()
         }
-        Session.instance?.registerListener(::onAddedReference)
-        Session.instance?.registerListener(::onRemovedReference)
+        GlobalEventDispatcher.register(::onAddedReference)
+        GlobalEventDispatcher.register(::onRemovedReference)
+    }
+
+    /**
+     * Remove registered event handlers.
+     */
+    override fun componentWillUnmount() {
+        GlobalEventDispatcher.unregisterAll(this::class)
     }
 
     /**

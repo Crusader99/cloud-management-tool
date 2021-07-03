@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.network.session
 
+import de.hsaalen.cmt.events.GlobalEventDispatcher
 import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.apiPathWebSocket
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
@@ -15,8 +16,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-typealias Listener<Event> = (Event) -> Unit
-
 /**
  * Client session with websocket connection to server backend.
  */
@@ -31,22 +30,10 @@ class Session(val userInfo: ServerUserInfoDto) :
         private set
 
     private var webSocketSendingQueue = Channel<Frame>()
-    val webSocketListeners = mutableListOf<Listener<LiveDto>>()
 
     init {
         GlobalScope.launch {
             connectWebSocket()
-        }
-    }
-
-    /**
-     * Add listener for handling received DTOs.
-     */
-    inline fun <reified Event : LiveDto> registerListener(crossinline packetListener: Listener<Event>) {
-        webSocketListeners += {
-            if (it is Event) {
-                packetListener(it)
-            }
         }
     }
 
@@ -86,18 +73,7 @@ class Session(val userInfo: ServerUserInfoDto) :
                     } else {
                         throw UnsupportedOperationException(frame::class.simpleName)
                     }
-                    for (handler in webSocketListeners) {
-                        if (isConnected) {
-                            handler(dto)
-                        } else {
-                            throw IllegalStateException("Not connected with websocket")
-                        }
-                    }
-//                        when (val frame = incoming.receive()) {
-//                            is Frame.Text -> println(frame.readText())
-//                            is Frame.Binary -> println(frame.readBytes())
-//                            else -> println("Unknown frame: " + frame.frameType.name)
-//                        }
+                    GlobalEventDispatcher.notify(dto)
                 }
                 println("Finished websocket")
             }

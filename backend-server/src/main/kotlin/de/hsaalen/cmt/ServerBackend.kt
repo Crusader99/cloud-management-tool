@@ -1,6 +1,7 @@
 package de.hsaalen.cmt
 
 import de.hsaalen.cmt.environment.REST_PORT
+import de.hsaalen.cmt.events.EventHandlers
 import de.hsaalen.cmt.exceptions.ConfigurationException
 import de.hsaalen.cmt.rest.RestServer
 import mu.KotlinLogging
@@ -19,7 +20,8 @@ fun main() {
     Thread.sleep(5_000)
 
     val engine = try {
-        Databases.init()
+        DatabaseModules.init()
+        EventHandlers.init()
         RestServer.configure(REST_PORT)
     } catch (ex: Throwable) {
         throw ConfigurationException(ex)

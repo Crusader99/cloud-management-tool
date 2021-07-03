@@ -3,8 +3,9 @@ package de.hsaalen.cmt.repository
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 
 /**
- * Repository layer for providing user authentication functionality. This can be implemented by server for SQL database
- * access or implemented for the client to access the server over network.
+ * Repository port for providing user authentication infrastructure. This can be implemented by the server for SQL database
+ * access or implemented for the client to access the server over network. The implementation can be injected using
+ * dependency injection.
  */
 interface AuthenticationRepository {
 

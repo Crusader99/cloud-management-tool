@@ -1,8 +1,7 @@
-package de.hsaalen.cmt.repositories
+package de.hsaalen.cmt.repository
 
 import de.hsaalen.cmt.environment.PASSWORD_SALT
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
-import de.hsaalen.cmt.repository.AuthenticationRepository
 import de.hsaalen.cmt.sql.schema.UserDao
 import de.hsaalen.cmt.sql.schema.UserTable
 import de.hsaalen.cmt.utils.validateEmailAndThrow
@@ -14,7 +13,7 @@ import org.joda.time.DateTime
 /**
  * Repository layer for providing user authentication functionality.
  */
-object AuthenticationRepositoryImpl : AuthenticationRepository {
+internal object AuthenticationRepositoryImpl : AuthenticationRepository {
 
     /**
      * Handles register request and provides a ServerUserInfoDto when successfully logged in or throws an exception when

@@ -1,10 +1,7 @@
-package de.hsaalen.cmt.support
+package de.hsaalen.cmt.utils
 
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
-import de.hsaalen.cmt.utils.JsonHelper
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 /**
  * Represents the data structure of the simplenote format.

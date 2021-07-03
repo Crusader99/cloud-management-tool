@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.pages
 
 import de.hsaalen.cmt.components.canvasRenderer
+import de.hsaalen.cmt.events.GlobalEventDispatcher
 import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode
 import de.hsaalen.cmt.network.dto.objects.Reference
@@ -53,8 +54,15 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
                 defaultText = text
             }
 
-            Session.instance?.registerListener(::onDocumentChangedRemote)
+            GlobalEventDispatcher.register(::onDocumentChangedRemote)
         }
+    }
+
+    /**
+     * Remove registered event handlers.
+     */
+    override fun componentWillUnmount() {
+        GlobalEventDispatcher.unregisterAll(this::class)
     }
 
     /**

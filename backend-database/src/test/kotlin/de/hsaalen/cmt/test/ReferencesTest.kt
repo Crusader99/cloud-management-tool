@@ -4,8 +4,9 @@ import de.hsaalen.cmt.mongo.MongoDB
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode.*
 import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
-import de.hsaalen.cmt.repositories.ReferencesRepositoryImpl
-import de.hsaalen.cmt.repositories.AuthenticationRepositoryImpl
+import de.hsaalen.cmt.repository.AuthenticationRepositoryImpl
+import de.hsaalen.cmt.repository.DocumentRepositoryImpl
+import de.hsaalen.cmt.repository.ReferencesRepositoryImpl
 import de.hsaalen.cmt.sql.Postgresql
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -52,26 +53,26 @@ class ReferencesTest {
         runBlocking {
             withTimeout(5000) {
                 val info = ClientCreateReferenceDto("test")
-                val ref = ReferencesRepositoryImpl.createItem(info, creatorEmail = userMail)
+                val ref = ReferencesRepositoryImpl(userMail).createReference(info)
                 assertEquals(info.displayName, ref.displayName)
                 assertEquals("", MongoDB.getDocumentContent(ref.uuid))
 
-                MongoDB.updateDocument(DocumentChangeDto(ref.uuid, 0, "line-1", MODIFY))
+                DocumentRepositoryImpl.modifyDocument(DocumentChangeDto(ref.uuid, 0, "line-1", MODIFY))
                 assertEquals("line-1", MongoDB.getDocumentContent(ref.uuid))
 
-                MongoDB.updateDocument(DocumentChangeDto(ref.uuid, 1, "line-2", ADD))
+                DocumentRepositoryImpl.modifyDocument(DocumentChangeDto(ref.uuid, 1, "line-2", ADD))
                 assertEquals("line-1\nline-2", MongoDB.getDocumentContent(ref.uuid))
 
-                MongoDB.updateDocument(DocumentChangeDto(ref.uuid, 0, "line-0", ADD))
+                DocumentRepositoryImpl.modifyDocument(DocumentChangeDto(ref.uuid, 0, "line-0", ADD))
                 assertEquals("line-0\nline-1\nline-2", MongoDB.getDocumentContent(ref.uuid))
 
-                MongoDB.updateDocument(DocumentChangeDto(ref.uuid, 1, "x", ADD))
+                DocumentRepositoryImpl.modifyDocument(DocumentChangeDto(ref.uuid, 1, "x", ADD))
                 assertEquals("line-0\nx\nline-1\nline-2", MongoDB.getDocumentContent(ref.uuid))
 
-                MongoDB.updateDocument(DocumentChangeDto(ref.uuid, 1, "y", MODIFY))
+                DocumentRepositoryImpl.modifyDocument(DocumentChangeDto(ref.uuid, 1, "y", MODIFY))
                 assertEquals("line-0\ny\nline-1\nline-2", MongoDB.getDocumentContent(ref.uuid))
 
-                MongoDB.updateDocument(DocumentChangeDto(ref.uuid, 1, "", DELETE))
+                DocumentRepositoryImpl.modifyDocument(DocumentChangeDto(ref.uuid, 1, "", DELETE))
                 assertEquals("line-0\nline-1\nline-2", MongoDB.getDocumentContent(ref.uuid))
             }
         }
