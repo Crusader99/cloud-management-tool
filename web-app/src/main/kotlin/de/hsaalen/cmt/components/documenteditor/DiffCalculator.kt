@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.views.components.documenteditor
+package de.hsaalen.cmt.components.documenteditor
 
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode
 import mu.KotlinLogging

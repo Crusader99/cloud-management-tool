@@ -12,14 +12,14 @@ object WebSocketManager {
     /**
      * List of all currently active web-socket connections.
      */
-    val connections = mutableListOf<WebSocketSession>()
+    val connections = mutableListOf<Connection>()
 
     /**
-     * Broadcast a DTO to all web-socket clients except to the own client.
+     * Broadcast a DTO to all web-socket clients except to the (own) client.
      */
-    suspend fun WebSocketSession.broadcastToOthers(dto: LiveDto) {
+    suspend fun broadcastExcept(excludeSocketId: String, dto: LiveDto) {
         val jsonText = JsonHelper.encode(dto)
-        for (others in WebSocketManager.connections.filter { it != this }) {
+        for (others in connections.filter { it.socketId != excludeSocketId }) {
             println("send: $jsonText")
             others.outgoing.send(Frame.Text(jsonText))
         }
@@ -30,7 +30,7 @@ object WebSocketManager {
      */
     suspend fun broadcast(dto: LiveDto) {
         val jsonText = JsonHelper.encode(dto)
-        for (others in WebSocketManager.connections) {
+        for (others in connections) {
             println("send: $jsonText")
             others.outgoing.send(Frame.Text(jsonText))
         }

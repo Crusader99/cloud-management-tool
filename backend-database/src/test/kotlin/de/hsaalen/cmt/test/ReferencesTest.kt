@@ -57,22 +57,24 @@ class ReferencesTest {
                 assertEquals(info.displayName, ref.displayName)
                 assertEquals("", MongoDB.getDocumentContent(ref.uuid))
 
-                DocumentRepositoryImpl.modifyDocument(DocumentChangeDto(ref.uuid, 0, "line-1", MODIFY))
+                val repo = DocumentRepositoryImpl("", "")
+
+                repo.modifyDocument(DocumentChangeDto(ref.uuid, 0, "line-1", MODIFY))
                 assertEquals("line-1", MongoDB.getDocumentContent(ref.uuid))
 
-                DocumentRepositoryImpl.modifyDocument(DocumentChangeDto(ref.uuid, 1, "line-2", ADD))
+                repo.modifyDocument(DocumentChangeDto(ref.uuid, 1, "line-2", ADD))
                 assertEquals("line-1\nline-2", MongoDB.getDocumentContent(ref.uuid))
 
-                DocumentRepositoryImpl.modifyDocument(DocumentChangeDto(ref.uuid, 0, "line-0", ADD))
+                repo.modifyDocument(DocumentChangeDto(ref.uuid, 0, "line-0", ADD))
                 assertEquals("line-0\nline-1\nline-2", MongoDB.getDocumentContent(ref.uuid))
 
-                DocumentRepositoryImpl.modifyDocument(DocumentChangeDto(ref.uuid, 1, "x", ADD))
+                repo.modifyDocument(DocumentChangeDto(ref.uuid, 1, "x", ADD))
                 assertEquals("line-0\nx\nline-1\nline-2", MongoDB.getDocumentContent(ref.uuid))
 
-                DocumentRepositoryImpl.modifyDocument(DocumentChangeDto(ref.uuid, 1, "y", MODIFY))
+                repo.modifyDocument(DocumentChangeDto(ref.uuid, 1, "y", MODIFY))
                 assertEquals("line-0\ny\nline-1\nline-2", MongoDB.getDocumentContent(ref.uuid))
 
-                DocumentRepositoryImpl.modifyDocument(DocumentChangeDto(ref.uuid, 1, "", DELETE))
+                repo.modifyDocument(DocumentChangeDto(ref.uuid, 1, "", DELETE))
                 assertEquals("line-0\nline-1\nline-2", MongoDB.getDocumentContent(ref.uuid))
             }
         }

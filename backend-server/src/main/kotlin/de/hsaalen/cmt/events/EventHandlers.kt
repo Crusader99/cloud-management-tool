@@ -1,6 +1,5 @@
 package de.hsaalen.cmt.events
 
-import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
 import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateEvent
 import de.hsaalen.cmt.websocket.WebSocketManager
 
@@ -27,8 +26,8 @@ object EventHandlers {
     /**
      * Invoked when user modified lines of a text document.
      */
-    private suspend fun handleDocumentChange(event: DocumentChangeDto) {
-        WebSocketManager.broadcast(event)
+    private suspend fun handleDocumentChange(event: UserDocumentChangeEvent) {
+        WebSocketManager.broadcastExcept(event.senderSocketId, event.modification)
     }
 
 }

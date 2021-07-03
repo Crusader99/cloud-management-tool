@@ -32,8 +32,6 @@ dependencies {
     implementation("io.ktor:ktor-auth-jwt:1.6.1")
 
     // Statistics & logging frameworks
-    // See https://github.com/MicroUtils/kotlin-logging
-    implementation("io.github.microutils:kotlin-logging-jvm:2.0.8")
     implementation("ch.qos.logback:logback-classic:1.2.3") {
         because("Ktor depends on this library and has issues when missing")
     }

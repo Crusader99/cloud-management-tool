@@ -2,6 +2,7 @@ package de.hsaalen.cmt.repository
 
 import com.mongodb.client.model.PushOptions
 import de.hsaalen.cmt.events.GlobalEventDispatcher
+import de.hsaalen.cmt.events.UserDocumentChangeEvent
 import de.hsaalen.cmt.mongo.MongoDB
 import de.hsaalen.cmt.mongo.TextDocument
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode.*
@@ -11,7 +12,10 @@ import org.litote.kmongo.*
 /**
  * Server implementation of the document repository using a Mongo database.
  */
-internal object DocumentRepositoryImpl : DocumentRepository {
+internal class DocumentRepositoryImpl(
+    private val userEmail: String,
+    private val senderSocketId: String
+) : DocumentRepository {
 
     /**
      * Apply a single modification to the document in repository.
@@ -30,7 +34,9 @@ internal object DocumentRepositoryImpl : DocumentRepository {
                 c.updateOneById(id, pull(allLines, null))
             }
         }
-        GlobalEventDispatcher.notify(request)
+
+        val event = UserDocumentChangeEvent(request, userEmail, senderSocketId)
+        GlobalEventDispatcher.notify(event)
     }
 
 }

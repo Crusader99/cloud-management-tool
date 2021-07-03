@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.repository
 
+import com.soywiz.krypto.SHA256
 import de.hsaalen.cmt.environment.PASSWORD_SALT
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.sql.schema.UserDao
@@ -96,8 +97,7 @@ internal object AuthenticationRepositoryImpl : AuthenticationRepository {
         val rawByteInput = saltedPassword.encodeToByteArray()
 
         // Hash salted password and convert to hex string
-        //return SHA256.digest(rawByteInput).hex // TODO: enable
-        return password
+        return SHA256.digest(rawByteInput).hex
     }
 
 }

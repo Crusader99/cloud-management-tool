@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.views.components.documenteditor
+package de.hsaalen.cmt.components.documenteditor
 
 import de.crusader.extensions.EnumDirection
 import de.crusader.objects.Point

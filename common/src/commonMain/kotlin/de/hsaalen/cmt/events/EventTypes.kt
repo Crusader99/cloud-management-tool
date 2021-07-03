@@ -3,11 +3,6 @@ package de.hsaalen.cmt.events
 import de.hsaalen.cmt.network.dto.websocket.LiveDto
 
 /**
- * Represent any event as [LiveDto] to allow serialization and transmitting over network.
- */
-typealias Event = LiveDto
-
-/**
  * Represent a listener when any specific event as data parameter.
  */
 typealias Listener<Event> = suspend (Event) -> Unit

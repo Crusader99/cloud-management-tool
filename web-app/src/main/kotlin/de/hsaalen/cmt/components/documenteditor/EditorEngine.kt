@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.views.components.documenteditor
+package de.hsaalen.cmt.components.documenteditor
 
 import de.crusader.extensions.EnumDirection
 
@@ -7,12 +7,12 @@ import de.crusader.extensions.EnumDirection
  */
 class EditorEngine(
     val isMultiLineAllowed: Boolean = true
-) {
+) : Engine {
     val lines = mutableListOf<Line>()
 
     val cursor = Cursor(CursorReference(this, CursorOwner(), 0), CursorPos(0, 0))
 
-    var text: String
+    override var text: String
         get() = lines.joinToString("\n")
         set(value) {
             lines.clear()
@@ -40,7 +40,7 @@ class EditorEngine(
 
     }
 
-    fun modifyLine(lineNumber: Int, newContent: String) {
+    override fun modifyLine(lineNumber: Int, newContent: String) {
 //        val line = lines[lineNumber] // TODO: enable for other cursors
 //        for(index in line.items.indices){
 //            val oldChar = line.items[index]
@@ -50,14 +50,14 @@ class EditorEngine(
         lines[lineNumber] = Line(newContent)
     }
 
-    fun addLine(lineNumber: Int, lineContent: String) {
+   override fun addLine(lineNumber: Int, lineContent: String) {
         lines.add(lineNumber, Line(lineContent))
 //        if (cursor.y >= lineNumber) { // TODO: enable for other cursors
 //            cursor.move(EnumDirection.DOWN, 1)
 //        }
     }
 
-    fun deleteLine(lineNumber: Int) {
+    override fun deleteLine(lineNumber: Int) {
         lines.removeAt(lineNumber)
 //        if (cursor.y > lineNumber) { // TODO: enable for other cursors
 //            cursor.move(EnumDirection.UP, 1)

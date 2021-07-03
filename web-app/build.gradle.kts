@@ -1,3 +1,5 @@
+import java.time.Duration
+
 plugins {
     kotlin("js")
 }
@@ -33,12 +35,18 @@ kotlin {
             commonWebpackConfig {
                 cssSupport.enabled = true
             }
-            runTask {
+            runTask { // Route backend requests to Traefik
                 val settings = mutableMapOf<String, Any>()
                 settings["target"] = "http://localhost:80"
                 settings["ws"] = true // Enable websocket support
                 val proxyTable = mutableMapOf<String, Any>("/api" to settings)
                 devServer = devServer?.copy(port = 8081, proxy = proxyTable)
+            }
+            testTask {
+                timeout.set(Duration.ofSeconds(60L))
+                useKarma { // Use Chromium for Linux support
+                    useChromiumHeadless()
+                }
             }
         }
     }
