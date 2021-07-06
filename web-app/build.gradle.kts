@@ -20,7 +20,7 @@ dependencies {
     implementation("com.ccfraser.muirwik:muirwik-components:0.8.1")
 
     // Ensure correct versions of material ui are used
-    implementation(npm("@material-ui/core", "~4.11.1"))
+    implementation(npm("@material-ui/core", "4.11.1"))
     implementation(npm("@material-ui/lab", "4.0.0-alpha.56"))
     implementation(npm("@material-ui/icons", "4.9.1"))
 
@@ -29,7 +29,7 @@ dependencies {
 }
 
 kotlin {
-    js(IR) {
+    js(LEGACY) {
         useCommonJs()
         binaries.executable()
         browser {
