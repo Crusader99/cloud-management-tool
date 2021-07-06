@@ -51,6 +51,9 @@ kotlin {
                 implementation("io.ktor:ktor-client-core:1.6.1")
                 implementation("io.ktor:ktor-client-serialization:1.6.1")
                 implementation("io.ktor:ktor-client-websockets:1.6.1")
+
+                // Kotlin crypto library for password hashing
+                implementation("com.soywiz.korlibs.krypto:krypto:2.2.0")
             }
         }
         val commonTest by getting {
@@ -61,8 +64,6 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                // Kotlin crypto library for password hashing // TODO:  fix crypto-error on js, move to common
-                api("com.soywiz.korlibs.krypto:krypto:2.2.0")
             }
         }
         val jvmTest by getting {

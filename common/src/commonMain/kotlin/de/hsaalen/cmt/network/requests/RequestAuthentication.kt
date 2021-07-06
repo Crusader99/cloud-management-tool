@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.network.requests
 
+import de.hsaalen.cmt.crypto.hashString
 import de.hsaalen.cmt.network.apiPathAuthLogin
 import de.hsaalen.cmt.network.apiPathAuthLogout
 import de.hsaalen.cmt.network.apiPathAuthRegister
@@ -71,12 +72,9 @@ internal object RequestAuthentication : Request, AuthenticationRepository {
      * Note: Salting only happens on server side and a specific salt is defined by setting a environment variable.
      */
     private fun hashPassword(password: String): String {
-        // Encode raw password to byte array
-        val rawByteInput = password.encodeToByteArray()
-
-        // Hash password and convert to hex string
-//        return SHA256.digest(rawByteInput).hex // TODO enable
-        return password
+        // Hash password without salting on clientside and convert to hex string
+        // Before saving password in database the server will hash the password again with a salt
+        return hashString(password)
     }
 
 }
