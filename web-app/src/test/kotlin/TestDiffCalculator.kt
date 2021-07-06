@@ -8,12 +8,13 @@ class TestDiffCalculator {
 
     @Test
     fun test() {
-        val calc = DiffCalculator(::onChangeLine)
-        calc.findChangedLines("line-1\nline-2\nline-3")
-        println(changedLines)
+        // TODO: implement test
+//        val calc = DiffCalculator(::onChangeLine)
+//        calc.findChangedLines("line-1\nline-2\nline-3")
+//        println(changedLines)
     }
 
-    fun onChangeLine(lineNumber: Int, lineContent: String, changeMode: LineChangeMode) {
+    private fun onChangeLine(lineNumber: Int, lineContent: String, changeMode: LineChangeMode) {
         changedLines += Pair(lineNumber, changeMode)
     }
 
