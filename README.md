@@ -68,9 +68,10 @@ for testing proposes.
 * [x] Implement mongodb data structure for text documents
 * [x] Implement algorithm for detecting changed lines in text
 * [x] Implement live sync for document edit
-* [ ] Implement text editor in frontend
+* [x] Implement text editor in frontend
+* [x] Allow offline access in Android app
 * [ ] Implement file upload / download
-* [ ] Allow offline access in Android app
+* [ ] Encrypt files and documents
 * [ ] ...
 * [x] Configure Grafana & Prometheus
 * [x] Provide statistics with Ktor: /metrics
