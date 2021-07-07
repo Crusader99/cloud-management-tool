@@ -21,14 +21,15 @@ for testing proposes.
 ## Technical background:
 
 * [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform.html) (share code between frontend and backend)
-* [Ktor](https://ktor.io/) (for client & server as network framework)
+* [Ktor](https://ktor.io) (network framework for client & server)
 * [Kotlinx Serialization](https://github.com/Kotlin/kotlinx.serialization) (for JSON in REST API)
+* [Insert-Koin](https://insert-koin.io) (dependency injection framework)
 * [Exposed](https://github.com/JetBrains/Exposed) (ORM framework for SQL in Kotlin)
-* [KMongo](https://litote.org/kmongo/) (ORM framework for MongoDB in Kotlin)
+* [KMongo](https://litote.org/kmongo) (ORM framework for MongoDB in Kotlin)
 * [Kotlinx Coroutines](https://github.com/Kotlin/kotlinx.coroutines) (non-blocking programming)
 * [React](https://kotlinlang.org/docs/js-get-started.html)
-  (as web-app frontend library, see [Kotlin/JS for React](https://kotlinlang.org/docs/js-get-started.html))
-* [Material UI](https://material-ui.com/) + [Muirwik](https://github.com/cfnz/muirwik) (provide react components)
+  (for frontend of web-app, see [Kotlin/JS for React](https://kotlinlang.org/docs/js-get-started.html))
+* [Material UI](https://material-ui.com) + [Muirwik](https://github.com/cfnz/muirwik) (provide react components)
 
 ## Databases:
 
@@ -51,7 +52,7 @@ for testing proposes.
 * [x] Make frontend GUI design decisions
 * [x] Create running projects for frontend: android, web/pc
 * [x] Experiment with compose and painter-library and [react](https://kotlinlang.org/docs/js-get-started.html)
-* [x] Implement frontend login app with react
+* [x] Implement frontend login with react
 * [x] Configure reverse proxy: [nginx](https://www.nginx.com/) or [traefik](https://traefik.io/)
 * [x] Call REST-API from frontend on login event
 * [x] Implement logout button in frontend
