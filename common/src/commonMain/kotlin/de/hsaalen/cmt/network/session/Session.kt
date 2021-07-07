@@ -1,22 +1,20 @@
 package de.hsaalen.cmt.network.session
 
+import de.hsaalen.cmt.events.GlobalEventDispatcher
 import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.apiPathWebSocket
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
+import de.hsaalen.cmt.network.dto.websocket.LiveDto
 import de.hsaalen.cmt.network.exceptions.ConnectException
 import de.hsaalen.cmt.network.requests.*
+import de.hsaalen.cmt.utils.JsonHelper
 import io.ktor.client.features.websocket.*
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-
-typealias Listener = (DocumentChangeDto) -> Unit
 
 /**
  * Client session with websocket connection to server backend.
@@ -32,19 +30,11 @@ class Session(val userInfo: ServerUserInfoDto) :
         private set
 
     private var webSocketSendingQueue = Channel<Frame>()
-    private val webSocketListeners = mutableListOf<Listener>()
 
     init {
         GlobalScope.launch {
             connectWebSocket()
         }
-    }
-
-    /**
-     * Add listener for handling received DTOs.
-     */
-    fun registerListener(packetListener: Listener) {
-        webSocketListeners += packetListener
     }
 
     /**
@@ -78,24 +68,12 @@ class Session(val userInfo: ServerUserInfoDto) :
                 while (isActive && isConnected) {
                     println("Waiting for websocket receive")
                     val frame = incoming.receive()
-                    val dto: DocumentChangeDto = if (frame is Frame.Text) {
-                        val jsonText = frame.readText()
-                        Json.decodeFromString(jsonText)
+                    val dto: LiveDto = if (frame is Frame.Text) {
+                        JsonHelper.decode(frame.readText())
                     } else {
                         throw UnsupportedOperationException(frame::class.simpleName)
                     }
-                    for (handler in webSocketListeners) {
-                        if (isConnected) {
-                            handler(dto)
-                        } else {
-                            throw IllegalStateException("Not connected with websocket")
-                        }
-                    }
-//                        when (val frame = incoming.receive()) {
-//                            is Frame.Text -> println(frame.readText())
-//                            is Frame.Binary -> println(frame.readBytes())
-//                            else -> println("Unknown frame: " + frame.frameType.name)
-//                        }
+                    GlobalEventDispatcher.notify(dto)
                 }
                 println("Finished websocket")
             }
@@ -109,7 +87,7 @@ class Session(val userInfo: ServerUserInfoDto) :
      * Send to text edit DTO to server and other clients.
      */
     suspend fun liveTextEdit(dto: DocumentChangeDto) {
-        val jsonText = Json.encodeToString(dto)
+        val jsonText = JsonHelper.encode(dto)
         webSocketSendingQueue.send(Frame.Text(jsonText))
     }
 
@@ -135,8 +113,7 @@ class Session(val userInfo: ServerUserInfoDto) :
          * Send login request to the server.
          */
         suspend fun login(email: String, passwordPlain: String): Session {
-            val passwordHashed = passwordPlain // TODO: hash password
-            val userInfo = RequestAuthentication.login(email, passwordHashed)
+            val userInfo = RequestAuthentication.login(email, passwordPlain)
             println("Logged in as: " + userInfo.email)
             return Session(userInfo)
         }
@@ -145,8 +122,7 @@ class Session(val userInfo: ServerUserInfoDto) :
          * Send register request to the server.
          */
         suspend fun register(firstName: String, email: String, passwordPlain: String): Session {
-            val passwordHashed = passwordPlain // TODO: hash password
-            val userInfo = RequestAuthentication.register(firstName, email, passwordHashed)
+            val userInfo = RequestAuthentication.register(firstName, email, passwordPlain)
             println("Logged in as: " + userInfo.email)
             return Session(userInfo)
         }
@@ -155,11 +131,11 @@ class Session(val userInfo: ServerUserInfoDto) :
          * Request server to restore user session. Session can only restored when JWT cookie is still valid.
          *
          * @return Session instance when session has been restored or null when it can't be restored.
-         * @throws ConnectException when no connection to backend de.hsaalen.cmt.services was possible.
+         * @throws ConnectException when no connection to backend services was possible.
          */
         suspend fun restore(): Session? {
             return try {
-                val userInfo = RequestAuthentication.restore()
+                val userInfo = RequestAuthentication.restore() // No email passed: not known yet, determined by server
                 println("Restored session for: " + userInfo.email)
                 Session(userInfo)
             } catch (t: Exception) {

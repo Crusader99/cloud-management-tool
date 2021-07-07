@@ -7,14 +7,12 @@ import com.ccfraser.muirwik.components.list.mListItem
 import com.ccfraser.muirwik.components.list.mListItemText
 import de.hsaalen.cmt.SoftwareInfo
 import de.hsaalen.cmt.components.dialogs.aboutSoftwareDialog
+import de.hsaalen.cmt.network.session.Session
 import kotlinx.css.FlexBasis
 import kotlinx.css.flex
 import org.w3c.dom.events.Event
 import react.*
-import react.dom.a
-import react.dom.br
-import react.dom.div
-import react.dom.h2
+import react.dom.*
 import styled.css
 import styled.styledDiv
 
@@ -36,7 +34,7 @@ fun RBuilder.appBar(
 /**
  * React props of the [ViewAppBar] component.
  */
-private external interface ViewAppBarProps : RProps {
+external interface ViewAppBarProps : RProps {
     var onLogout: () -> Unit
     var isLoggedIn: Boolean
     var drawerMenu: Map<String, (Event) -> Unit>
@@ -45,7 +43,7 @@ private external interface ViewAppBarProps : RProps {
 /**
  * React state of the [ViewAppBar] component.
  */
-private external interface ViewAppBarState : RState {
+external interface ViewAppBarState : RState {
     var isDrawerVisible: Boolean
     var isAboutDialogOpen: Boolean
 }
@@ -53,7 +51,8 @@ private external interface ViewAppBarState : RState {
 /**
  * Defines the header of the app which also includes a search box and a button with menu options.
  */
-private class ViewAppBar : RComponent<ViewAppBarProps, ViewAppBarState>() {
+@JsExport
+class ViewAppBar : RComponent<ViewAppBarProps, ViewAppBarState>() {
 
     /**
      * Initialize state of the [ViewAppBar].
@@ -84,6 +83,9 @@ private class ViewAppBar : RComponent<ViewAppBarProps, ViewAppBarState>() {
                             css {
                                 flex(1.0, 1.0, FlexBasis.auto)
                             }
+                        }
+                        Session.instance?.userInfo?.fullName?.let { userName ->
+                            p { +userName }
                         }
                         mTooltip("Logout") {
                             mIconButton(

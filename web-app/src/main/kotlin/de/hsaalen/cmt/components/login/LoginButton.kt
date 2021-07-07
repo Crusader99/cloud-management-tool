@@ -24,14 +24,15 @@ fun RBuilder.loginButton(
 /**
  * React properties for this [LoginButton] component.
  */
-private external interface LoginButtonProps : RProps {
+external interface LoginButtonProps : RProps {
     var title: String
 }
 
 /**
  * A react component for displaying a simple login button which can be used in a form with submit event.
  */
-private class LoginButton : RComponent<LoginButtonProps, RState>() {
+@JsExport
+class LoginButton : RComponent<LoginButtonProps, RState>() {
 
     /**
      * Called when this button component is rendered.

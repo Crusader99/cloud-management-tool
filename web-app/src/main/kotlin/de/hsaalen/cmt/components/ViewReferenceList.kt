@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.components
 
 import com.ccfraser.muirwik.components.button.mIconButton
+import com.ccfraser.muirwik.components.mTooltip
 import de.crusader.extensions.toDate
 import de.crusader.objects.color.Color
 import de.hsaalen.cmt.network.dto.objects.Reference
@@ -34,7 +35,7 @@ fun RBuilder.referenceList(
 /**
  * React properties of the [ViewReferenceList] component.
  */
-private external interface ViewReferenceListProps : RProps {
+external interface ViewReferenceListProps : RProps {
     var dto: ServerReferenceListDto?
     var onItemOpen: (Reference) -> Unit
     var onItemDelete: (Reference) -> Unit
@@ -43,7 +44,8 @@ private external interface ViewReferenceListProps : RProps {
 /**
  * Intended to render a list of files that are found by tags from search component.
  */
-private class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
+@JsExport
+class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
 
     /**
      * Called when page is rendered.
@@ -64,8 +66,8 @@ private class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
      */
     private fun RBuilder.renderTableHead() = styledThead {
         css {
-            color = Color.GRAY.toCssColor()
-            backgroundColor = (Color.DARK_GRAY * 0.7f).toCssColor()
+            color = Color.BLACK.toCssColor()
+            backgroundColor = (Color.WHITE * 0.9f).toCssColor()
             fontSize = 15.px
         }
 
@@ -74,7 +76,7 @@ private class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
             for (column in columns) {
                 styledTh {
                     css {
-                        borderRight = "1px solid " + Color.GRAY.hex
+                        borderRight = "1px solid " + Color.BLACK.hex
                         lastChild {
                             borderRight = "none"
                         }
@@ -130,10 +132,12 @@ private class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
         renderTableBodyColumn(ref.labels.joinToString())
         renderTableBodyColumn(ref.dateLastAccess.toDate().toDateString())
         styledTd {
-            mIconButton("delete", onClick = {
-                it.stopPropagation() // Prevent parent element to receive onClick event, which would open the reference
-                props.onItemDelete(ref)
-            })
+            mTooltip("Delete") {
+                mIconButton("delete", onClick = {
+                    it.stopPropagation() // Prevent parent element to receive onClick event, which would open the reference
+                    props.onItemDelete(ref)
+                })
+            }
         }
     }
 

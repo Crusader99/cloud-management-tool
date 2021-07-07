@@ -1,4 +1,4 @@
-FROM nginx:1.19.9-alpine
+FROM nginx:1.21-alpine
 MAINTAINER Simon Forschner
 
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf

@@ -13,10 +13,19 @@ import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 
-object MongoDB {
+/**
+ * Functionality related to MongoDB, which is used for storing documents by their lines.
+ */
+internal object MongoDB {
+    /**
+     * Local logger instance for this class.
+     */
     private val logger = KotlinLogging.logger { }
 
-    private var collection: CoroutineCollection<TextDocument>? = null
+    /**
+     * The collection where documents are stored.
+     */
+    var collection: CoroutineCollection<TextDocument>? = null
 
     /**
      * Configure postgresql driver with system environment variables and test connection.
@@ -30,39 +39,35 @@ object MongoDB {
         logger.info("Successfully connected to mongodb!")
     }
 
+    /**
+     * Create new document by given content.
+     */
     suspend fun createDocument(uuid: String, content: String = "") {
         logger.info("Creating new text document in mongo-db...")
         val lines = content.lines().toTypedArray()
         collection?.insertOne(TextDocument(uuid, *lines))
     }
 
+    /**
+     * Download the complete content of the document.
+     */
     suspend fun getDocumentContent(uuid: String): String {
         val lines = findDocument(uuid).lines
         return lines.joinToString("\n")
     }
 
-    suspend fun updateDocument(dto: DocumentChangeDto) {
-        val c = collection ?: return
-        val id = dto.uuid
-        val line = dto.lineContentEncrypted
-        val documentLines = TextDocument::lines
-        val targetLine = documentLines.colProperty.memberWithAdditionalPath(dto.lineNumber.toString())
-        when (dto.lineChangeMode) {
-            MODIFY -> c.updateOneById(id, set(targetLine setTo line))
-            ADD -> c.updateOneById(id, pushEach(documentLines, listOf(line), PushOptions().position(dto.lineNumber)))
-            DELETE -> {
-                c.updateOneById(id, unset(targetLine))
-                c.updateOneById(id, pull(documentLines, null))
-            }
-        }
-    }
-
+    /**
+     * Replace the hole content of a document.
+     */
     suspend fun replaceDocument(uuid: String, content: String = "") {
         val newLines = content.lines()
         val doc = TextDocument(uuid, newLines)
         collection?.updateOneById(uuid, doc)
     }
 
+    /**
+     * Search in collection for document.
+     */
     private suspend fun findDocument(uuid: String): TextDocument {
         return collection
             ?.findOne(TextDocument::uuid eq uuid)

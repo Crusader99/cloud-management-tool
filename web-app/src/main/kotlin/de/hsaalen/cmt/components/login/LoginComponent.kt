@@ -25,6 +25,7 @@ fun RBuilder.loginComponent(
 /**
  * A react component for displaying all fields and buttons required for user login.
  */
+@JsExport
 open class LoginComponent(props: FormComponentProps) : FormComponent(props) {
 
     /**

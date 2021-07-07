@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.extensions
 
 import de.hsaalen.cmt.components.dialogs.InputDialogComponent
+import de.hsaalen.cmt.components.dialogs.show
 import de.hsaalen.cmt.network.RestPaths
 import kotlinx.browser.window
 import kotlinx.coroutines.launch
@@ -53,7 +54,8 @@ object BackendLocator {
     val defaultBackend: String
         get() {
             val frontendURL = window.location.toString()
-            return if (frontendURL.startsWith("file://")) {
+            val frontendHost = window.location.host
+            return if (frontendURL.startsWith("file://") || frontendHost == "appassets.androidplatform.net") {
                 // This is the official default backend server
                 // It can be changed using the "switch backend"-button
                 "https://provider.ddnss.de/se-project/" + RestPaths.base

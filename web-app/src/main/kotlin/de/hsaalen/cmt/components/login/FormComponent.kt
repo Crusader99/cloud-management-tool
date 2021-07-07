@@ -2,10 +2,7 @@ package de.hsaalen.cmt.components.login
 
 import kotlinx.html.js.onSubmitFunction
 import org.w3c.dom.events.Event
-import react.RBuilder
-import react.RComponent
-import react.RProps
-import react.RState
+import react.*
 import react.dom.attrs
 import react.dom.form
 import react.dom.h3
@@ -33,6 +30,7 @@ external interface FormComponentState : RState {
 /**
  * A react component to simplify login/register forms.
  */
+@JsExport
 abstract class FormComponent(props: FormComponentProps) : RComponent<FormComponentProps, FormComponentState>(props) {
 
     /**

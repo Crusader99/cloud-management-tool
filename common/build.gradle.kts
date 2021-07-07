@@ -20,7 +20,7 @@ kotlin {
         browser {
             testTask {
                 timeout.set(Duration.ofSeconds(60L))
-                useKarma {
+                useKarma { // Use Chromium for Linux support
                     useChromiumHeadless()
                 }
             }
@@ -32,7 +32,10 @@ kotlin {
             dependencies { // Use api instead implementation to allow transitive access from modules
                 // Statistics & logging frameworks
                 // See https://github.com/MicroUtils/kotlin-logging
-                implementation("io.github.microutils:kotlin-logging:2.0.8")
+                api("io.github.microutils:kotlin-logging:2.0.8")
+
+                // Use Koin as dependency injection framework
+                api("io.insert-koin:koin-core:3.1.2")
 
                 api("de.crusader:kotlin-extensions:1.1.1")
                 api("de.crusader:library-objects:1.1.1")
@@ -45,9 +48,12 @@ kotlin {
                 }
 
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
-                implementation("io.ktor:ktor-client-core:1.6.0")
-                implementation("io.ktor:ktor-client-serialization:1.6.0")
-                implementation("io.ktor:ktor-client-websockets:1.6.0")
+                implementation("io.ktor:ktor-client-core:1.6.1")
+                implementation("io.ktor:ktor-client-serialization:1.6.1")
+                implementation("io.ktor:ktor-client-websockets:1.6.1")
+
+                // Kotlin crypto library for password hashing
+                implementation("com.soywiz.korlibs.krypto:krypto:2.2.0")
             }
         }
         val commonTest by getting {

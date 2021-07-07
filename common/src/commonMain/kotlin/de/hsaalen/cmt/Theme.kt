@@ -12,8 +12,23 @@ sealed interface Theme {
      */
     val primaryColor: Color
 
+    /**
+     * Default color to be used for normal text.
+     */
+    val textColor: Color
+
+    /**
+     * Color to be used behind text.
+     */
+    val backgroundColor: Color
+
     companion object {
         val LIGHT = LightTheme
+
+        /**
+         * Current selected theme.
+         */
+        val current = LIGHT
     }
 }
 
@@ -26,6 +41,16 @@ object LightTheme : Theme {
      * The color which is used for highlighted components.
      */
     override val primaryColor = Color.byHex("#1890f2")
+
+    /**
+     * Default color to be used for normal text.
+     */
+    override val textColor = Color.BLACK
+
+    /**
+     * Color to be used behind text.
+     */
+    override val backgroundColor = Color.WHITE
 
 }
 

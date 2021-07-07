@@ -1,16 +1,22 @@
 package de.hsaalen.cmt.pages
 
-import de.hsaalen.cmt.components.canvasRenderer
+import de.hsaalen.cmt.components.documenteditor.DiffCalculator
+import de.hsaalen.cmt.components.documenteditor.Engine
+import de.hsaalen.cmt.components.documenteditor.TextareaEngine
+import de.hsaalen.cmt.events.GlobalEventDispatcher
 import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
 import de.hsaalen.cmt.network.session.Session
-import de.hsaalen.cmt.views.components.documenteditor.DiffCalculator
-import de.hsaalen.cmt.views.components.documenteditor.DocumentEditor
-import de.hsaalen.cmt.views.components.documenteditor.EditorEngine
 import kotlinx.coroutines.launch
+import kotlinx.css.*
+import kotlinx.html.js.onInputFunction
+import org.w3c.dom.HTMLTextAreaElement
 import react.*
+import react.dom.attrs
+import styled.css
+import styled.styledTextarea
 
 /**
  * React properties of the [DocumentEditPage] component.
@@ -30,6 +36,7 @@ external interface DocumentEditPageState : RState {
 /**
  * A React component for editing documents live with other user users.
  */
+@JsExport
 class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState>() {
     /**
      * Algorithm that detects changes in document
@@ -37,9 +44,14 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
     private var diffCalculator = DiffCalculator(::onDocumentChangedLocal)
 
     /**
+     * Reference to the text area element.
+     */
+    private val textarea = createRef<HTMLTextAreaElement>()
+
+    /**
      * The engine for handling text changes.
      */
-    private val engine = EditorEngine(true)
+    private val engine: Engine = TextareaEngine(textarea)
 
     /**
      * Initialize state of the [DocumentEditPage].
@@ -53,15 +65,37 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
                 defaultText = text
             }
 
-            Session.instance?.registerListener(::onDocumentChangedRemote)
+            GlobalEventDispatcher.register(::onDocumentChangedRemote)
         }
+    }
+
+    /**
+     * Remove registered event handlers.
+     */
+    override fun componentWillUnmount() {
+        GlobalEventDispatcher.unregisterAll(this::class)
     }
 
     /**
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        canvasRenderer(DocumentEditor(engine, ::onTextChanged))
+        styledTextarea {
+            css {
+                width = 100.pct
+                height = 100.pct
+                top = 64.px
+                left = 0.px
+                right = 0.px
+                bottom = 0.px
+                position = Position.fixed
+                resize = Resize.none
+            }
+            attrs {
+                ref = textarea
+                onInputFunction = { onTextChanged(engine.text) }
+            }
+        }
     }
 
     /**

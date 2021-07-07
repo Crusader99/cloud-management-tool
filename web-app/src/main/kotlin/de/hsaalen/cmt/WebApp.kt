@@ -5,9 +5,11 @@ import com.ccfraser.muirwik.components.mThemeProvider
 import de.hsaalen.cmt.components.appBar
 import de.hsaalen.cmt.components.dialogs.InputDialogComponent
 import de.hsaalen.cmt.components.dialogs.renderInputDialog
+import de.hsaalen.cmt.components.dialogs.show
 import de.hsaalen.cmt.components.features.ViewSnackbar
 import de.hsaalen.cmt.components.features.loadingOverlay
 import de.hsaalen.cmt.components.features.renderSnackbar
+import de.hsaalen.cmt.components.features.show
 import de.hsaalen.cmt.components.login.Credentials
 import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.extensions.openFileSelector
@@ -19,7 +21,7 @@ import de.hsaalen.cmt.pages.AuthenticationPage
 import de.hsaalen.cmt.pages.DocumentEditPage
 import de.hsaalen.cmt.pages.FallbackPage
 import de.hsaalen.cmt.pages.OverviewPage
-import de.hsaalen.cmt.support.SimpleNoteImportJson
+import de.hsaalen.cmt.utils.SimpleNoteImportJson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -40,6 +42,7 @@ external interface WebAppState : RState {
 /**
  * The main app component.
  */
+@JsExport
 class WebApp : RComponent<RProps, WebAppState>() {
 
     /**
@@ -102,7 +105,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
      * Called whenever an update is required.
      */
     override fun RBuilder.render() {
-        mThemeProvider(Theme.LIGHT.toMuiTheme()) {
+        //mThemeProvider(Theme.LIGHT.toMuiTheme()) { // TODO: re enable when fixed
             renderHeader()
             renderInputDialog(refCreateReferenceDialog)
             renderSnackbar(refSnackBar)
@@ -157,7 +160,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                     }
                 }
             }
-        }
+//        }
     }
 
     /**
@@ -304,7 +307,6 @@ class WebApp : RComponent<RProps, WebAppState>() {
                     importFile(file.name, text)
                     println(file.name + " successfully imported")
                 }
-                refOverview.current?.updateReferences()
             } finally {
                 setState {
                     isLoading = false
@@ -325,7 +327,6 @@ class WebApp : RComponent<RProps, WebAppState>() {
             ) ?: return@launch
             println("Selected display name: $displayName")
             Session.instance?.createReference(displayName)
-            refOverview.current?.updateReferences()
         }
     }
 

@@ -2,9 +2,11 @@ package de.hsaalen.cmt.rest
 
 import com.auth0.jwt.JWT
 import de.crusader.extensions.initialCause
+import de.hsaalen.cmt.DatabaseModules
 import de.hsaalen.cmt.jwt.JwtCookie
 import de.hsaalen.cmt.jwt.toPayload
 import de.hsaalen.cmt.network.dto.server.ServerErrorDto
+import de.hsaalen.cmt.utils.JsonHelper
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -20,8 +22,9 @@ import io.ktor.server.engine.*
 import io.ktor.websocket.*
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
-import kotlinx.serialization.json.Json
 import mu.KotlinLogging
+import org.koin.ktor.ext.Koin
+import org.koin.logger.slf4jLogger
 import org.slf4j.event.Level
 import java.time.Duration
 
@@ -40,16 +43,17 @@ object RestServer {
      * Configure an embedded HTTP server for providing a REST API.
      */
     fun configure(port: Int) = embeddedServer(CIO, port) {
+        install(Koin) { // Dependency injection
+            slf4jLogger()
+            modules(DatabaseModules.dependencies) // Inject database repositories
+        }
         install(CallLogging) {
             // Configure default logging level
             level = Level.INFO
         }
         install(ContentNegotiation) {
             // Configure the JSON serializer
-            json(Json {
-                prettyPrint = true
-                isLenient = true
-            })
+            json(JsonHelper.configured)
         }
         install(WebSockets) { // Define settings for the web socket connection
             pingPeriod = Duration.ofSeconds(10)

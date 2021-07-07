@@ -1,10 +1,14 @@
-package de.hsaalen.cmt.services
+package de.hsaalen.cmt.repository
 
+import de.hsaalen.cmt.events.GlobalEventDispatcher
 import de.hsaalen.cmt.mongo.MongoDB
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
+import de.hsaalen.cmt.network.dto.client.ClientDeleteReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
+import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateAddDto
+import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateRemoveDto
 import de.hsaalen.cmt.sql.schema.ReferenceDao
 import de.hsaalen.cmt.sql.schema.RevisionDao
 import de.hsaalen.cmt.sql.schema.UserDao
@@ -12,29 +16,26 @@ import de.hsaalen.cmt.sql.schema.UserTable
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.joda.time.DateTime
-import java.io.InputStream
 import java.util.*
 
 /**
  * Handles database operations for the reference and revision management.
  */
-object ServiceReferences {
+internal class ReferencesRepositoryImpl(private val userEmail: String) : ReferencesRepository {
 
     /**
-     * Create a new reference to a first revision.
+     * Send request to repository for creating a new reference.
      */
-    suspend fun createItem(
-        info: ClientCreateReferenceDto,
-        creatorEmail: String,
-    ): Reference {
+    override suspend fun createReference(request: ClientCreateReferenceDto): Reference {
         val ref: Reference = newSuspendedTransaction {
-            val creator = UserDao.find(UserTable.email eq creatorEmail)
+            // Create document in SQL
+            val creator = UserDao.find(UserTable.email eq userEmail)
                 .singleOrNull()
-                ?: throw SecurityException("User $creatorEmail not found!")
+                ?: throw SecurityException("User $userEmail not found!")
             val now = DateTime.now()
             val reference = ReferenceDao.new {
                 this.accessCode = "ACCESS_CODE"
-                this.displayName = info.displayName
+                this.displayName = request.displayName
                 this.contentType = "document"
             }
             val revision = RevisionDao.new {
@@ -43,7 +44,7 @@ object ServiceReferences {
 
                 this.dateCreation = now
                 this.dateLastAccess = now
-                this.comment = info.comment
+                this.comment = request.comment
                 this.creator = creator
                 this.accessCount = 0
             }
@@ -57,11 +58,24 @@ object ServiceReferences {
                 labels = listOf("Not implemented yet")
             )
         }
-        MongoDB.createDocument(ref.uuid, info.content)
+
+        // Create document in mongo-db
+        try {
+            MongoDB.createDocument(ref.uuid, request.content)
+        } catch (ex: Exception) {
+            deleteReference(ref) // Cleanup also in SQL on failure
+            throw IllegalStateException("Unable to create document for new reference", ex)
+        }
+
+        // Call event handlers
+        GlobalEventDispatcher.notify(ReferenceUpdateAddDto(ref))
         return ref
     }
 
-    suspend fun listReferences(query: ClientReferenceQueryDto): ServerReferenceListDto {
+    /**
+     * Provide a list of all related references to search query.
+     */
+    override suspend fun listReferences(query: ClientReferenceQueryDto): ServerReferenceListDto {
         val refs = newSuspendedTransaction {
             // TODO: filter only files that user owns
             ReferenceDao.all().map { it.toReference() }
@@ -69,19 +83,24 @@ object ServiceReferences {
         return ServerReferenceListDto(refs)
     }
 
-    suspend fun downloadContent(uuid: String): InputStream {
-        return MongoDB.getDocumentContent(uuid).byteInputStream()
-    }
+    /**
+     * Download the content of a specific reference by uuid.
+     */
+    override suspend fun downloadContent(uuid: String): String = MongoDB.getDocumentContent(uuid)
 
     /**
      * Delete a reference by the given reference uuid.
      */
-    suspend fun deleteReferences(uuid: String) {
+    override suspend fun deleteReference(request: ClientDeleteReferenceDto) {
+        val uuid = request.uuid
         newSuspendedTransaction {
             ReferenceDao.findById(UUID.fromString(uuid))
                 ?.delete()
                 ?: throw IllegalArgumentException("No reference with uuid=$uuid found!")
         }
+
+        // Call event handlers
+        GlobalEventDispatcher.notify(ReferenceUpdateRemoveDto(uuid))
     }
 
 }

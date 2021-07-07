@@ -36,6 +36,7 @@ external interface AuthenticationPageState : RState {
 /**
  * Page for user authentication
  */
+@JsExport
 class AuthenticationPage(props: AuthenticationPageProps) :
     RComponent<AuthenticationPageProps, AuthenticationPageState>(props) {
 

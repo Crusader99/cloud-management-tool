@@ -1,5 +1,5 @@
-// Manuel written mongo queries for line updating to test directly
-// Note: This file is not required by the project for building
+// Manuel written mongo queries for line updating to test directly.
+// Note: This file is not required by the project for building.
 
 doc = {
   "lines": ["1"]

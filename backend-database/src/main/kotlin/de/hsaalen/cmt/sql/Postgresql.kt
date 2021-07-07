@@ -1,9 +1,9 @@
 package de.hsaalen.cmt.sql
 
 import de.hsaalen.cmt.environment.*
+import de.hsaalen.cmt.sql.schema.LabelTable
 import de.hsaalen.cmt.sql.schema.ReferenceTable
 import de.hsaalen.cmt.sql.schema.RevisionTable
-import de.hsaalen.cmt.sql.schema.LabelTable
 import de.hsaalen.cmt.sql.schema.UserTable
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.Database
@@ -16,7 +16,10 @@ import org.jetbrains.exposed.sql.transactions.transaction
 /**
  * Object for handling postgresql specific tasks.
  */
-object Postgresql {
+internal object Postgresql {
+    /**
+     * Local logger instance for this class.
+     */
     private val logger = KotlinLogging.logger { }
 
     /**
@@ -28,7 +31,7 @@ object Postgresql {
         logger.info("Connecting to postgresql using $url")
         Database.connect(url, driver = driverClass, user = POSTGRESQL_USER, password = POSTGRESQL_PASSWORD)
         transaction {
-            // Configure de.hsaalen.cmt.sql logger to simplify debugging
+            // Configure self4j logger to simplify debugging
             addLogger(Slf4jSqlDebugLogger)
 
             // Creates the tables when not existing

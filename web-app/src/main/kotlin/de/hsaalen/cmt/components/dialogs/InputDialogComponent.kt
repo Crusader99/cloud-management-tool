@@ -26,6 +26,34 @@ fun RBuilder.renderInputDialog(ref: RReadableRef<InputDialogComponent>) =
     }
 
 /**
+ * Opens the dialog and suspends until user cancels operation or the user typed in a text. This
+ * function will return null when the user cancelled the action otherwise the typed value is returned.
+ */
+suspend fun InputDialogComponent.show(
+    title: String,
+    message: String? = null,
+    placeholder: String = "",
+    button: String = "OK"
+): String? {
+    val newName: String? = suspendCoroutine { continuation ->
+        onCloseHandler = { continuation.resume(null) }
+        onCreateHandler = { continuation.resume(state.userInput) }
+        setState {
+            this.title = title
+            this.message = message
+            this.placeholder = placeholder
+            this.button = button
+            this.isOpen = true
+        }
+    }
+    setState {
+        isOpen = false
+        userInput = ""
+    }
+    return newName
+}
+
+/**
  * React state of the [InputDialogComponent] component.
  */
 external interface InputDialogComponentState : RState {
@@ -46,17 +74,18 @@ private typealias Event = () -> Unit
 /**
  * A dialog for requesting a text from user.
  */
+@JsExport
 class InputDialogComponent : RComponent<RProps, InputDialogComponentState>() {
 
     /**
      * Optional handler for close dialog [Event].
      */
-    private var onCloseHandler: Event? = null
+    var onCloseHandler: Event? = null
 
     /**
      * Optional handler for create-button clicked [Event].
      */
-    private var onCreateHandler: Event? = null
+    var onCreateHandler: Event? = null
 
     /**
      * Called the first time when this component is created. Note: The dialog can be shown
@@ -101,34 +130,6 @@ class InputDialogComponent : RComponent<RProps, InputDialogComponentState>() {
         setState {
             userInput = newText
         }
-    }
-
-    /**
-     * Opens the dialog and suspends until user cancels operation or the user typed in a text. This
-     * function will return null when the user cancelled the action otherwise the typed value is returned.
-     */
-    suspend fun show(
-        title: String,
-        message: String? = null,
-        placeholder: String = "",
-        button: String = "OK"
-    ): String? {
-        val newName: String? = suspendCoroutine { continuation ->
-            onCloseHandler = { continuation.resume(null) }
-            onCreateHandler = { continuation.resume(state.userInput) }
-            setState {
-                this.title = title
-                this.message = message
-                this.placeholder = placeholder
-                this.button = button
-                this.isOpen = true
-            }
-        }
-        setState {
-            isOpen = false
-            userInput = ""
-        }
-        return newName
     }
 
 }
