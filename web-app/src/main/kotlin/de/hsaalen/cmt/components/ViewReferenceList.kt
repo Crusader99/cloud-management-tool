@@ -23,11 +23,13 @@ import styled.*
 fun RBuilder.referenceList(
     dto: ServerReferenceListDto?,
     onItemOpen: (Reference) -> Unit,
+    onItemDownload: (Reference) -> Unit,
     onItemDelete: (Reference) -> Unit
 ) = child(ViewReferenceList::class) {
     attrs {
         this.dto = dto
         this.onItemOpen = onItemOpen
+        this.onItemDownload = onItemDownload
         this.onItemDelete = onItemDelete
     }
 }
@@ -38,6 +40,7 @@ fun RBuilder.referenceList(
 external interface ViewReferenceListProps : RProps {
     var dto: ServerReferenceListDto?
     var onItemOpen: (Reference) -> Unit
+    var onItemDownload: (Reference) -> Unit
     var onItemDelete: (Reference) -> Unit
 }
 
@@ -132,9 +135,15 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
         renderTableBodyColumn(ref.labels.joinToString())
         renderTableBodyColumn(ref.dateLastAccess.toDate().toDateString())
         styledTd {
+            mTooltip("Download") {
+                mIconButton("download", onClick = {
+                    it.stopPropagation() // Prevent parent to receive onClick event, which would open the reference
+                    props.onItemDownload(ref)
+                })
+            }
             mTooltip("Delete") {
                 mIconButton("delete", onClick = {
-                    it.stopPropagation() // Prevent parent element to receive onClick event, which would open the reference
+                    it.stopPropagation() // Prevent parent to receive onClick event, which would open the reference
                     props.onItemDelete(ref)
                 })
             }

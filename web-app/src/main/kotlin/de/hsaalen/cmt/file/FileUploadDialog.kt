@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.extensions
+package de.hsaalen.cmt.file
 
 import kotlinx.browser.document
 import org.w3c.dom.HTMLInputElement

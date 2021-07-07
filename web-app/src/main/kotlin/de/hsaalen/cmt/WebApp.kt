@@ -11,8 +11,8 @@ import de.hsaalen.cmt.components.features.renderSnackbar
 import de.hsaalen.cmt.components.features.show
 import de.hsaalen.cmt.components.login.Credentials
 import de.hsaalen.cmt.extensions.coroutines
-import de.hsaalen.cmt.extensions.openFileSelector
-import de.hsaalen.cmt.extensions.readText
+import de.hsaalen.cmt.file.openFileSelector
+import de.hsaalen.cmt.file.readText
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.exceptions.ConnectException
 import de.hsaalen.cmt.network.session.Session
