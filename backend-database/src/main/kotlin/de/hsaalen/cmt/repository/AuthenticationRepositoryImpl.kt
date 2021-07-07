@@ -1,12 +1,11 @@
 package de.hsaalen.cmt.repository
 
-import de.hsaalen.cmt.crypto.hashString
+import de.hsaalen.cmt.crypto.hashSHA256
 import de.hsaalen.cmt.environment.PASSWORD_SALT
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.sql.schema.UserDao
 import de.hsaalen.cmt.sql.schema.UserTable
 import de.hsaalen.cmt.utils.validateEmailAndThrow
-import de.hsaalen.cmt.utils.validatePasswordAndThrow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.joda.time.DateTime
@@ -24,7 +23,11 @@ internal object AuthenticationRepositoryImpl : AuthenticationRepository {
         try {
             // Check user input and throw exception when invalid.
             email.validateEmailAndThrow()
-            passwordPlain.validatePasswordAndThrow()
+            if (passwordPlain.isBlank()) {
+                throw IllegalArgumentException("Password can't be empty")
+            } else if (passwordPlain.length > 1024) {
+                throw IllegalArgumentException("Password too long!")
+            }
         } catch (ex: Exception) {
             throw SecurityException(ex.message, ex)
         }
@@ -94,7 +97,7 @@ internal object AuthenticationRepositoryImpl : AuthenticationRepository {
         val saltedPassword = password + PASSWORD_SALT
 
         // Hash salted password and convert to hex string
-        return hashString(saltedPassword)
+        return hashSHA256(saltedPassword)
     }
 
 }

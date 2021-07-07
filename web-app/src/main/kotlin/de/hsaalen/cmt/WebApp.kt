@@ -105,7 +105,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
      * Called whenever an update is required.
      */
     override fun RBuilder.render() {
-        //mThemeProvider(Theme.LIGHT.toMuiTheme()) { // TODO: renable when fixed
+        //mThemeProvider(Theme.LIGHT.toMuiTheme()) { // TODO: re enable when fixed
             renderHeader()
             renderInputDialog(refCreateReferenceDialog)
             renderSnackbar(refSnackBar)

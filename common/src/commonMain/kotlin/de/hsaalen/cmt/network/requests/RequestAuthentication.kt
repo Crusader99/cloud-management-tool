@@ -1,6 +1,6 @@
 package de.hsaalen.cmt.network.requests
 
-import de.hsaalen.cmt.crypto.hashString
+import de.hsaalen.cmt.crypto.hashSHA256
 import de.hsaalen.cmt.network.apiPathAuthLogin
 import de.hsaalen.cmt.network.apiPathAuthLogout
 import de.hsaalen.cmt.network.apiPathAuthRegister
@@ -74,7 +74,7 @@ internal object RequestAuthentication : Request, AuthenticationRepository {
     private fun hashPassword(password: String): String {
         // Hash password without salting on clientside and convert to hex string
         // Before saving password in database the server will hash the password again with a salt
-        return hashString(password)
+        return hashSHA256(password)
     }
 
 }
