@@ -31,6 +31,7 @@ external interface OverviewPageState : RState {
 /**
  * The overview app component for displaying results of the search.
  */
+@JsExport
 class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
 
     /**

@@ -5,9 +5,11 @@ import com.ccfraser.muirwik.components.mThemeProvider
 import de.hsaalen.cmt.components.appBar
 import de.hsaalen.cmt.components.dialogs.InputDialogComponent
 import de.hsaalen.cmt.components.dialogs.renderInputDialog
+import de.hsaalen.cmt.components.dialogs.show
 import de.hsaalen.cmt.components.features.ViewSnackbar
 import de.hsaalen.cmt.components.features.loadingOverlay
 import de.hsaalen.cmt.components.features.renderSnackbar
+import de.hsaalen.cmt.components.features.show
 import de.hsaalen.cmt.components.login.Credentials
 import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.extensions.openFileSelector
@@ -40,6 +42,7 @@ external interface WebAppState : RState {
 /**
  * The main app component.
  */
+@JsExport
 class WebApp : RComponent<RProps, WebAppState>() {
 
     /**
@@ -102,7 +105,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
      * Called whenever an update is required.
      */
     override fun RBuilder.render() {
-        mThemeProvider(Theme.LIGHT.toMuiTheme()) {
+        //mThemeProvider(Theme.LIGHT.toMuiTheme()) { // TODO: renable when fixed
             renderHeader()
             renderInputDialog(refCreateReferenceDialog)
             renderSnackbar(refSnackBar)
@@ -157,7 +160,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                     }
                 }
             }
-        }
+//        }
     }
 
     /**

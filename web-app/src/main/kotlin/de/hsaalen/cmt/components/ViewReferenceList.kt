@@ -35,7 +35,7 @@ fun RBuilder.referenceList(
 /**
  * React properties of the [ViewReferenceList] component.
  */
-private external interface ViewReferenceListProps : RProps {
+external interface ViewReferenceListProps : RProps {
     var dto: ServerReferenceListDto?
     var onItemOpen: (Reference) -> Unit
     var onItemDelete: (Reference) -> Unit
@@ -44,7 +44,8 @@ private external interface ViewReferenceListProps : RProps {
 /**
  * Intended to render a list of files that are found by tags from search component.
  */
-private class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
+@JsExport
+class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
 
     /**
      * Called when page is rendered.

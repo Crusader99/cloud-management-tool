@@ -22,6 +22,28 @@ fun RBuilder.renderSnackbar(ref: RReadableRef<ViewSnackbar>) =
     }
 
 /**
+ * Opens a new snack bar and replaces the previous one when the previous one is still open.
+ */
+suspend fun ViewSnackbar.show(message: String, severity: MAlertSeverity, timeoutMs: Long = 4_000) {
+    currentCloseJob?.cancel() // Cancel previous snack bar close-after-timeout handler
+    setState {
+        this.isVisible = true
+        this.message = message
+        this.severity = severity
+    }
+    coroutineScope {
+        val closeJob = launch {
+            delay(timeoutMs)
+            setState {
+                isVisible = false
+            }
+        }
+        currentCloseJob = closeJob // Register close job to allow cancellation
+        closeJob.join()
+    }
+}
+
+/**
  * Holds information to be displayed later in snackbar gui object.
  */
 external interface ViewSnackbarState : RState {
@@ -33,12 +55,13 @@ external interface ViewSnackbarState : RState {
 /**
  * The snackbar component is a wrapper around the material ui component to simplify event handling.
  */
+@JsExport
 class ViewSnackbar : RComponent<RProps, ViewSnackbarState>() {
 
     /**
      * Holds the current close job to to allow cancellation. Required for replacing snack bar content.
      */
-    private var currentCloseJob: CoroutineContext? = null
+    var currentCloseJob: CoroutineContext? = null
 
     /**
      * Initialize state of the [ViewSnackbar].
@@ -72,28 +95,6 @@ class ViewSnackbar : RComponent<RProps, ViewSnackbarState>() {
             isVisible = false
         }
         currentCloseJob?.cancel()
-    }
-
-    /**
-     * Opens a new snack bar and replaces the previous one when the previous one is still open.
-     */
-    suspend fun show(message: String, severity: MAlertSeverity, timeoutMs: Long = 4_000) {
-        currentCloseJob?.cancel() // Cancel previous snack bar close-after-timeout handler
-        setState {
-            this.isVisible = true
-            this.message = message
-            this.severity = severity
-        }
-        coroutineScope {
-            val closeJob = launch {
-                delay(timeoutMs)
-                setState {
-                    isVisible = false
-                }
-            }
-            currentCloseJob = closeJob // Register close job to allow cancellation
-            closeJob.join()
-        }
     }
 
 }

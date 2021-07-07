@@ -35,14 +35,15 @@ fun RBuilder.canvasRenderer(view: MPView) = child(ViewCanvasRenderer::class) {
 /**
  * React properties of the [ViewCanvasRenderer] component.
  */
-private external interface ViewCanvasRendererProps : RProps {
+external interface ViewCanvasRendererProps : RProps {
     var view: MPView
 }
 
 /**
  * A React component for rendering canvas elements which supports multi-platform support.
  */
-private class ViewCanvasRenderer : RComponent<ViewCanvasRendererProps, RState>() {
+@JsExport
+class ViewCanvasRenderer : RComponent<ViewCanvasRendererProps, RState>() {
     private var previousMouse: Point? = null
     private var refreshJob: Job? = null
     private var canvasRef = createRef<HTMLCanvasElement>()

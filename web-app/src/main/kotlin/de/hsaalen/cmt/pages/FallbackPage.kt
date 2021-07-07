@@ -22,6 +22,7 @@ external interface FallbackPageProps : RProps {
 /**
  * Fallback page when backend is not available.
  */
+@JsExport
 class FallbackPage : RComponent<FallbackPageProps, RState>() {
 
     /**

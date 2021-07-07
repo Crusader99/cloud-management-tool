@@ -63,6 +63,7 @@ external interface LoginFieldState : RState {
 /**
  * A component for displaying a simple login/password field.
  */
+@JsExport
 class LoginField(props: LoginFieldProps) : RComponent<LoginFieldProps, LoginFieldState>(props) {
 
     /**

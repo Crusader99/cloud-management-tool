@@ -29,8 +29,7 @@ dependencies {
 }
 
 kotlin {
-    js(LEGACY) {
-        useCommonJs()
+    js(IR) {
         binaries.executable()
         browser {
             // For continuous integration: gradle browserDevelopmentRun --continuous

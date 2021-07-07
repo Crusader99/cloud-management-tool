@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.extensions
 
 import de.hsaalen.cmt.components.dialogs.InputDialogComponent
+import de.hsaalen.cmt.components.dialogs.show
 import de.hsaalen.cmt.network.RestPaths
 import kotlinx.browser.window
 import kotlinx.coroutines.launch

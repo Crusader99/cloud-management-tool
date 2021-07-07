@@ -36,6 +36,7 @@ external interface DocumentEditPageState : RState {
 /**
  * A React component for editing documents live with other user users.
  */
+@JsExport
 class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState>() {
     /**
      * Algorithm that detects changes in document

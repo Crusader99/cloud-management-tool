@@ -32,6 +32,7 @@ fun RBuilder.registerComponent(
 /**
  * A component for handling user registration.
  */
+@JsExport
 class RegisterComponent(props: FormComponentProps) : FormComponent(props) {
 
     /**

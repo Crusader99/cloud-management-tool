@@ -30,7 +30,7 @@ fun RBuilder.aboutSoftwareDialog(text: String, open: Boolean, onClose: () -> Uni
 /**
  * React properties of the [DialogAboutSoftware] component.
  */
-private external interface DialogAboutSoftwareProps : RProps {
+external interface DialogAboutSoftwareProps : RProps {
     var text: String
     var open: Boolean
     var onClose: () -> Unit
@@ -39,7 +39,8 @@ private external interface DialogAboutSoftwareProps : RProps {
 /**
  * A component for displaying a info dialog with links.
  */
-private class DialogAboutSoftware : RComponent<DialogAboutSoftwareProps, RState>() {
+@JsExport
+class DialogAboutSoftware : RComponent<DialogAboutSoftwareProps, RState>() {
 
     /**
      * Called when this dialog is rendered.
