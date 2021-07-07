@@ -6,6 +6,11 @@
 # - Currently no multi-user support
 # - Requires Docker-Compose to be installed
 
+if [ "$EUID" != 0 ]; then
+  echo "Please run as root"
+  exit
+fi
+
 docker-compose down &
 echo Execute gradle using user \'$(users)\'...
 su $(users) -c "./gradlew build"
