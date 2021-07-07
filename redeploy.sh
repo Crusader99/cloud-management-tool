@@ -1,7 +1,12 @@
 #/bin/bash
 # This script builds the projects and updates the docker contains.
-# Note: Has to be executed as root user.
+#
+# Notes:
+# - Has to be executed as root user
+# - Currently no multi-user support
+# - Requires Docker-Compose to be installed
+
 docker-compose down &
 echo Execute gradle using user \'$(users)\'...
-su $(users) -c "gradle build"
+su $(users) -c "./gradlew build"
 docker-compose up --build -d
