@@ -8,6 +8,7 @@ import com.ccfraser.muirwik.components.list.mListItemText
 import de.hsaalen.cmt.SoftwareInfo
 import de.hsaalen.cmt.components.dialogs.aboutSoftwareDialog
 import de.hsaalen.cmt.network.session.Session
+import kotlinx.browser.window
 import kotlinx.css.FlexBasis
 import kotlinx.css.flex
 import org.w3c.dom.events.Event
@@ -84,8 +85,12 @@ class ViewAppBar : RComponent<ViewAppBarProps, ViewAppBarState>() {
                                 flex(1.0, 1.0, FlexBasis.auto)
                             }
                         }
-                        Session.instance?.userInfo?.fullName?.let { userName ->
-                            p { +userName }
+                        if (window.innerWidth > 500) {  // Only print user name when on large page
+                            Session.instance?.userInfo?.let { userInfo ->
+                                mTooltip("Logged in as " + userInfo.email) {
+                                    p { +userInfo.fullName }
+                                }
+                            }
                         }
                         mTooltip("Logout") {
                             mIconButton(

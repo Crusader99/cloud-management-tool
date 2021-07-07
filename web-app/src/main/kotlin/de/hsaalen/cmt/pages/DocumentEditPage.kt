@@ -90,10 +90,12 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
                 bottom = 0.px
                 position = Position.fixed
                 resize = Resize.none
+                border = "0"
             }
             attrs {
                 ref = textarea
                 onInputFunction = { onTextChanged(engine.text) }
+                autoFocus = true
             }
         }
     }

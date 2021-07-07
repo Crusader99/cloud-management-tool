@@ -1,7 +1,6 @@
 package de.hsaalen.cmt
 
 import com.ccfraser.muirwik.components.lab.alert.MAlertSeverity
-import com.ccfraser.muirwik.components.mThemeProvider
 import de.hsaalen.cmt.components.appBar
 import de.hsaalen.cmt.components.dialogs.InputDialogComponent
 import de.hsaalen.cmt.components.dialogs.renderInputDialog
@@ -106,61 +105,60 @@ class WebApp : RComponent<RProps, WebAppState>() {
      */
     override fun RBuilder.render() {
         //mThemeProvider(Theme.LIGHT.toMuiTheme()) { // TODO: re enable when fixed
-            renderHeader()
-            renderInputDialog(refCreateReferenceDialog)
-            renderSnackbar(refSnackBar)
-            loadingOverlay(state.isLoading)
+        renderHeader()
+        renderInputDialog(refCreateReferenceDialog)
+        renderSnackbar(refSnackBar)
+        loadingOverlay(state.isLoading)
 
-            when (state.page) {
-                EnumPageType.CONNECTING -> {
-                    // Keep empty to print empty page
-                }
-                EnumPageType.UNAVAILABLE -> {
-                    child(FallbackPage::class) {
-                        attrs {
-                            onRetry = ::onReconnect
-                        }
-                    }
-                }
-                EnumPageType.AUTHENTICATION -> {
-                    // Allow user to login
-                    child(AuthenticationPage::class) {
-                        attrs {
-                            onLogin = { credentials -> onLogin(credentials, isRegistration = false) }
-                            onRegister = { credentials -> onLogin(credentials, isRegistration = true) }
-                            lastEmail = ""
-                            isEnabled = !state.isLoading
-                        }
-                    }
-                }
-                EnumPageType.OVERVIEW -> {
-                    val localSession = Session.instance!! // TODO: exception handling
-                    // When already logged in
-                    child(OverviewPage::class) {
-                        attrs {
-                            session = localSession
-                            onItemOpen = { ref ->
-                                setState {
-                                    reference = ref
-                                    page = EnumPageType.EDIT_DOCUMENT
-                                }
-                            }
-                            ref = refOverview
-                        }
-                    }
-                }
-                EnumPageType.EDIT_DOCUMENT -> {
-                    val localSession = Session.instance!! // TODO: exception handling
-                    val ref = state.reference!!
-                    child(DocumentEditPage::class) {
-                        attrs {
-                            session = localSession
-                            reference = ref
-                        }
+        when (state.page) {
+            EnumPageType.CONNECTING -> {
+                // Keep empty to print empty page
+            }
+            EnumPageType.UNAVAILABLE -> {
+                child(FallbackPage::class) {
+                    attrs {
+                        onRetry = ::onReconnect
                     }
                 }
             }
-//        }
+            EnumPageType.AUTHENTICATION -> {
+                // Allow user to login
+                child(AuthenticationPage::class) {
+                    attrs {
+                        onLogin = { credentials -> onLogin(credentials, isRegistration = false) }
+                        onRegister = { credentials -> onLogin(credentials, isRegistration = true) }
+                        lastEmail = ""
+                        isEnabled = !state.isLoading
+                    }
+                }
+            }
+            EnumPageType.OVERVIEW -> {
+                val localSession = Session.instance!! // TODO: exception handling
+                // When already logged in
+                child(OverviewPage::class) {
+                    attrs {
+                        session = localSession
+                        onItemOpen = { ref ->
+                            setState {
+                                reference = ref
+                                page = EnumPageType.EDIT_DOCUMENT
+                            }
+                        }
+                        ref = refOverview
+                    }
+                }
+            }
+            EnumPageType.EDIT_DOCUMENT -> {
+                val localSession = Session.instance!! // TODO: exception handling
+                val ref = state.reference!!
+                child(DocumentEditPage::class) {
+                    attrs {
+                        session = localSession
+                        reference = ref
+                    }
+                }
+            }
+        }
     }
 
     /**
