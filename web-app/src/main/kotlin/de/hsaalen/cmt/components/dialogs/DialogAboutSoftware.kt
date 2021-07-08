@@ -88,10 +88,10 @@ class DialogAboutSoftware : RComponent<DialogAboutSoftwareProps, RState>() {
                         mLink(text = line, hRef = link)
                         br {}
                     } else {
-                        mTypography(
-                            text = line,
-                            gutterBottom = true
-                        )
+                        +line
+                        attrs {
+                            gutterBottom = true // Enable bottom margin for text
+                        }
                     }
                 }
             }

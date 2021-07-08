@@ -3,12 +3,14 @@ package de.hsaalen.cmt.pages
 import de.hsaalen.cmt.components.referenceList
 import de.hsaalen.cmt.events.GlobalEventDispatcher
 import de.hsaalen.cmt.extensions.coroutines
+import de.hsaalen.cmt.file.openFileSaver
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateAddDto
 import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateRemoveDto
 import de.hsaalen.cmt.network.session.Session
+import kotlinx.browser.window
 import kotlinx.coroutines.launch
 import react.*
 
@@ -58,7 +60,12 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        referenceList(dto = state.dto, onItemOpen = props.onItemOpen, onItemDelete = ::onItemDelete)
+        referenceList(
+            dto = state.dto,
+            onItemOpen = props.onItemOpen,
+            onItemDelete = ::onItemDelete,
+            onItemDownload = ::onItemDownload
+        )
     }
 
     /**
@@ -68,6 +75,20 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
         val received = props.session.listReferences(state.query)
         setState {
             dto = received
+        }
+    }
+
+    /**
+     * Allow downloading selected reference to local computer.
+     */
+    private fun onItemDownload(ref: Reference) {
+        coroutines.launch {
+            val content = Session.instance?.download(ref.uuid)
+            if (content == null) {
+                window.alert("Content not available. Check server connection.")
+            } else {
+                openFileSaver(ref.displayName + ".txt", content)
+            }
         }
     }
 
