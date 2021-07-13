@@ -2,6 +2,7 @@ import java.time.Duration
 
 plugins {
     kotlin("js")
+    id("org.jetbrains.dokka") // Generate API documentation from source code
 }
 
 // Simplify declaration of kotlin wrapper modules

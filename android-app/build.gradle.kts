@@ -3,6 +3,7 @@ import com.android.build.gradle.internal.tasks.factory.dependsOn
 plugins {
     id("com.android.application")
     kotlin("android")
+    id("org.jetbrains.dokka") // Generate API documentation from source code
 }
 
 android {

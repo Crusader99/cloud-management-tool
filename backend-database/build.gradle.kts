@@ -8,6 +8,7 @@ plugins {
     kotlin("jvm") // There are some bugs with Intellij older than 2021.1
     kotlin("plugin.serialization")
     id("com.github.gelangweilte-studenten.gradle-docker-tests")
+    id("org.jetbrains.dokka") // Generate API documentation from source code
 }
 
 kotlin.target {

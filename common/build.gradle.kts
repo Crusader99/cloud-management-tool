@@ -4,6 +4,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("com.android.library")
+    id("org.jetbrains.dokka") // Generate API documentation from source code
 }
 
 val attr = Attribute.of("de.crusader.targetAttribute", String::class.java)
