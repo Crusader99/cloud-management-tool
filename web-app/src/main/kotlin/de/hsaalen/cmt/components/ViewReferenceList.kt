@@ -1,21 +1,23 @@
 package de.hsaalen.cmt.components
 
 import com.ccfraser.muirwik.components.button.mIconButton
+import com.ccfraser.muirwik.components.mChip
+import com.ccfraser.muirwik.components.mPaper
 import com.ccfraser.muirwik.components.mTooltip
+import com.ccfraser.muirwik.components.table.*
 import de.crusader.extensions.toDate
 import de.crusader.objects.color.Color
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.toCssColor
-import kotlinx.css.*
-import kotlinx.html.js.onClickFunction
+import kotlinx.css.Cursor
+import kotlinx.css.backgroundColor
+import kotlinx.css.cursor
 import react.RBuilder
 import react.RComponent
 import react.RProps
 import react.RState
-import react.dom.attrs
-import react.dom.tr
-import styled.*
+import styled.css
 
 /**
  * Wrapper function to simplify creation of this react component.
@@ -54,35 +56,36 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        styledTable {
-            css {
-                width = 100.pct // Same as 100 %
-                borderCollapse = BorderCollapse.collapse // Print separators
+        mPaper {
+            mTableContainer {
+                mTable {
+                    attrs {
+                        asDynamic().size = "small"
+                    }
+                    renderTableHead()
+                    renderTableBody()
+                }
             }
-            renderTableHead()
-            renderTableBody()
+            mTablePagination(
+                rowsPerPageOptions = arrayOf(10, 25, 100),
+                component = "div",
+                page = 0,
+                count = 23,
+                rowsPerPage = 10,
+            )
         }
     }
 
     /**
      * Called when the header of the table should be rendered.
      */
-    private fun RBuilder.renderTableHead() = styledThead {
-        css {
-            color = Color.BLACK.toCssColor()
-            backgroundColor = (Color.WHITE * 0.9f).toCssColor()
-            fontSize = 15.px
-        }
-
+    private fun RBuilder.renderTableHead() = mTableHead {
         val columns = arrayOf("Display Name", "Labels", "Last Access", "")
-        tr {
+        mTableRow {
             for (column in columns) {
-                styledTh {
+                mTableCell {
                     css {
-                        borderRight = "1px solid " + Color.BLACK.hex
-                        lastChild {
-                            borderRight = "none"
-                        }
+                        backgroundColor = Color.DARK_GRAY.toCssColor()
                     }
                     +column
                 }
@@ -93,12 +96,7 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
     /**
      * Called when the complete body of the table should be rendered.
      */
-    private fun RBuilder.renderTableBody() = styledTbody {
-        css {
-            textAlign = TextAlign.start
-            backgroundColor = Color.WHITE.toCssColor()
-            color = Color.BLACK.toCssColor()
-        }
+    private fun RBuilder.renderTableBody() = mTableBody {
         val dto = props.dto
         if (dto == null) {
             renderTableBodyRow(null) // Currently no references loaded
@@ -112,29 +110,32 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
     /**
      * Called when the only a single row of the table body should be rendered.
      */
-    private fun RBuilder.renderTableBodyRow(ref: Reference?) = styledTr {
+    private fun RBuilder.renderTableBodyRow(ref: Reference?) = mTableRow(hover = true) {
         css {
-            fontSize = 15.px
             cursor = Cursor.pointer
-            borderBottom = "1px solid " + Color.GRAY.toCssColor()
-            hover {
-                backgroundColor = Color.GRAY.toCssColor()
-            }
         }
         attrs {
             if (ref != null) {
-                onClickFunction = { props.onItemOpen(ref) }
+                onClick = { props.onItemOpen(ref) }
             }
         }
         if (ref == null) {
-            renderTableBodyColumn("Loading...")
-            return@styledTr
+            mTableCell { +"Loading..." }
+            return@mTableRow
         }
 
-        renderTableBodyColumn(ref.displayName)
-        renderTableBodyColumn(ref.labels.joinToString())
-        renderTableBodyColumn(ref.dateLastAccess.toDate().toDateString())
-        styledTd {
+        mTableCell { +ref.displayName }
+        mTableCell {
+            for (label in ref.labels) {
+                mChip(label) {
+                    attrs {
+                        asDynamic().clickable = true
+                    }
+                }
+            }
+        }
+        mTableCell { +ref.dateLastAccess.toDate().toDateString() }
+        mTableCell(align = MTableCellAlign.right) {
             mTooltip("Download") {
                 mIconButton("download", onClick = {
                     it.stopPropagation() // Prevent parent to receive onClick event, which would open the reference
@@ -148,15 +149,5 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
                 })
             }
         }
-    }
-
-    /**
-     * Render the text of a single table column.
-     */
-    private fun RBuilder.renderTableBodyColumn(text: String) = styledTd {
-        css {
-            padding(14.px, 14.px)
-        }
-        +text
     }
 }
