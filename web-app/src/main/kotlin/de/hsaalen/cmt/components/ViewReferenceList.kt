@@ -66,13 +66,6 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
                     renderTableBody()
                 }
             }
-            mTablePagination(
-                rowsPerPageOptions = arrayOf(10, 25, 100),
-                component = "div",
-                page = 0,
-                count = 23,
-                rowsPerPage = 10,
-            )
         }
     }
 
