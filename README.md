@@ -27,6 +27,7 @@ for testing proposes.
 * [Exposed](https://github.com/JetBrains/Exposed) (ORM framework for SQL in Kotlin)
 * [KMongo](https://litote.org/kmongo) (ORM framework for MongoDB in Kotlin)
 * [Kotlinx Coroutines](https://github.com/Kotlin/kotlinx.coroutines) (non-blocking programming)
+* [Kotlin-Logging](https://github.com/MicroUtils/kotlin-logging) (multiplatform logging framework)
 * [React](https://kotlinlang.org/docs/js-get-started.html)
   (for frontend of web-app, see [Kotlin/JS for React](https://kotlinlang.org/docs/js-get-started.html))
 * [Material UI](https://material-ui.com) + [Muirwik](https://github.com/cfnz/muirwik) (provide react components)
