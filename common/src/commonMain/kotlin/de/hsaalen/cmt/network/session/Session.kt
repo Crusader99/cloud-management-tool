@@ -15,6 +15,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import mu.KotlinLogging
 
 /**
  * Client session with websocket connection to server backend.
@@ -30,6 +31,11 @@ class Session(val userInfo: ServerUserInfoDto) :
         private set
 
     private var webSocketSendingQueue = Channel<Frame>()
+
+    /**
+     * Local logger instance for this specific user [Session].
+     */
+    private val logger = KotlinLogging.logger(this::class.simpleName + "@" + userInfo.email)
 
     init {
         GlobalScope.launch {
@@ -49,7 +55,7 @@ class Session(val userInfo: ServerUserInfoDto) :
         }
         try {
             Client.instance.ws(urlString = url) {
-                println("Connected websocket")
+                logger.info { "Connected websocket" }
 
                 launch {
                     try {
@@ -66,7 +72,7 @@ class Session(val userInfo: ServerUserInfoDto) :
                 }
 
                 while (isActive && isConnected) {
-                    println("Waiting for websocket receive")
+                    logger.info { "Waiting for websocket receive" }
                     val frame = incoming.receive()
                     val dto: LiveDto = if (frame is Frame.Text) {
                         JsonHelper.decode(frame.readText())
@@ -75,7 +81,7 @@ class Session(val userInfo: ServerUserInfoDto) :
                     }
                     GlobalEventDispatcher.notify(dto)
                 }
-                println("Finished websocket")
+                logger.info { "Finished websocket" }
             }
 
         } finally {
@@ -114,8 +120,9 @@ class Session(val userInfo: ServerUserInfoDto) :
          */
         suspend fun login(email: String, passwordPlain: String): Session {
             val userInfo = RequestAuthentication.login(email, passwordPlain)
-            println("Logged in as: " + userInfo.email)
-            return Session(userInfo)
+            return Session(userInfo).apply {
+                logger.info { "Logged in as: " + userInfo.fullName }
+            }
         }
 
         /**
@@ -123,8 +130,9 @@ class Session(val userInfo: ServerUserInfoDto) :
          */
         suspend fun register(firstName: String, email: String, passwordPlain: String): Session {
             val userInfo = RequestAuthentication.register(firstName, email, passwordPlain)
-            println("Logged in as: " + userInfo.email)
-            return Session(userInfo)
+            return Session(userInfo).apply {
+                logger.info { "Registered as: " + userInfo.fullName }
+            }
         }
 
         /**
@@ -136,8 +144,9 @@ class Session(val userInfo: ServerUserInfoDto) :
         suspend fun restore(): Session? {
             return try {
                 val userInfo = RequestAuthentication.restore() // No email passed: not known yet, determined by server
-                println("Restored session for: " + userInfo.email)
-                Session(userInfo)
+                Session(userInfo).apply {
+                    logger.info { "Restored session for: " + userInfo.fullName }
+                }
             } catch (t: Exception) {
                 // Return null when restore not accepted
                 // But throw exception when connect failed
