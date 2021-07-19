@@ -5,6 +5,7 @@ import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.UUIDTable
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.jodatime.datetime
 import java.util.*
 
@@ -25,7 +26,11 @@ object UserTable : UUIDTable("user") {
  * A data access object for a user instance.
  */
 class UserDao(id: EntityID<UUID>) : UUIDEntity(id) {
-    companion object : UUIDEntityClass<UserDao>(UserTable)
+    companion object : UUIDEntityClass<UserDao>(UserTable) {
+        fun findUserByEmail(mail: String) = UserDao.find(UserTable.email eq mail)
+            .singleOrNull()
+            ?: throw SecurityException("User $mail not found!")
+    }
 
     var fullName by UserTable.fullName
     var email by UserTable.email
@@ -39,4 +44,5 @@ class UserDao(id: EntityID<UUID>) : UUIDEntity(id) {
      * Convert to data transfer object.
      */
     fun toServerUserInfoDto() = ServerUserInfoDto(fullName, email)
+
 }

@@ -4,7 +4,8 @@ plugins {
     kotlin("jvm") // There are some bugs with Intellij older than 2021.1
     kotlin("plugin.serialization")
     id("com.github.gelangweilte-studenten.gradle-docker-tests")
-    //id("io.gitlab.arturbosch.detekt") // Code quality analyze tool TODO: enable when out-of-memory fixed
+    id("org.jetbrains.dokka") // Generate API documentation from source code
+    id("io.gitlab.arturbosch.detekt") // Code quality analyze tool
     application
 }
 
@@ -18,6 +19,7 @@ configurations.all {
 
 dependencies {
     implementation(project(":backend-database"))
+    implementation(project(":backend-environment"))
     implementation(project(":common"))
 
     // Network framework
@@ -35,16 +37,18 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.3") {
         because("Ktor depends on this library and has issues when missing")
     }
-    implementation("io.micrometer:micrometer-registry-prometheus:1.7.1")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.7.2")
     implementation("io.insert-koin:koin-logger-slf4j:3.1.2")
 
     // Use Koin as dependency injection framework
     implementation("io.insert-koin:koin-ktor:3.1.2")
 
     // JUnit test framework
-    testImplementation(kotlin("test"))
+    testImplementation("io.ktor:ktor-server-test-host:1.6.1")
     testImplementation("de.crusader:webscraper-selenium:3.1.0")
     testImplementation("de.crusader:webscraper-htmlunit:3.1.0")
+    testImplementation("io.insert-koin:koin-test-junit5:3.1.2")
+    testImplementation("io.mockk:mockk:1.12.0")
 }
 
 tasks.test {
@@ -53,18 +57,9 @@ tasks.test {
 }
 
 // Configure detekt code analyze tool to generate HTML report
-//detekt {
-//    ignoreFailures = true // Currently only print warning
-//    reports {
-//        html.enabled = true
-//    }
-//}
-//
-// The detekt analyze plugin caused out-of-memory in GitHub Actions.
-// This is a workaround to disable detekt directly on build.
-// (For mor information see https://github.com/detekt/detekt/issues/1894)
-//tasks.getByName("check") {
-//    this.setDependsOn(this.dependsOn.filterNot {
-//        it is TaskProvider<*> && it.name == "detekt"
-//    })
-//}
+detekt {
+    ignoreFailures = true // Currently only print warning
+    reports {
+        html.enabled = true
+    }
+}

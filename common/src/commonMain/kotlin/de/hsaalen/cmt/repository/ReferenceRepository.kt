@@ -4,6 +4,7 @@ import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientDeleteReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.Reference
+import de.hsaalen.cmt.network.dto.objects.UUID
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 
 /**
@@ -11,12 +12,12 @@ import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
  * access or implemented for the client to access the server over network. The implementation can be injected using
  * dependency injection.
  */
-interface ReferencesRepository {
+interface ReferenceRepository {
 
     /**
      * Provide a list of all related references to search query.
      */
-    suspend fun listReferences(query: ClientReferenceQueryDto): ServerReferenceListDto
+    suspend fun listReferences(query: ClientReferenceQueryDto = ClientReferenceQueryDto()): ServerReferenceListDto
 
     /**
      * Send request to repository for creating a new reference.
@@ -31,7 +32,7 @@ interface ReferencesRepository {
     /**
      * Request repository to delete a reference by the given reference uuid.
      */
-    suspend fun deleteReference(uuid: String) = deleteReference(ClientDeleteReferenceDto(uuid))
+    suspend fun deleteReference(uuid: UUID) = deleteReference(ClientDeleteReferenceDto(uuid))
 
     /**
      * Send request repository to delete a reference.
@@ -41,6 +42,6 @@ interface ReferencesRepository {
     /**
      * Download the content of a specific reference by uuid.
      */
-    suspend fun downloadContent(uuid: String): String
+    suspend fun downloadContent(uuid: UUID): String
 
 }

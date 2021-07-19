@@ -15,6 +15,9 @@ object DatabaseModules {
      * Initialize all used database connections.
      */
     fun init() {
+        // Delay on startup to ensure databases have enough time to initialize
+        Thread.sleep(5_000)
+
         MongoDB.configure()
         Postgresql.configure()
     }
@@ -28,8 +31,9 @@ object DatabaseModules {
      */
     val dependencies = module {
         single<AuthenticationRepository> { AuthenticationRepositoryImpl }
-        factory<ReferencesRepository> { (userEmail: String) -> ReferencesRepositoryImpl(userEmail) }
-        factory<DocumentRepository> { (email: String, socketId: String) -> DocumentRepositoryImpl(email, socketId) }
+        single<ReferenceRepository> { ReferenceRepositoryImpl }
+        single<LabelRepository> { LabelRepositoryImpl }
+        single<DocumentRepository> { DocumentRepositoryImpl }
     }
 
 

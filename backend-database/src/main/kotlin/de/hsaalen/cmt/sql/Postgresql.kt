@@ -1,10 +1,7 @@
 package de.hsaalen.cmt.sql
 
 import de.hsaalen.cmt.environment.*
-import de.hsaalen.cmt.sql.schema.LabelTable
-import de.hsaalen.cmt.sql.schema.ReferenceTable
-import de.hsaalen.cmt.sql.schema.RevisionTable
-import de.hsaalen.cmt.sql.schema.UserTable
+import de.hsaalen.cmt.sql.schema.*
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -36,7 +33,7 @@ internal object Postgresql {
 
             // Creates the tables when not existing
             // Also used to test the connection to database
-            SchemaUtils.create(UserTable, ReferenceTable, RevisionTable, LabelTable)
+            SchemaUtils.create(UserTable, ReferenceTable, RevisionTable, LabelTable, LabelRefMappingTable)
         }
     }
 

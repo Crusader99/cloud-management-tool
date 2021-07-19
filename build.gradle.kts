@@ -13,8 +13,8 @@ allprojects {
 }
 
 plugins {
-    kotlin("multiplatform") version "1.5.20" apply false // Allows common projects
-    kotlin("plugin.serialization") version "1.5.20" apply false // Support for json serialization
+    kotlin("multiplatform") version "1.5.21" apply false // Allows common projects
+    kotlin("plugin.serialization") version "1.5.21" apply false // Support for json serialization
 
     // Gradle plugin for android development
     id("com.android.application") version "4.1.3" apply false
@@ -27,10 +27,19 @@ plugins {
     // This plugin was written because of issues in the existing docker gradle plugins available
     id("com.github.gelangweilte-studenten.gradle-docker-tests") version "1.2.6" apply false
 
-    // Code quality analyze tool
+    // Code quality: Tool for static code analysis
     id("io.gitlab.arturbosch.detekt") version "1.17.1" apply false
+
+    // Generate API documentation from source code
+    id("org.jetbrains.dokka") version "1.5.0"
 
     // Register plugins for better IDE support
     eclipse
     idea
+}
+
+// Configure API doc generator
+tasks.dokkaHtmlMultiModule {
+    outputDirectory.set(buildDir.resolve("api-doc"))
+    includes.from("README.md") // Print on index page
 }

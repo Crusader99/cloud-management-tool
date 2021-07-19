@@ -14,6 +14,7 @@ object EventHandlers {
     fun init() {
         GlobalEventDispatcher.register(::handleReferenceUpdate)
         GlobalEventDispatcher.register(::handleDocumentChange)
+        GlobalEventDispatcher.register(::handleLabelChange)
     }
 
     /**
@@ -28,6 +29,13 @@ object EventHandlers {
      */
     private suspend fun handleDocumentChange(event: UserDocumentChangeEvent) {
         WebSocketManager.broadcastExcept(event.senderSocketId, event.modification)
+    }
+
+    /**
+     * Invoked when user adds/removed labels.
+     */
+    private suspend fun handleLabelChange(event: LabelChangeEvent) {
+        WebSocketManager.broadcast(event.modification)
     }
 
 }

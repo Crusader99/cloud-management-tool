@@ -113,7 +113,7 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
     private fun onDocumentChangedLocal(lineNumber: Int, lineContent: String, changeMode: LineChangeMode) {
         val dto = DocumentChangeDto(props.reference.uuid, lineNumber, lineContent, changeMode)
         coroutines.launch {
-            Session.instance?.liveTextEdit(dto)
+            Session.instance?.modifyDocument(dto)
         }
     }
 

@@ -18,6 +18,7 @@ pluginManagement {
 }
 
 include(":common")
+include(":backend-environment")
 include(":backend-database")
 include(":backend-server")
 include(":web-app")

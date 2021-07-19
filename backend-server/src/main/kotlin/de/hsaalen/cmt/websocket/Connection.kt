@@ -1,15 +1,15 @@
 package de.hsaalen.cmt.websocket
 
-import de.hsaalen.cmt.jwt.readJwtCookie
 import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
 import de.hsaalen.cmt.repository.DocumentRepository
+import de.hsaalen.cmt.session.jwt.readJwtCookie
+import de.hsaalen.cmt.session.withWebSocketSession
 import de.hsaalen.cmt.utils.JsonHelper
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.cio.websocket.*
 import mu.KLogger
 import mu.KotlinLogging
-import org.koin.core.parameter.parametersOf
 import org.koin.ktor.ext.inject
 import java.util.*
 
@@ -52,15 +52,19 @@ class Connection(socket: WebSocketSession, private val context: ApplicationCall)
      */
     suspend fun suspendProcessing() {
         logger.info("websocket: connected")
-        val repo: DocumentRepository by context.inject { parametersOf(userEmail, socketId) }
-        for (frame in incoming) {
-            if (frame is Frame.Text) {
-                val jsonText = frame.readText()
-                logger.debug("websocket: received: $jsonText")
-                val dto: DocumentChangeDto = JsonHelper.decode(jsonText)
-                repo.modifyDocument(dto)
-            } else {
-                logger.warn("websocket: received unknown frame: " + frame.frameType.name)
+
+        withWebSocketSession(userEmail, socketId) {
+            val repo: DocumentRepository by context.inject()
+
+            for (frame in incoming) {
+                if (frame is Frame.Text) {
+                    val jsonText = frame.readText()
+                    logger.debug("websocket: received: $jsonText")
+                    val dto: DocumentChangeDto = JsonHelper.decode(jsonText)
+                    repo.modifyDocument(dto)
+                } else {
+                    logger.warn("websocket: received unknown frame: " + frame.frameType.name)
+                }
             }
         }
     }

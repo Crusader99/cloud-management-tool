@@ -3,6 +3,8 @@ import com.android.build.gradle.internal.tasks.factory.dependsOn
 plugins {
     id("com.android.application")
     kotlin("android")
+    id("org.jetbrains.dokka") // Generate API documentation from source code
+    id("io.gitlab.arturbosch.detekt") // Code quality analyze tool
 }
 
 android {
@@ -52,13 +54,21 @@ dependencies {
 
     // https://developer.android.com/jetpack/androidx/migrate/artifact-mappings
     implementation("androidx.webkit:webkit:1.4.0") // Used to provide android web-browser
-    implementation("androidx.core:core-ktx:1.5.0")
+    implementation("androidx.core:core-ktx:1.6.0")
     implementation("androidx.appcompat:appcompat:1.3.0")
-    implementation("com.google.android.material:material:1.3.0")
+    implementation("com.google.android.material:material:1.4.0")
     implementation("androidx.constraintlayout:constraintlayout:2.0.4")
     implementation("androidx.navigation:navigation-fragment-ktx:2.3.5")
     implementation("androidx.navigation:navigation-ui-ktx:2.3.5")
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.2")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+}
+
+// Configure detekt code analyze tool to generate HTML report
+detekt {
+    ignoreFailures = true // Currently only print warning
+    reports {
+        html.enabled = true
+    }
 }

@@ -30,4 +30,4 @@ jobs:
       # Runs gradle build
       - uses: eskatos/gradle-command-action@v1
         with: # Stacktrace argument to provide more error details
-          arguments: build --stacktrace
+          arguments: build -x detekt --stacktrace

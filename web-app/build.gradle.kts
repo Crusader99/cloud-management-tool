@@ -2,6 +2,8 @@ import java.time.Duration
 
 plugins {
     kotlin("js")
+    id("org.jetbrains.dokka") // Generate API documentation from source code
+    id("io.gitlab.arturbosch.detekt") // Code quality analyze tool
 }
 
 // Simplify declaration of kotlin wrapper modules
@@ -17,12 +19,7 @@ dependencies {
 
     // Wrapper for material ui components
     // See https://material-ui.com and https://github.com/cfnz/muirwik
-    implementation("com.ccfraser.muirwik:muirwik-components:0.8.1")
-
-    // Ensure correct versions of material ui are used
-    implementation(npm("@material-ui/core", "4.11.1"))
-    implementation(npm("@material-ui/lab", "4.0.0-alpha.56"))
-    implementation(npm("@material-ui/icons", "4.9.1"))
+    implementation("com.ccfraser.muirwik:muirwik-components:0.8.2")
 
     // Test framework on javascript platform
     testImplementation(kotlin("test-js"))
@@ -53,5 +50,13 @@ kotlin {
                 }
             }
         }
+    }
+}
+
+// Configure detekt code analyze tool to generate HTML report
+detekt {
+    ignoreFailures = true // Currently only print warning
+    reports {
+        html.enabled = true
     }
 }

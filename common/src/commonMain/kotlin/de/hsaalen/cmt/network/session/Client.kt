@@ -14,6 +14,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.withTimeout
+import mu.KotlinLogging
 
 /**
  * Client library for web-app and android-app.
@@ -29,6 +30,11 @@ internal object Client {
         }
         install(WebSockets)
     }
+
+    /**
+     * Logging instance for this class.
+     */
+    private val logger = KotlinLogging.logger("network-client")
 
     /**
      * Network request method for all types of HTTP requests. This function handles functionality that is used in
@@ -76,7 +82,7 @@ internal object Client {
         try {
             val errorInfo: ServerErrorDto = response.receive()
             val errorMessage = errorInfo.error
-            println("Server-Error ($statusCode): $statusDescription: $errorMessage")
+            logger.info { "Server-Error ($statusCode): $statusDescription: $errorMessage" }
             throw ServerException(statusCode, errorMessage)
         } catch (t: Throwable) {
             val message = t.message.takeIf { it?.length in 3..100 } ?: "Server-Error ($statusCode)"

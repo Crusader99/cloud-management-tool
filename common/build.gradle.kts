@@ -4,6 +4,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("com.android.library")
+    id("org.jetbrains.dokka") // Generate API documentation from source code
 }
 
 val attr = Attribute.of("de.crusader.targetAttribute", String::class.java)
@@ -32,7 +33,7 @@ kotlin {
             dependencies { // Use api instead implementation to allow transitive access from modules
                 // Statistics & logging frameworks
                 // See https://github.com/MicroUtils/kotlin-logging
-                api("io.github.microutils:kotlin-logging:2.0.8")
+                api("io.github.microutils:kotlin-logging:2.0.10")
 
                 // Use Koin as dependency injection framework
                 api("io.insert-koin:koin-core:3.1.2")
@@ -47,7 +48,7 @@ kotlin {
                     api("de.crusader:library-painter:1.1.1")
                 }
 
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
                 implementation("io.ktor:ktor-client-core:1.6.1")
                 implementation("io.ktor:ktor-client-serialization:1.6.1")
                 implementation("io.ktor:ktor-client-websockets:1.6.1")
