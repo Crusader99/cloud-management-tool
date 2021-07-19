@@ -31,9 +31,9 @@ object DatabaseModules {
      */
     val dependencies = module {
         single<AuthenticationRepository> { AuthenticationRepositoryImpl }
-        factory<ReferenceRepository> { (userEmail: String) -> ReferenceRepositoryImpl(userEmail) }
-        factory<LabelRepository> { (userEmail: String) -> LabelRepositoryImpl(userEmail) }
-        factory<DocumentRepository> { (email: String, socketId: String) -> DocumentRepositoryImpl(email, socketId) }
+        single<ReferenceRepository> { ReferenceRepositoryImpl }
+        single<LabelRepository> { LabelRepositoryImpl }
+        single<DocumentRepository> { DocumentRepositoryImpl }
     }
 
 

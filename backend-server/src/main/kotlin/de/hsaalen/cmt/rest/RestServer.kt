@@ -3,8 +3,8 @@ package de.hsaalen.cmt.rest
 import com.auth0.jwt.JWT
 import de.crusader.extensions.initialCause
 import de.hsaalen.cmt.DatabaseModules
-import de.hsaalen.cmt.jwt.JwtCookie
-import de.hsaalen.cmt.jwt.toPayload
+import de.hsaalen.cmt.session.jwt.JwtCookie
+import de.hsaalen.cmt.session.jwt.toPayload
 import de.hsaalen.cmt.network.dto.server.ServerErrorDto
 import de.hsaalen.cmt.utils.JsonHelper
 import io.ktor.application.*

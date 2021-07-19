@@ -33,7 +33,7 @@ kotlin {
             dependencies { // Use api instead implementation to allow transitive access from modules
                 // Statistics & logging frameworks
                 // See https://github.com/MicroUtils/kotlin-logging
-                api("io.github.microutils:kotlin-logging:2.0.8")
+                api("io.github.microutils:kotlin-logging:2.0.10")
 
                 // Use Koin as dependency injection framework
                 api("io.insert-koin:koin-core:3.1.2")

@@ -19,6 +19,7 @@ configurations.all {
 
 dependencies {
     implementation(project(":backend-database"))
+    implementation(project(":backend-environment"))
     implementation(project(":common"))
 
     // Network framework
@@ -36,16 +37,27 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.3") {
         because("Ktor depends on this library and has issues when missing")
     }
-    implementation("io.micrometer:micrometer-registry-prometheus:1.7.1")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.7.2")
     implementation("io.insert-koin:koin-logger-slf4j:3.1.2")
 
     // Use Koin as dependency injection framework
     implementation("io.insert-koin:koin-ktor:3.1.2")
 
     // JUnit test framework
-    testImplementation(kotlin("test"))
+//    testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
+    testImplementation("io.ktor:ktor-server-test-host:1.6.1")
     testImplementation("de.crusader:webscraper-selenium:3.1.0")
     testImplementation("de.crusader:webscraper-htmlunit:3.1.0")
+    testImplementation("io.mockk:mockk:1.12.0")
+
+//    testImplementation("io.insert-koin:koin-test:3.1.2")
+    testImplementation("io.insert-koin:koin-test-junit5:3.1.2")
+
+//    api("io.kotest:kotest-runner-junit5:4.6.1")
+//    api("org.junit.jupiter:junit-jupiter-api:5.7.1")
+//    api("org.junit.jupiter:junit-jupiter-params:5.7.1")
+//    runtimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.1")
 }
 
 tasks.test {

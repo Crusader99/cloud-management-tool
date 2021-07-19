@@ -11,12 +11,6 @@ plugins {
     id("org.jetbrains.dokka") // Generate API documentation from source code
 }
 
-kotlin.target {
-    compilations.all {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-}
-
 configurations.all {
     // Choose 'jvm' from disambiguating targets
     val attr = Attribute.of("de.crusader.targetAttribute", String::class.java)
@@ -25,6 +19,7 @@ configurations.all {
 
 dependencies {
     implementation(project(":common"))
+    implementation(project(":backend-environment"))
 
     // SQL database driver for postgres
     implementation("org.jetbrains.exposed:exposed-core:0.32.1")
@@ -38,7 +33,7 @@ dependencies {
 
     // Statistics & logging frameworks
     // See https://github.com/MicroUtils/kotlin-logging
-    implementation("io.github.microutils:kotlin-logging-jvm:2.0.8")
+    implementation("io.github.microutils:kotlin-logging-jvm:2.0.10")
     implementation("ch.qos.logback:logback-classic:1.2.3") {
         because("Ktor depends on this library and has issues when missing")
     }

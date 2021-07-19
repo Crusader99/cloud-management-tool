@@ -5,6 +5,7 @@ import de.hsaalen.cmt.events.LabelChangeEvent
 import de.hsaalen.cmt.network.dto.objects.LabelChangeMode
 import de.hsaalen.cmt.network.dto.objects.UUID
 import de.hsaalen.cmt.network.dto.websocket.LabelUpdateDto
+import de.hsaalen.cmt.session.currentSession
 import de.hsaalen.cmt.sql.schema.*
 import de.hsaalen.cmt.utils.id
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -15,23 +16,33 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 /**
  * Executes database operations for the label management.
  */
-internal class LabelRepositoryImpl(private val userEmail: String) : LabelRepository {
+internal object LabelRepositoryImpl : LabelRepository {
+
+    /**
+     * E-Mail address of the current user session.
+     */
+    private val userEmail: String
+        get() = currentSession.userMail
 
     /**
      * Add label to an existing reference by it's [UUID].
      */
     override suspend fun addLabel(reference: UUID, labelName: String) {
-        newSuspendedTransaction {
-            val creator = UserDao.findUserByEmail(userEmail)
-            val ref = findReference(reference) ?: throw IllegalStateException("Reference not found: $reference")
-            val label = findLabel(creator, labelName) ?: LabelDao.new {
-                this.labelName = labelName
-                this.owner = creator
+        try {
+            newSuspendedTransaction {
+                val creator = UserDao.findUserByEmail(userEmail)
+                val ref = findReference(reference) ?: error("Reference not found")
+                val label = findLabel(creator, labelName) ?: LabelDao.new {
+                    this.labelName = labelName
+                    this.owner = creator
+                }
+                LabelRefMappingDao.new {
+                    this.label = label
+                    this.reference = ref
+                }
             }
-            LabelRefMappingDao.new {
-                this.label = label
-                this.reference = ref
-            }
+        } catch (ex: Exception) {
+            throw IllegalStateException("Can not add label to reference")
         }
 
         // Call event handlers
@@ -43,19 +54,24 @@ internal class LabelRepositoryImpl(private val userEmail: String) : LabelReposit
      * Remove label from an existing reference by it's [UUID].
      */
     override suspend fun removeLabel(reference: UUID, labelName: String) {
-        newSuspendedTransaction {
-            val creator = UserDao.findUserByEmail(userEmail)
-            val ref = findReference(reference) ?: throw IllegalStateException("Reference not found: $reference")
-            val label = findLabel(creator, labelName) ?: throw IllegalStateException("Label not found: $labelName")
+        try {
+            newSuspendedTransaction {
+                val creator = UserDao.findUserByEmail(userEmail)
+                val ref = findReference(reference) ?: error("Reference not found")
+                val label = findLabel(creator, labelName) ?: error("Label not found")
 
-            // Remove label from reference
-            val removeQuery = (LabelRefMappingTable.label eq label.id) and (LabelRefMappingTable.reference eq ref.id)
-            LabelRefMappingTable.deleteWhere { removeQuery }
+                // Remove label from reference
+                val removeQuery =
+                    (LabelRefMappingTable.label eq label.id) and (LabelRefMappingTable.reference eq ref.id)
+                LabelRefMappingTable.deleteWhere { removeQuery }
 
-            // Cleanup label when used nowhere
-            if (LabelRefMappingDao.find(LabelRefMappingTable.label eq label.id).count() == 0L) {
-                LabelTable.deleteWhere { LabelTable.id eq label.id }
+                // Cleanup label when used nowhere
+                if (LabelRefMappingDao.find(LabelRefMappingTable.label eq label.id).count() == 0L) {
+                    LabelTable.deleteWhere { LabelTable.id eq label.id }
+                }
             }
+        } catch (ex: Exception) {
+            throw IllegalStateException("Can not remove label from reference", ex)
         }
 
         // Call event handlers
@@ -67,9 +83,13 @@ internal class LabelRepositoryImpl(private val userEmail: String) : LabelReposit
      * List all labels from a user that are applied to any reference.
      */
     override suspend fun listLabels(): List<String> {
-        return newSuspendedTransaction {
-            val user = UserDao.findUserByEmail(userEmail)
-            LabelDao.find(LabelTable.owner eq user.id).map { it.labelName }
+        try {
+            return newSuspendedTransaction {
+                val user = UserDao.findUserByEmail(userEmail)
+                LabelDao.find(LabelTable.owner eq user.id).map { it.labelName }
+            }
+        } catch (ex: Exception) {
+            throw IllegalStateException("Can not list all labels for user", ex)
         }
     }
 

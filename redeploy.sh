@@ -13,5 +13,4 @@ fi
 
 docker-compose down &
 echo Execute gradle using user \'$(users)\'...
-su $(users) -c "./gradlew build"
-docker-compose up --build -d
+su $(users) -c "./gradlew build" && docker-compose up --build -d

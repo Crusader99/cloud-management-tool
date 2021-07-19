@@ -1,14 +1,14 @@
 package de.hsaalen.cmt.rest
 
-import de.hsaalen.cmt.jwt.JwtCookie
-import de.hsaalen.cmt.jwt.readJwtCookie
-import de.hsaalen.cmt.jwt.updateJwtCookie
 import de.hsaalen.cmt.network.*
 import de.hsaalen.cmt.network.dto.client.ClientLoginDto
 import de.hsaalen.cmt.network.dto.client.ClientRegisterDto
 import de.hsaalen.cmt.repository.AuthenticationRepository
+import de.hsaalen.cmt.session.getWithSession
+import de.hsaalen.cmt.session.jwt.JwtCookie
+import de.hsaalen.cmt.session.jwt.readJwtCookie
+import de.hsaalen.cmt.session.jwt.updateJwtCookie
 import io.ktor.application.*
-import io.ktor.auth.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -46,13 +46,11 @@ fun Routing.routeAuthentication() = route("/" + RestPaths.base) {
         call.response.cookies.appendExpired(name = JwtCookie.cookieName, path = "/", domain = "")
         call.respond(Unit)
     }
-    authenticate {
-        // Check authorization cookie is set and refresh JWT token when logged in
-        get(apiPathAuthRestore) {
-            val payload = call.request.readJwtCookie()
-            val user = repo.restore(payload.email)
-            call.response.updateJwtCookie(user.toJwtPayload())
-            call.respond(user)
-        }
+    // Check authorization cookie is set and refresh JWT token when logged in
+    getWithSession(apiPathAuthRestore) {
+        val payload = call.request.readJwtCookie()
+        val user = repo.restore(payload.email)
+        call.response.updateJwtCookie(user.toJwtPayload())
+        call.respond(user)
     }
 }

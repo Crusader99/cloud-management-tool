@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.jwt
+package de.hsaalen.cmt.session.jwt
 
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import io.ktor.auth.*

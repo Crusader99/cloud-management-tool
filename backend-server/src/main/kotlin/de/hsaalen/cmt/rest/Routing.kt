@@ -1,8 +1,8 @@
 package de.hsaalen.cmt.rest
 
-import de.hsaalen.cmt.jwt.JwtPayload
 import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
+import de.hsaalen.cmt.session.jwt.JwtPayload
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.routing.*

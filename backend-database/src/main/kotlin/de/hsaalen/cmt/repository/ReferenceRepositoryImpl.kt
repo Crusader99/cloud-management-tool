@@ -10,20 +10,25 @@ import de.hsaalen.cmt.network.dto.objects.UUID
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateAddDto
 import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateRemoveDto
+import de.hsaalen.cmt.session.currentSession
 import de.hsaalen.cmt.sql.schema.ReferenceDao
 import de.hsaalen.cmt.sql.schema.RevisionDao
 import de.hsaalen.cmt.sql.schema.UserDao
-import de.hsaalen.cmt.sql.schema.UserTable
 import de.hsaalen.cmt.utils.id
 import de.hsaalen.cmt.utils.toUUID
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.joda.time.DateTime
 
 /**
  * Handles database operations for the reference and revision management.
  */
-class ReferenceRepositoryImpl(private val userEmail: String) : ReferenceRepository {
+internal object ReferenceRepositoryImpl : ReferenceRepository {
+
+    /**
+     * E-Mail address of the current user session.
+     */
+    private val userEmail: String
+        get() = currentSession.userMail
 
     /**
      * Send request to repository for creating a new reference.
@@ -48,6 +53,7 @@ class ReferenceRepositoryImpl(private val userEmail: String) : ReferenceReposito
                 this.creator = creator
                 this.accessCount = 0
             }
+
             Reference(
                 uuid = reference.id.toUUID(),
                 accessCode = reference.accessCode,
@@ -55,7 +61,7 @@ class ReferenceRepositoryImpl(private val userEmail: String) : ReferenceReposito
                 contentType = reference.contentType,
                 dateCreation = revision.dateCreation.millis,
                 dateLastAccess = revision.dateLastAccess.millis,
-                labels = listOf("Not implemented yet")
+                labels = request.labels
             )
         }
 
@@ -65,6 +71,16 @@ class ReferenceRepositoryImpl(private val userEmail: String) : ReferenceReposito
         } catch (ex: Exception) {
             deleteReference(ref) // Cleanup also in SQL on failure
             throw IllegalStateException("Unable to create document for new reference", ex)
+        }
+
+        // Add labels
+        try {
+            for (label in request.labels) {
+                LabelRepositoryImpl.addLabel(ref.uuid, label)
+            }
+        } catch (ex: Exception) {
+            deleteReference(ref) // Cleanup also in SQL on failure
+            throw IllegalStateException("Unable to add labels for new reference", ex)
         }
 
         // Call event handlers

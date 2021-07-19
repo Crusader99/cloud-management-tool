@@ -1,7 +1,7 @@
 package de.hsaalen.cmt.test
 
-import de.hsaalen.cmt.jwt.JwtCookie
-import de.hsaalen.cmt.jwt.JwtPayload
+import de.hsaalen.cmt.session.jwt.JwtCookie
+import de.hsaalen.cmt.session.jwt.JwtPayload
 import de.hsaalen.cmt.rest.module
 import io.ktor.http.*
 import io.ktor.server.testing.*

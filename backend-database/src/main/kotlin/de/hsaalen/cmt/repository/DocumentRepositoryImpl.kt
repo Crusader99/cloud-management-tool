@@ -7,15 +7,14 @@ import de.hsaalen.cmt.mongo.MongoDB
 import de.hsaalen.cmt.mongo.TextDocument
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode.*
 import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
+import de.hsaalen.cmt.session.currentSession
+import de.hsaalen.cmt.session.senderSocketId
 import org.litote.kmongo.*
 
 /**
  * Server implementation of the document repository using a Mongo database.
  */
-internal class DocumentRepositoryImpl(
-    private val userEmail: String,
-    private val senderSocketId: String
-) : DocumentRepository {
+internal object DocumentRepositoryImpl : DocumentRepository {
 
     /**
      * Apply a single modification to the document in repository.
@@ -35,7 +34,7 @@ internal class DocumentRepositoryImpl(
             }
         }
 
-        val event = UserDocumentChangeEvent(request, userEmail, senderSocketId)
+        val event = UserDocumentChangeEvent(request, currentSession.userMail, currentSession.senderSocketId)
         GlobalEventDispatcher.notify(event)
     }
 

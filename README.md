@@ -31,6 +31,7 @@ for testing proposes.
 * [React](https://kotlinlang.org/docs/js-get-started.html)
   (for frontend of web-app, see [Kotlin/JS for React](https://kotlinlang.org/docs/js-get-started.html))
 * [Material UI](https://material-ui.com) + [Muirwik](https://github.com/cfnz/muirwik) (provide react components)
+* [Mockk](https://mockk.io) (Help mocking in test units)
 
 ## Databases:
 
