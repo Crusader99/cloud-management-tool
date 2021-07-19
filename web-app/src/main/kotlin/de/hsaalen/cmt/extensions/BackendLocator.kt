@@ -5,6 +5,12 @@ import de.hsaalen.cmt.components.dialogs.show
 import de.hsaalen.cmt.network.RestPaths
 import kotlinx.browser.window
 import kotlinx.coroutines.launch
+import mu.KotlinLogging
+
+/**
+ * Logging instance for this class.
+ */
+private val logger = KotlinLogging.logger { }
 
 /**
  * Opens a new dialog for configuring backend url for REST API in async mode.
@@ -22,7 +28,7 @@ fun InputDialogComponent.handleSwitchBackendDialog() {
             placeholder = "New API-Endpoint",
             button = "Switch"
         ) ?: return@launch
-        println("Selected new API-Endpoint: $newURL")
+        logger.debug { "Selected new API-Endpoint: $newURL" }
         BackendLocator.configuredBackend = newURL
         window.location.reload()
     }
@@ -41,10 +47,10 @@ object BackendLocator {
         val customApiEndpoint = window.sessionStorage.getItem(KEY_API_ENDPOINT)
         if (customApiEndpoint == null) {
             RestPaths.apiEndpoint = defaultBackend
-            println("Using default REST API endpoint: $configuredBackend")
+            logger.debug { "Using default REST API endpoint: $configuredBackend" }
         } else {
             RestPaths.apiEndpoint = customApiEndpoint
-            println("Using configured REST API endpoint: $configuredBackend")
+            logger.debug { "Using configured REST API endpoint: $configuredBackend" }
         }
     }
 
