@@ -44,8 +44,6 @@ dependencies {
     implementation("io.insert-koin:koin-ktor:3.1.2")
 
     // JUnit test framework
-//    testImplementation(kotlin("test"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
     testImplementation("io.ktor:ktor-server-test-host:1.6.1")
     testImplementation("de.crusader:webscraper-selenium:3.1.0")
     testImplementation("de.crusader:webscraper-htmlunit:3.1.0")

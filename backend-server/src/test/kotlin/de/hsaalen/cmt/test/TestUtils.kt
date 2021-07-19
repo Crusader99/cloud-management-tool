@@ -1,10 +1,11 @@
 package de.hsaalen.cmt.test
 
+import de.hsaalen.cmt.rest.module
 import de.hsaalen.cmt.session.jwt.JwtCookie
 import de.hsaalen.cmt.session.jwt.JwtPayload
-import de.hsaalen.cmt.rest.module
 import io.ktor.http.*
 import io.ktor.server.testing.*
+import io.mockk.unmockkAll
 
 /**
  * Generate JWT token and pass as cookie header to authenticate in REST server.
@@ -22,6 +23,10 @@ fun TestApplicationRequest.passAuthenticationHeader() {
  */
 fun networkTest(test: TestApplicationEngine.() -> Unit) {
     withTestApplication({ module() }) {
-        test()
+        try {
+            test()
+        } finally {
+            unmockkAll()
+        }
     }
 }
