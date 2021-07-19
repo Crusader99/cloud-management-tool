@@ -8,7 +8,7 @@ object RestPaths {
     /**
      * The base path for REST API.
      */
-    val base = "api/v1.0"
+    const val base = "api/v1.0"
 
     /**
      * The url to use for requests to REST API server.
@@ -23,7 +23,11 @@ const val apiPathCreateReference = "/createReference"
 
 const val apiPathListReferences = "/listReferences"
 
+const val apiPathListLabels = "/listLabels"
+
 const val apiPathImport = "/import"
+
+const val apiPathDownload = "/download"
 
 const val apiPathAuthRestore = "/restore"
 

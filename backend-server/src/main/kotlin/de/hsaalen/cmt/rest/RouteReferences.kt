@@ -5,7 +5,8 @@ import de.hsaalen.cmt.network.*
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientDeleteReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
-import de.hsaalen.cmt.repository.ReferencesRepository
+import de.hsaalen.cmt.network.dto.objects.UUID
+import de.hsaalen.cmt.repository.ReferenceRepository
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
@@ -41,9 +42,9 @@ fun Routing.routeReferences() = route("/" + RestPaths.base) {
         get("/upload") {
             call.respondText("Upload")
         }
-        get("/download/{uuid}") {
+        get("$apiPathDownload/{uuid}") {
             val uuid: String by call.parameters
-            val stream = call.injectRepository().downloadContent(uuid).byteInputStream()
+            val stream = call.injectRepository().downloadContent(UUID(uuid)).byteInputStream()
             call.response.header(HttpHeaders.ContentDisposition, "attachment")
             call.respondOutputStream {
                 stream.copyTo(this)
@@ -66,10 +67,10 @@ fun Routing.routeReferences() = route("/" + RestPaths.base) {
 }
 
 /**
- * Inject [ReferencesRepository] by reading the email from the JWT payload.
+ * Inject [ReferenceRepository] by reading the email from the JWT payload.
  */
-private fun ApplicationCall.injectRepository(): ReferencesRepository {
+private fun ApplicationCall.injectRepository(): ReferenceRepository {
     val userEmail = request.readJwtCookie().email
-    val repository: ReferencesRepository by inject { parametersOf(userEmail) }
+    val repository: ReferenceRepository by inject { parametersOf(userEmail) }
     return repository // Repository is created for specific user using dependency injection
 }

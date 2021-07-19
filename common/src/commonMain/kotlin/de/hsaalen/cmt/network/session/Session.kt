@@ -8,6 +8,7 @@ import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
 import de.hsaalen.cmt.network.dto.websocket.LiveDto
 import de.hsaalen.cmt.network.exceptions.ConnectException
 import de.hsaalen.cmt.network.requests.*
+import de.hsaalen.cmt.repository.DocumentRepository
 import de.hsaalen.cmt.utils.JsonHelper
 import io.ktor.client.features.websocket.*
 import io.ktor.http.cio.websocket.*
@@ -24,13 +25,18 @@ class Session(val userInfo: ServerUserInfoDto) :
     RequestListReferences,
     RequestCreateReference,
     RequestDeleteReference,
-    RequestDownload {
+    RequestDownload,
+    RequestLabel,
+    DocumentRepository {
 
     // True while the websocket is connected to the server
     var isConnected = true
         private set
 
-    private var webSocketSendingQueue = Channel<Frame>()
+    /**
+     * Queue for storing frames to be send to server over websocket.
+     */
+    var webSocketSendingQueue = Channel<Frame>()
 
     /**
      * Local logger instance for this specific user [Session].
@@ -92,8 +98,8 @@ class Session(val userInfo: ServerUserInfoDto) :
     /**
      * Send to text edit DTO to server and other clients.
      */
-    suspend fun liveTextEdit(dto: DocumentChangeDto) {
-        val jsonText = JsonHelper.encode(dto)
+    override suspend fun modifyDocument(request: DocumentChangeDto) {
+        val jsonText = JsonHelper.encode(request)
         webSocketSendingQueue.send(Frame.Text(jsonText))
     }
 
@@ -157,3 +163,4 @@ class Session(val userInfo: ServerUserInfoDto) :
     }
 
 }
+

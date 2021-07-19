@@ -1,16 +1,13 @@
 package de.hsaalen.cmt.mongo
 
-import com.mongodb.client.model.PushOptions
 import de.hsaalen.cmt.environment.MONGO_HOST
 import de.hsaalen.cmt.environment.MONGO_PASSWORD
 import de.hsaalen.cmt.environment.MONGO_PORT
 import de.hsaalen.cmt.environment.MONGO_USER
-import de.hsaalen.cmt.network.dto.objects.LineChangeMode.*
-import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
 import mu.KotlinLogging
-import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.coroutine
+import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.KMongo
 
 /**

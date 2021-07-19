@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.network.dto.websocket
 
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode
+import de.hsaalen.cmt.network.dto.objects.UUID
 import kotlinx.serialization.Serializable
 
 /**
@@ -8,7 +9,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class DocumentChangeDto(
-    val uuid: String,
+    val uuid: UUID,
     val lineNumber: Int,
     val lineContentEncrypted: String,
     val lineChangeMode: LineChangeMode,

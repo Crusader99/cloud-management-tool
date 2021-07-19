@@ -1,0 +1,27 @@
+package de.hsaalen.cmt.test
+
+import de.hsaalen.cmt.jwt.JwtCookie
+import de.hsaalen.cmt.jwt.JwtPayload
+import de.hsaalen.cmt.rest.module
+import io.ktor.http.*
+import io.ktor.server.testing.*
+
+/**
+ * Generate JWT token and pass as cookie header to authenticate in REST server.
+ */
+fun TestApplicationRequest.passAuthenticationHeader() {
+    val payload = JwtPayload("Simon Forschner", "simon@test.de")
+    val token = JwtCookie.generateToken(payload)
+    val header = JwtCookie.cookieName + "=$token"
+    addHeader(HttpHeaders.Cookie, header)
+    addHeader(HttpHeaders.XForwardedProto, "https")
+}
+
+/**
+ * Wrapper around the test application function to provide easier access.
+ */
+fun networkTest(test: TestApplicationEngine.() -> Unit) {
+    withTestApplication({ module() }) {
+        test()
+    }
+}

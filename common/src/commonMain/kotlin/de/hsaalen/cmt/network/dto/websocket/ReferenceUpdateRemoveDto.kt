@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.network.dto.websocket
 
+import de.hsaalen.cmt.network.dto.objects.UUID
 import kotlinx.serialization.Serializable
 
 /**
@@ -7,5 +8,5 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class ReferenceUpdateRemoveDto(
-    val uuid: String,
+    val uuid: UUID,
 ) : ReferenceUpdateDto()

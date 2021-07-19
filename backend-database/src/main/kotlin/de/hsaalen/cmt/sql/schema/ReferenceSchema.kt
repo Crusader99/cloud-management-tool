@@ -1,11 +1,11 @@
 package de.hsaalen.cmt.sql.schema
 
 import de.hsaalen.cmt.network.dto.objects.Reference
+import de.hsaalen.cmt.utils.toUUID
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.UUIDTable
-import org.jetbrains.exposed.sql.ReferenceOption
 import java.util.*
 
 /**
@@ -28,10 +28,14 @@ class ReferenceDao(id: EntityID<UUID>) : UUIDEntity(id) {
     var accessCode by ReferenceTable.accessCode
     var displayName by ReferenceTable.displayName
     var contentType by ReferenceTable.contentType
+    var labels by LabelDao via LabelRefMappingTable
 
-    fun toReference() : Reference{
+    /**
+     * Convert [ReferenceDao] to [Reference] instance to be transmitted oer network.
+     */
+    fun toReference(): Reference {
         val now = System.currentTimeMillis()
-        val labels = listOf("note") // TODO implement
-        return Reference(id.value.toString(), accessCode, displayName, contentType, now, now, labels)
+        val labels = labels.map { it.labelName }
+        return Reference(id.toUUID(), accessCode, displayName, contentType, now, now, labels)
     }
 }
