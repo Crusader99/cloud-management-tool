@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     id("org.jetbrains.dokka") // Generate API documentation from source code
+    id("io.gitlab.arturbosch.detekt") // Code quality analyze tool
 }
 
 android {
@@ -62,4 +63,12 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+}
+
+// Configure detekt code analyze tool to generate HTML report
+detekt {
+    ignoreFailures = true // Currently only print warning
+    reports {
+        html.enabled = true
+    }
 }

@@ -3,6 +3,7 @@ import java.time.Duration
 plugins {
     kotlin("js")
     id("org.jetbrains.dokka") // Generate API documentation from source code
+    id("io.gitlab.arturbosch.detekt") // Code quality analyze tool
 }
 
 // Simplify declaration of kotlin wrapper modules
@@ -49,5 +50,13 @@ kotlin {
                 }
             }
         }
+    }
+}
+
+// Configure detekt code analyze tool to generate HTML report
+detekt {
+    ignoreFailures = true // Currently only print warning
+    reports {
+        html.enabled = true
     }
 }

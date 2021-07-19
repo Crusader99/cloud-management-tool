@@ -9,12 +9,7 @@ plugins {
     kotlin("plugin.serialization")
     id("com.github.gelangweilte-studenten.gradle-docker-tests")
     id("org.jetbrains.dokka") // Generate API documentation from source code
-}
-
-configurations.all {
-    // Choose 'jvm' from disambiguating targets
-    val attr = Attribute.of("de.crusader.targetAttribute", String::class.java)
-    attributes.attribute(attr, "jvm")
+    id("io.gitlab.arturbosch.detekt") // Code quality analyze tool
 }
 
 dependencies {
@@ -40,7 +35,13 @@ dependencies {
 
     // JUnit test framework
     testImplementation(kotlin("test"))
-    testImplementation("io.mockk:mockk:1.11.0")
+    testImplementation("io.mockk:mockk:1.12.0")
+}
+
+configurations.all {
+    // Choose 'jvm' from disambiguating targets
+    val attr = Attribute.of("de.crusader.targetAttribute", String::class.java)
+    attributes.attribute(attr, "jvm")
 }
 
 val dockerPostgres by tasks.registering(DockerRunTask::class) {
@@ -82,4 +83,12 @@ tasks.test {
 
     useJUnitPlatform()
     timeout.set(Duration.ofSeconds(60L))
+}
+
+// Configure detekt code analyze tool to generate HTML report
+detekt {
+    ignoreFailures = true // Currently only print warning
+    reports {
+        html.enabled = true
+    }
 }

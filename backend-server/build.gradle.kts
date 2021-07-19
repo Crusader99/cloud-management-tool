@@ -5,7 +5,7 @@ plugins {
     kotlin("plugin.serialization")
     id("com.github.gelangweilte-studenten.gradle-docker-tests")
     id("org.jetbrains.dokka") // Generate API documentation from source code
-    //id("io.gitlab.arturbosch.detekt") // Code quality analyze tool TODO: enable when out-of-memory fixed
+    id("io.gitlab.arturbosch.detekt") // Code quality analyze tool
     application
 }
 
@@ -47,15 +47,8 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:1.6.1")
     testImplementation("de.crusader:webscraper-selenium:3.1.0")
     testImplementation("de.crusader:webscraper-htmlunit:3.1.0")
-    testImplementation("io.mockk:mockk:1.12.0")
-
-//    testImplementation("io.insert-koin:koin-test:3.1.2")
     testImplementation("io.insert-koin:koin-test-junit5:3.1.2")
-
-//    api("io.kotest:kotest-runner-junit5:4.6.1")
-//    api("org.junit.jupiter:junit-jupiter-api:5.7.1")
-//    api("org.junit.jupiter:junit-jupiter-params:5.7.1")
-//    runtimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.1")
+    testImplementation("io.mockk:mockk:1.12.0")
 }
 
 tasks.test {
@@ -64,18 +57,9 @@ tasks.test {
 }
 
 // Configure detekt code analyze tool to generate HTML report
-//detekt {
-//    ignoreFailures = true // Currently only print warning
-//    reports {
-//        html.enabled = true
-//    }
-//}
-//
-// The detekt analyze plugin caused out-of-memory in GitHub Actions.
-// This is a workaround to disable detekt directly on build.
-// (For mor information see https://github.com/detekt/detekt/issues/1894)
-//tasks.getByName("check") {
-//    this.setDependsOn(this.dependsOn.filterNot {
-//        it is TaskProvider<*> && it.name == "detekt"
-//    })
-//}
+detekt {
+    ignoreFailures = true // Currently only print warning
+    reports {
+        html.enabled = true
+    }
+}
