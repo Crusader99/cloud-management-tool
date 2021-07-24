@@ -1,11 +1,13 @@
 package de.hsaalen.cmt.repository
 
 import de.hsaalen.cmt.crypto.hashSHA256
+import de.hsaalen.cmt.environment.DEFAULT_CREDENTIAL_VALUE
 import de.hsaalen.cmt.environment.PASSWORD_SALT
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.sql.schema.UserDao
 import de.hsaalen.cmt.sql.schema.UserTable
 import de.hsaalen.cmt.utils.validateEmailAndThrow
+import mu.KotlinLogging
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.joda.time.DateTime
@@ -14,6 +16,11 @@ import org.joda.time.DateTime
  * Repository layer for providing user authentication functionality.
  */
 internal object AuthenticationRepositoryImpl : AuthenticationRepository {
+
+    /**
+     * Local logger instance for this class.
+     */
+    private val logger = KotlinLogging.logger { }
 
     /**
      * Handles register request and provides a ServerUserInfoDto when successfully logged in or throws an exception when
@@ -93,6 +100,10 @@ internal object AuthenticationRepositoryImpl : AuthenticationRepository {
      * Salt and hash the given password parameter.
      */
     private fun hashPassword(password: String): String {
+        if (PASSWORD_SALT == DEFAULT_CREDENTIAL_VALUE) {
+            logger.warn("Please configure a unique salt for password storage via system environment variables!")
+        }
+
         // Salt password with system environment variable
         val saltedPassword = password + PASSWORD_SALT
 

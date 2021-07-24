@@ -10,10 +10,10 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.mockk.coEvery
 import io.mockk.mockkObject
-import org.junit.jupiter.api.Test
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import kotlin.test.assertEquals
+import kotlin.test.Test
 
 /**
  * Tests that use the ktor REST API directly to ensure communication is working.

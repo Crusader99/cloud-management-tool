@@ -3,6 +3,7 @@ package de.hsaalen.cmt.session.jwt
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
+import de.hsaalen.cmt.environment.DEFAULT_CREDENTIAL_VALUE
 import de.hsaalen.cmt.environment.JWT_HMAC512_SECRET_KEY
 import de.hsaalen.cmt.environment.JWT_ISSUER
 import de.hsaalen.cmt.environment.JWT_MAX_AGE_MS
@@ -11,6 +12,7 @@ import io.ktor.auth.*
 import io.ktor.auth.jwt.*
 import io.ktor.request.*
 import io.ktor.response.*
+import mu.KotlinLogging
 import java.util.*
 
 /**
@@ -37,6 +39,17 @@ object JwtCookie {
      * Verifier that validates JWT tokens and allows extracting payload.
      */
     val verifier: JWTVerifier = JWT.require(algorithm).withIssuer(JWT_ISSUER).build()
+
+    /**
+     * Local logger instance for this class.
+     */
+    private val logger = KotlinLogging.logger { }
+
+    init {
+        if (JWT_HMAC512_SECRET_KEY == DEFAULT_CREDENTIAL_VALUE) {
+            logger.warn("Please configure a secure secret key for JWT via system environment variables!")
+        }
+    }
 
     /**
      * Verify JWT token and extract [JwtPayload].

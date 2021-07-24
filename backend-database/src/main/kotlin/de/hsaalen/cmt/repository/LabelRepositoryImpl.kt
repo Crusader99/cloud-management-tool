@@ -42,7 +42,7 @@ internal object LabelRepositoryImpl : LabelRepository {
                 }
             }
         } catch (ex: Exception) {
-            throw IllegalStateException("Can not add label to reference")
+            throw IllegalStateException("Can not add label to reference", ex)
         }
 
         // Call event handlers

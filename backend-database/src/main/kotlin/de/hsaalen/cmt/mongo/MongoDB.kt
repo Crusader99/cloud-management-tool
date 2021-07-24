@@ -1,9 +1,6 @@
 package de.hsaalen.cmt.mongo
 
-import de.hsaalen.cmt.environment.MONGO_HOST
-import de.hsaalen.cmt.environment.MONGO_PASSWORD
-import de.hsaalen.cmt.environment.MONGO_PORT
-import de.hsaalen.cmt.environment.MONGO_USER
+import de.hsaalen.cmt.environment.*
 import mu.KotlinLogging
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.coroutine
@@ -28,6 +25,10 @@ internal object MongoDB {
      * Configure postgresql driver with system environment variables and test connection.
      */
     fun configure() {
+        if (MONGO_PASSWORD == DEFAULT_CREDENTIAL_VALUE) {
+            logger.warn("Please configure a secure password for mariadb via system environment variables!")
+        }
+
         val url = "mongodb://$MONGO_USER:$MONGO_PASSWORD@$MONGO_HOST:$MONGO_PORT"
         logger.info("Connecting to $url")
         val client = KMongo.createClient(url).coroutine
@@ -68,6 +69,6 @@ internal object MongoDB {
     private suspend fun findDocument(uuid: String): TextDocument {
         return collection
             ?.findOne(TextDocument::uuid eq uuid)
-            ?: throw IllegalStateException("Could not find text document with uuid '$uuid' in mongo-db!")
+            ?: error("Could not find text document with uuid '$uuid' in mongo-db!")
     }
 }

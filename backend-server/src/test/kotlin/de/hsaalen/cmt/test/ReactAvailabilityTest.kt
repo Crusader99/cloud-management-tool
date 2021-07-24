@@ -25,7 +25,7 @@ class ReactAvailabilityTest {
     fun setupWebServer() {
         val webFolder = File("../web-app/build/artifact-js")
         if (!webFolder.exists()) {
-            throw IllegalStateException("Please build web-app first to run test. Not found: " + webFolder.canonicalPath)
+            error("Please build web-app first to run test. Not found: " + webFolder.canonicalPath)
         }
         webServer = embeddedServer(CIO, freeHostSystemPort) {
             routing {

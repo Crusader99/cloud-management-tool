@@ -23,6 +23,10 @@ internal object Postgresql {
      * Configure postgresql driver with system environment variables and test connection.
      */
     fun configure() {
+        if (POSTGRESQL_PASSWORD == DEFAULT_CREDENTIAL_VALUE) {
+            logger.warn("Please configure a secure password for postgresql via system environment variables!")
+        }
+
         val url = "jdbc:postgresql://$POSTGRESQL_HOST:$POSTGRESQL_PORT/$POSTGRESQL_DB"
         val driverClass = "org.postgresql.Driver"
         logger.info("Connecting to postgresql using $url")

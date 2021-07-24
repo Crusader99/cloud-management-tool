@@ -13,6 +13,11 @@ private val logger = KotlinLogging.logger { }.apply {
 }
 
 /**
+ * The default value for user name and password when not configured over sy
+ */
+const val DEFAULT_CREDENTIAL_VALUE = "admin"
+
+/**
  * Port to be used for REST API server.
  */
 val REST_PORT = envOrDefault("REST_PORT", 80).toInt()
@@ -25,7 +30,7 @@ val JWT_ISSUER = envOrDefault("JWT_ISSUER", "CloudTool")
 /**
  * Name of JWT token issuer.
  */
-val JWT_HMAC512_SECRET_KEY = envOrDefault("JWT_HMAC512_SECRET_KEY", "A secret key")
+val JWT_HMAC512_SECRET_KEY = envOrDefault("JWT_HMAC512_SECRET_KEY", DEFAULT_CREDENTIAL_VALUE)
 
 /**
  * Maximum age of JWT before token expires in milliseconds. Default is 14 days.
@@ -35,7 +40,7 @@ val JWT_MAX_AGE_MS = envOrDefault("JWT_MAX_AGE_MS", 14 * 24 * 60 * 60 * 1000L).t
 /**
  * Hash passwords with this salt before storing in SQL database.
  */
-val PASSWORD_SALT = env("PASSWORD_SALT")
+val PASSWORD_SALT = envOrDefault("PASSWORD_SALT", "salt")
 
 /**
  * Host address of the postgres SQL connection.
@@ -50,12 +55,12 @@ val POSTGRESQL_PORT = envOrDefault("POSTGRESQL_PORT", 5432).toInt()
 /**
  * User name for postgres SQL authorization.
  */
-val POSTGRESQL_USER = envOrDefault("POSTGRESQL_USER", "admin")
+val POSTGRESQL_USER = envOrDefault("POSTGRESQL_USER", DEFAULT_CREDENTIAL_VALUE)
 
 /**
  * User password for postgres SQL authentication.
  */
-val POSTGRESQL_PASSWORD = env("POSTGRESQL_PASSWORD")
+val POSTGRESQL_PASSWORD = envOrDefault("POSTGRESQL_PASSWORD", DEFAULT_CREDENTIAL_VALUE)
 
 /**
  * Database name for postgres SQL authorization.
@@ -75,12 +80,12 @@ val MONGO_PORT = envOrDefault("MONGO_PORT", 27017).toInt()
 /**
  * User name for mongo database authorization.
  */
-val MONGO_USER = envOrDefault("MONGO_USER", "admin")
+val MONGO_USER = envOrDefault("MONGO_USER", DEFAULT_CREDENTIAL_VALUE)
 
 /**
  * User name for mongo database authentication.
  */
-val MONGO_PASSWORD = env("MONGO_PASSWORD")
+val MONGO_PASSWORD = envOrDefault("MONGO_PASSWORD", DEFAULT_CREDENTIAL_VALUE)
 
 /**
  * Reads a system environment variable or throws an exception when not available.
