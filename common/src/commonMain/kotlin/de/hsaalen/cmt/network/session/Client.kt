@@ -1,9 +1,13 @@
 package de.hsaalen.cmt.network.session
 
+import de.hsaalen.cmt.events.GlobalEventDispatcher
 import de.hsaalen.cmt.network.dto.server.ServerErrorDto
+import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
+import de.hsaalen.cmt.network.dto.websocket.LiveDto
 import de.hsaalen.cmt.network.exceptions.ConnectException
 import de.hsaalen.cmt.network.exceptions.ServerException
 import de.hsaalen.cmt.network.exceptions.UnauthorizedException
+import de.hsaalen.cmt.utils.decodeProtobufData
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.features.*
@@ -13,6 +17,13 @@ import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.rsocket.kotlin.RSocketRequestHandler
+import io.rsocket.kotlin.core.RSocketConnector
+import io.rsocket.kotlin.keepalive.KeepAlive
+import io.rsocket.kotlin.payload.PayloadMimeType
+import io.rsocket.kotlin.payload.buildPayload
+import io.rsocket.kotlin.payload.data
+import io.rsocket.kotlin.transport.ktor.client.RSocketSupport
 import kotlinx.coroutines.withTimeout
 import mu.KotlinLogging
 
@@ -22,19 +33,58 @@ import mu.KotlinLogging
 internal object Client {
 
     /**
-     * Actual network client from ktor with multi platform support.
-     */
-    val instance = HttpClient {
-        install(JsonFeature) {
-            serializer = KotlinxSerializer()
-        }
-        install(WebSockets)
-    }
-
-    /**
      * Logging instance for this class.
      */
     private val logger = KotlinLogging.logger("network-client")
+
+    /**
+     * Actual network client from ktor with multi platform support.
+     */
+    val instance: HttpClient = configure()
+
+    /**
+     * Allow reconfiguring the client for a specific user info to provide correct JWT token.
+     */
+    fun configure(userInfo: ServerUserInfoDto? = null) = HttpClient {
+        install(JsonFeature) {
+            serializer = KotlinxSerializer()
+        }
+        if (userInfo != null) { // Only enable rSocket support when user info provided
+            install(WebSockets) // Required to use rSocket over websocket
+            install(RSocketSupport) {
+                connector = RSocketConnector {
+                    // Configure rSocket connector (all values have defaults)
+                    connectionConfig {
+                        keepAlive = KeepAlive(
+                            intervalMillis = 5_000,
+                            maxLifetimeMillis = 25_000
+                        )
+
+                        // Payload for setup frame
+                        setupPayload { buildPayload { data(userInfo.jwtToken) } }
+
+                        // Mime types
+                        payloadMimeType = PayloadMimeType(
+                            data = "application/json",
+                            metadata = "application/json"
+                        )
+                    }
+
+                    // Acceptor for server requests
+                    acceptor {
+                        RSocketRequestHandler {
+                            fireAndForget { payload ->
+                                println("# Received fire and forgot")
+                                val dto: LiveDto = payload.decodeProtobufData()
+                                GlobalEventDispatcher.notify(dto)
+                            }
+                            requestResponse { it } //echo request payload
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Network request method for all types of HTTP requests. This function handles functionality that is used in

@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.rest
+package de.hsaalen.cmt.rest.routes
 
 import de.hsaalen.cmt.network.*
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto

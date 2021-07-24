@@ -50,7 +50,7 @@ class EditorEngine(
         lines[lineNumber] = Line(newContent)
     }
 
-   override fun addLine(lineNumber: Int, lineContent: String) {
+    override fun addLine(lineNumber: Int, lineContent: String) {
         lines.add(lineNumber, Line(lineContent))
 //        if (cursor.y >= lineNumber) { // TODO: enable for other cursors
 //            cursor.move(EnumDirection.DOWN, 1)

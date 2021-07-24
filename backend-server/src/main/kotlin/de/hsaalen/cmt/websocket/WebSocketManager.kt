@@ -1,8 +1,10 @@
 package de.hsaalen.cmt.websocket
 
 import de.hsaalen.cmt.network.dto.websocket.LiveDto
-import de.hsaalen.cmt.utils.JsonHelper
-import io.ktor.http.cio.websocket.*
+import de.hsaalen.cmt.utils.SerializeHelper
+import de.hsaalen.cmt.utils.protobufData
+import io.rsocket.kotlin.payload.Payload
+import io.rsocket.kotlin.payload.buildPayload
 import mu.KotlinLogging
 
 /**
@@ -24,10 +26,9 @@ object WebSocketManager {
      * Broadcast a DTO to all web-socket clients except to the (own) client.
      */
     suspend fun broadcastExcept(excludeSocketId: String, dto: LiveDto) {
-        val jsonText = JsonHelper.encode(dto)
-        logger.trace("send: $jsonText")
+        val payload = dto.toPayload()
         for (others in connections.filter { it.socketId != excludeSocketId }) {
-            others.outgoing.send(Frame.Text(jsonText))
+            others.fireAndForget(payload)
         }
     }
 
@@ -35,11 +36,29 @@ object WebSocketManager {
      * Broadcast a DTO to all web-socket clients.
      */
     suspend fun broadcast(dto: LiveDto) {
-        val jsonText = JsonHelper.encode(dto)
-        logger.trace("send: $jsonText")
+        val payload = dto.toPayload()
         for (others in connections) {
-            others.outgoing.send(Frame.Text(jsonText))
+            others.fireAndForget(payload)
         }
     }
 
+    /**
+     * Disconnect all clients with related JWT token.
+     */
+    suspend fun disconnect(withJwtToken: String) {
+        for (others in connections.filter { it.jwtToken == withJwtToken }) {
+            others.disconnect()
+        }
+    }
+
+    /**
+     * Convert LiveDto to payload that can be used for rSocket transmission.
+     */
+    private fun LiveDto.toPayload(): Payload {
+        logger.debug("broadcast: " + this::class.simpleName)
+        logger.debug(SerializeHelper.encodeJson(this))
+        return buildPayload {
+            protobufData(this@toPayload)
+        }
+    }
 }

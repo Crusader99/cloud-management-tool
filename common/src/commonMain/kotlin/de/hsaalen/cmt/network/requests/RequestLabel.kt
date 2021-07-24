@@ -7,9 +7,7 @@ import de.hsaalen.cmt.network.dto.websocket.LabelUpdateDto
 import de.hsaalen.cmt.network.session.Client
 import de.hsaalen.cmt.network.session.Session
 import de.hsaalen.cmt.repository.LabelRepository
-import de.hsaalen.cmt.utils.JsonHelper
 import io.ktor.http.*
-import io.ktor.http.cio.websocket.*
 
 /**
  * Provides access to server side label functionality.
@@ -21,8 +19,7 @@ internal interface RequestLabel : Request, LabelRepository {
      */
     override suspend fun addLabel(reference: UUID, labelName: String) {
         val dto = LabelUpdateDto(reference, labelName, LabelChangeMode.ADD)
-        val jsonText = JsonHelper.encode(dto)
-        Session.instance?.webSocketSendingQueue?.send(Frame.Text(jsonText))
+        Session.instance?.sendLiveDTO(dto)
     }
 
     /**
@@ -30,8 +27,7 @@ internal interface RequestLabel : Request, LabelRepository {
      */
     override suspend fun removeLabel(reference: UUID, labelName: String) {
         val dto = LabelUpdateDto(reference, labelName, LabelChangeMode.DELETE)
-        val jsonText = JsonHelper.encode(dto)
-        Session.instance?.webSocketSendingQueue?.send(Frame.Text(jsonText))
+        Session.instance?.sendLiveDTO(dto)
     }
 
     /**

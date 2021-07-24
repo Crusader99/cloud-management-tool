@@ -1,7 +1,5 @@
 package de.hsaalen.cmt.events
 
-import de.hsaalen.cmt.network.dto.websocket.LiveDto
-
 /**
  * Represent a listener when any specific event as data parameter.
  */

@@ -5,7 +5,7 @@ package de.hsaalen.cmt.components.documenteditor
  */
 interface Engine {
 
-    var text : String
+    var text: String
 
     fun modifyLine(lineNumber: Int, newContent: String)
 

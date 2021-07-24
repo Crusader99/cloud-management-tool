@@ -1,5 +1,6 @@
-package de.hsaalen.cmt.rest
+package de.hsaalen.cmt.rest.routes
 
+import de.hsaalen.cmt.rest.RestServer
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.routing.*

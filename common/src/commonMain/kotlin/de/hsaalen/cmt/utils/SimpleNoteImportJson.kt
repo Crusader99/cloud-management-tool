@@ -16,7 +16,7 @@ data class SimpleNoteImportJson(
          * Import data from simplenote json format.
          */
         fun import(json: String): List<ClientCreateReferenceDto> {
-            val data: SimpleNoteImportJson = JsonHelper.decode(json)
+            val data: SimpleNoteImportJson = SerializeHelper.decodeJson(json)
             return data.activeNotes.map { note ->
                 ClientCreateReferenceDto(note.title, content = note.content, labels = note.tags)
             }

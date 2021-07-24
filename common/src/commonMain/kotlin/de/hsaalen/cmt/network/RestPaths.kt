@@ -37,4 +37,4 @@ const val apiPathAuthLogout = "/logout"
 
 const val apiPathAuthRegister = "/register"
 
-const val apiPathWebSocket = "/websocket"
+const val apiPathRSocket = "/rsocket"

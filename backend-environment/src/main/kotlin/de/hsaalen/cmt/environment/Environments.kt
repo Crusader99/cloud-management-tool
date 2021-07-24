@@ -18,6 +18,21 @@ private val logger = KotlinLogging.logger { }.apply {
 val REST_PORT = envOrDefault("REST_PORT", 80).toInt()
 
 /**
+ * Name of JWT token issuer.
+ */
+val JWT_ISSUER = envOrDefault("JWT_ISSUER", "CloudTool")
+
+/**
+ * Name of JWT token issuer.
+ */
+val JWT_HMAC512_SECRET_KEY = envOrDefault("JWT_HMAC512_SECRET_KEY", "A secret key")
+
+/**
+ * Maximum age of JWT before token expires in milliseconds. Default is 14 days.
+ */
+val JWT_MAX_AGE_MS = envOrDefault("JWT_MAX_AGE_MS", 14 * 24 * 60 * 60 * 1000L).toLong()
+
+/**
  * Hash passwords with this salt before storing in SQL database.
  */
 val PASSWORD_SALT = env("PASSWORD_SALT")
@@ -71,7 +86,7 @@ val MONGO_PASSWORD = env("MONGO_PASSWORD")
  * Reads a system environment variable or throws an exception when not available.
  */
 private fun env(environmentName: String) = envOrNull(environmentName)
-    ?: throw IllegalStateException("Environment variable '$environmentName' has to be provided")
+    ?: error("Environment variable '$environmentName' has to be provided")
 
 /**
  * Reads a system environment variable or returns null when not available.

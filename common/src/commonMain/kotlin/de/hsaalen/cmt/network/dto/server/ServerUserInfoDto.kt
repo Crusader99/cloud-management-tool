@@ -8,5 +8,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ServerUserInfoDto(
     val fullName: String,
-    val email: String
+    val email: String,
+    var jwtToken: String = "", // Will be injected before sending over network
 ) : ServerDto

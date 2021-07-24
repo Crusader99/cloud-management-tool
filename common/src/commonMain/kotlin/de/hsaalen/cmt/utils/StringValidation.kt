@@ -48,7 +48,7 @@ fun String.validateEmailAndGetError(): String? {
 fun String.validateFullNameAndGetError(): String? {
     if (length < 2) {
         return "Name too short"
-    }else   if (length > 40) {
+    } else if (length > 40) {
         return "Name too long"
     }
     return null
