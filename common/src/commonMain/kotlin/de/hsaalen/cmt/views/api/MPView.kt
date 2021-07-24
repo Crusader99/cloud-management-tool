@@ -1,10 +1,10 @@
 package de.hsaalen.cmt.views.api
 
+import de.crusader.objects.Rectangle
+import de.crusader.painter.Painter
 import de.hsaalen.cmt.views.events.MPKeyboardEvent
 import de.hsaalen.cmt.views.events.MPMouseEvent
 import de.hsaalen.cmt.views.events.MPWheelEvent
-import de.crusader.objects.Rectangle
-import de.crusader.painter.Painter
 
 abstract class MPView {
 
@@ -36,7 +36,7 @@ abstract class MPView {
             rectangle = rectangle.height(value)
         }
 
-    open fun onRepaint(p: Painter){}
+    open fun onRepaint(p: Painter) {}
 
     open fun onMouseMove(e: MPMouseEvent) {}
 

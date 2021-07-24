@@ -32,8 +32,11 @@ class Session(val userInfo: ServerUserInfoDto) :
      * True while the websocket is connected to the server.
      */
     val isConnected
-        get() = rSocket != null
+        get() = rSocket != null && rSocket?.job?.isActive == true
 
+    /**
+     * Session related http client for RSocket request.
+     */
     private var client: HttpClient = Client.configure(userInfo)
 
     /**
@@ -85,8 +88,13 @@ class Session(val userInfo: ServerUserInfoDto) :
      * Disconnect the websocket from server
      */
     suspend fun logout() {
-        rSocket = null
+        if (instance == null) {
+            // Ignore because already session cancelled
+            // This can't cause any concurrent issues due to single-context suspend function
+            return
+        }
         instance = null
+        rSocket = null
         try {
             RequestAuthentication.logout()
         } catch (t: Throwable) {

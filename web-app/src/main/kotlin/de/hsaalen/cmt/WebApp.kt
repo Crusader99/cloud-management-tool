@@ -29,6 +29,7 @@ import mu.KotlinLogging
 import org.w3c.dom.events.Event
 import react.*
 import react.dom.header
+import kotlin.coroutines.coroutineContext
 
 /**
  * React properties of the [WebApp] component.
@@ -88,6 +89,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                     page = if (restoredSession) EnumPageType.OVERVIEW else EnumPageType.AUTHENTICATION
                     isLoading = false
                 }
+                launch { runKeepAliveJob() }
             } catch (ex: ConnectException) {
                 delay(2000)
                 setState {
@@ -211,23 +213,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                 launch {
                     refSnackBar.current?.show("Successfully logged in!", MAlertSeverity.success)
                 }
-                launch {
-                    try {
-                        while (isActive) {
-                            val client = Session.instance ?: break
-                            check(client.isConnected) { "Disconnect from server" }
-                            delay(1000)
-                        }
-                    } catch (t: Throwable) {
-                        if (Session.instance != null) {
-                            setState {
-                                page = EnumPageType.UNAVAILABLE
-                            }
-                            val errorMessage = t.message ?: "Unknown error occurred"
-                            refSnackBar.current?.show(errorMessage, MAlertSeverity.warning)
-                        }
-                    }
-                }
+                launch { runKeepAliveJob() }
             } catch (ex: Throwable) {
                 val failMessage = "Login failed: " + ex.message
                 logger.warn { failMessage }
@@ -237,6 +223,31 @@ class WebApp : RComponent<RProps, WebAppState>() {
                 coroutines.launch {
                     refSnackBar.current?.show(failMessage, MAlertSeverity.error)
                 }
+            }
+        }
+    }
+
+    /**
+     * Suspending function that checks working connection with backend.
+     * Shows backend-unavailable page when connection broken.
+     */
+    private suspend fun runKeepAliveJob() {
+        try {
+            logger.debug { "Started keep-alive job" }
+            while (coroutineContext.isActive) {
+                val client = Session.instance ?: break
+                check(client.isConnected) { "Disconnected from server" }
+                delay(1000)
+            }
+            logger.debug { "Job no longer active. Logged out?" }
+        } catch (t: Throwable) {
+            val errorMessage = t.message ?: "Unknown error occurred"
+            logger.info(t) { "Backend seems to be unavailable: $errorMessage" }
+            if (Session.instance != null) {
+                setState {
+                    page = EnumPageType.UNAVAILABLE
+                }
+                refSnackBar.current?.show(errorMessage, MAlertSeverity.warning)
             }
         }
     }
