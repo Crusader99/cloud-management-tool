@@ -13,11 +13,13 @@ import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateAddDto
 import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateRemoveDto
 import de.hsaalen.cmt.session.currentSession
 import de.hsaalen.cmt.sql.schema.ReferenceDao
+import de.hsaalen.cmt.sql.schema.ReferenceTable
 import de.hsaalen.cmt.sql.schema.RevisionDao
 import de.hsaalen.cmt.sql.schema.UserDao
 import de.hsaalen.cmt.storage.StorageS3
 import de.hsaalen.cmt.utils.id
 import de.hsaalen.cmt.utils.toUUID
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.joda.time.DateTime
 
@@ -94,8 +96,8 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
      */
     override suspend fun listReferences(query: ClientReferenceQueryDto): ServerReferenceListDto {
         val refs = newSuspendedTransaction {
-            // TODO: filter only files that user owns
-            ReferenceDao.all().map { it.toReference() }
+            val creator = UserDao.findUserByEmail(userEmail)
+            ReferenceDao.find(ReferenceTable.owner eq creator.id).map { it.toReference() }
         }
         return ServerReferenceListDto(refs)
     }
@@ -110,6 +112,10 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
         // Delete reference from SQL database
         newSuspendedTransaction {
             val ref = ReferenceDao.findById(uuid.id) ?: error("No reference with uuid=$uuid found!")
+            if (ref.owner.email != userEmail) {
+                throw SecurityException("Can not delete references from different users!")
+            }
+
             contentType = ref.contentType
             ref.delete()
         }

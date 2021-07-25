@@ -14,6 +14,7 @@ internal object FileRepositoryImpl : FileRepository {
      * Download the reference content by a specific [UUID].
      */
     override suspend fun download(uuid: UUID, contentStream: SendChannel<ByteArray>) {
+        // TODO: Ensure user has edit permissions for that file
         StorageS3.downloadFile(uuid).buffered().use { inputStream ->
             // TODO: implement
 //            contentStream.send(inputStream.read)
@@ -24,7 +25,8 @@ internal object FileRepositoryImpl : FileRepository {
      * Upload or overwrite the reference content by a specific [UUID].
      */
     override suspend fun upload(uuid: UUID, contentStream: ReceiveChannel<ByteArray>, contentLength: Long) {
-        // TODO: implement
+        // TODO: Ensure user has edit permissions for that file
+        // TODO: implement download
 //        StorageS3.uploadFile(uuid)
     }
 

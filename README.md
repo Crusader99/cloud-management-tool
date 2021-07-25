@@ -35,9 +35,9 @@ for testing proposes.
 
 ## Databases:
 
-* [PostgreSQL](https://www.postgresql.org/) for user management and tags/labels
-* [MongoDB](https://www.mongodb.com/) for encrypted notes to allow update only one line
-* Amazon S3 compatible container used as storage for encrypted files
+* [PostgreSQL](https://www.postgresql.org) for user management and references / labels
+* [MongoDB](https://www.mongodb.com) for encrypted notes to allow updating only a single line
+* [Minio](https://min.io) Amazon S3 compatible container as storage for encrypted files
 
 ## Platforms:
 
@@ -73,8 +73,8 @@ for testing proposes.
 * [x] Implement live sync for document edit
 * [x] Implement text editor in frontend
 * [x] Allow offline access in Android app
-* [ ] Implement file upload / download
-* [ ] Encrypt files and documents
+* [x] Implement file upload / download
+* [x] Encrypt files and documents
 * [ ] ...
 * [x] Configure Grafana & Prometheus
 * [x] Provide statistics with Ktor: /metrics

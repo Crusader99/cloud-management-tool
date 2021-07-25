@@ -7,6 +7,7 @@ import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.UUIDTable
+import org.jetbrains.exposed.sql.ReferenceOption
 import java.util.*
 
 /**
@@ -16,6 +17,7 @@ object ReferenceTable : UUIDTable("reference") {
     val accessCode = varchar("access_code", 32) //.uniqueIndex()
     val displayName = varchar("display_name", 512)
     val contentType = enumeration("content_type", ContentType::class)
+    val owner = reference("owner", UserTable, onDelete = ReferenceOption.CASCADE)
     // val latestRevision = reference("latest_revision", RevisionTable, onDelete = ReferenceOption.RESTRICT)
     // TODO fix initialization problem
 }
@@ -29,6 +31,7 @@ class ReferenceDao(id: EntityID<UUID>) : UUIDEntity(id) {
     var accessCode by ReferenceTable.accessCode
     var displayName by ReferenceTable.displayName
     var contentType by ReferenceTable.contentType
+    var owner by UserDao referencedOn LabelTable.owner
     var labels by LabelDao via LabelRefMappingTable
 
     /**
