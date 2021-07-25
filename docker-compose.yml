@@ -19,6 +19,9 @@ services:
       MONGO_HOST: mongodb
       MONGO_USER: ${MONGO_USER}
       MONGO_PASSWORD: ${MONGO_PASSWORD}
+      S3_ENDPOINT: http://file-storage:9000
+      S3_USER: ${S3_USER}
+      S3_PASSWORD: ${S3_PASSWORD}
       JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8686
   postgres:
     image: postgres:13.3-alpine
@@ -29,6 +32,9 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+  redis:
+    image: redis
+    restart: always
   mongodb: # For encrypted text documents to allow update only one line
     image: mongo:4.4
     restart: always
@@ -49,8 +55,8 @@ services:
     restart: always
     command: server /data
     environment:
-      MINIO_ROOT_USER: ${MINIO_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+      MINIO_ROOT_USER: ${S3_USER}
+      MINIO_ROOT_PASSWORD: ${S3_PASSWORD}
     expose:
       - 9000
     volumes:

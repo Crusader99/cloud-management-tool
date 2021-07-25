@@ -31,7 +31,7 @@ class ReferenceDao(id: EntityID<UUID>) : UUIDEntity(id) {
     var accessCode by ReferenceTable.accessCode
     var displayName by ReferenceTable.displayName
     var contentType by ReferenceTable.contentType
-    var owner by UserDao referencedOn LabelTable.owner
+    var owner by UserDao referencedOn ReferenceTable.owner
     var labels by LabelDao via LabelRefMappingTable
 
     /**

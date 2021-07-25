@@ -46,6 +46,7 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
                 this.accessCode = "ACCESS_CODE"
                 this.displayName = request.displayName
                 this.contentType = request.contentType
+                this.owner = creator
             }
             val revision = RevisionDao.new {
                 this.item = reference
