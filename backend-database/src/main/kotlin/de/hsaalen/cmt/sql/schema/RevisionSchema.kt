@@ -17,7 +17,6 @@ object RevisionTable : UUIDTable("revision") {
 
     val dateCreation = datetime("date_creation")
     val dateLastAccess = datetime("date_last_access")
-    val comment = varchar("comment", 256)
     val creator = reference("creator", UserTable)
     val accessCount = long("access_count")
 }
@@ -33,7 +32,6 @@ class RevisionDao(id: EntityID<UUID>) : UUIDEntity(id) {
 
     var dateCreation by RevisionTable.dateCreation
     var dateLastAccess by RevisionTable.dateLastAccess
-    var comment by RevisionTable.comment
     var creator by UserDao referencedOn RevisionTable.creator
     var accessCount by RevisionTable.accessCount
 

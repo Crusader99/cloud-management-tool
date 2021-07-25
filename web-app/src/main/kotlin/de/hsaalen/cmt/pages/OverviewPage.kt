@@ -83,7 +83,7 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
      */
     private fun onItemDownload(ref: Reference) {
         coroutines.launch {
-            val content = Session.instance?.download(ref.uuid)
+            val content = Session.instance?.downloadContent(ref.uuid)
             if (content == null) {
                 window.alert("Content not available. Check server connection.")
             } else {

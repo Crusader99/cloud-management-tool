@@ -25,6 +25,13 @@ interface ReferenceRepository {
     suspend fun createReference(request: ClientCreateReferenceDto): Reference
 
     /**
+     * Request repository to create a new reference.
+     */
+    suspend fun createReference(displayName: String, documentContent: String = "") {
+        createReference(ClientCreateReferenceDto(displayName, content = documentContent))
+    }
+
+    /**
      * Request repository to delete a reference by the reference object.
      */
     suspend fun deleteReference(reference: Reference) = deleteReference(reference.uuid)

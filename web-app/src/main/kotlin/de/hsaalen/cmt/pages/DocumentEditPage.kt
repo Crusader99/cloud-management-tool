@@ -58,7 +58,7 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
      */
     override fun DocumentEditPageState.init() {
         coroutines.launch {
-            val text = Session.instance?.download(props.reference.uuid) ?: return@launch
+            val text = Session.instance?.downloadContent(props.reference.uuid) ?: return@launch
             diffCalculator.setText(text)
             engine.text = text
             setState {
@@ -126,7 +126,7 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
             return
         }
         println("Received text change: $dto")
-        val lineContentDecrypted = dto.lineContentEncrypted
+        val lineContentDecrypted = dto.lineContent
         when (dto.lineChangeMode) {
             LineChangeMode.MODIFY -> engine.modifyLine(dto.lineNumber, lineContentDecrypted)
             LineChangeMode.ADD -> engine.addLine(dto.lineNumber, lineContentDecrypted)

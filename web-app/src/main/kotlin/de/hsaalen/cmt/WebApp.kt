@@ -241,12 +241,12 @@ class WebApp : RComponent<RProps, WebAppState>() {
             }
             logger.debug { "Job no longer active. Logged out?" }
         } catch (t: Throwable) {
-            val errorMessage = t.message ?: "Unknown error occurred"
-            logger.info(t) { "Backend seems to be unavailable: $errorMessage" }
-            if (Session.instance != null) {
+            if (Session.instance != null && state.page.isLoggedIn) {
                 setState {
                     page = EnumPageType.UNAVAILABLE
                 }
+                val errorMessage = t.message ?: "Unknown error occurred"
+                logger.info(t) { "Backend seems to be unavailable: $errorMessage" }
                 refSnackBar.current?.show(errorMessage, MAlertSeverity.warning)
             }
         }

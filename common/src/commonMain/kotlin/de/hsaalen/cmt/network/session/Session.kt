@@ -1,13 +1,16 @@
 package de.hsaalen.cmt.network.session
 
+import com.soywiz.krypto.encoding.fromBase64
 import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.apiPathRSocket
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
-import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
 import de.hsaalen.cmt.network.dto.websocket.LiveDto
 import de.hsaalen.cmt.network.exceptions.ConnectException
-import de.hsaalen.cmt.network.requests.*
-import de.hsaalen.cmt.repository.DocumentRepository
+import de.hsaalen.cmt.network.requests.AuthenticationRepositoryImpl
+import de.hsaalen.cmt.network.requests.DocumentRepositoryImpl
+import de.hsaalen.cmt.network.requests.LabelRepositoryImpl
+import de.hsaalen.cmt.network.requests.ReferenceRepositoryImpl
+import de.hsaalen.cmt.repository.AuthenticationRepository
 import de.hsaalen.cmt.utils.protobufData
 import io.ktor.client.*
 import io.rsocket.kotlin.RSocket
@@ -20,13 +23,7 @@ import mu.KotlinLogging
 /**
  * Client session with websocket connection to server backend.
  */
-class Session(val userInfo: ServerUserInfoDto) :
-    RequestListReferences,
-    RequestCreateReference,
-    RequestDeleteReference,
-    RequestDownload,
-    RequestLabel,
-    DocumentRepository {
+class Session(val userInfo: ServerUserInfoDto) : ReferenceRepositoryImpl, LabelRepositoryImpl, DocumentRepositoryImpl {
 
     /**
      * True while the websocket is connected to the server.
@@ -74,15 +71,11 @@ class Session(val userInfo: ServerUserInfoDto) :
      */
     suspend fun sendLiveDTO(dto: LiveDto) {
         val payload = buildPayload {
-            protobufData(dto)
+            // Encrypt content before sending to server
+            protobufData(dto.encrypt())
         }
         rSocket?.fireAndForget(payload)
     }
-
-    /**
-     * Send to text edit DTO to server and other clients.
-     */
-    override suspend fun modifyDocument(request: DocumentChangeDto) = sendLiveDTO(request)
 
     /**
      * Disconnect the websocket from server
@@ -96,7 +89,7 @@ class Session(val userInfo: ServerUserInfoDto) :
         instance = null
         rSocket = null
         try {
-            RequestAuthentication.logout()
+            authRepo.logout()
         } catch (t: Throwable) {
             // Ignore any errors
             logger.error(t) { "Unable to perform logout" }
@@ -121,10 +114,23 @@ class Session(val userInfo: ServerUserInfoDto) :
             private set
 
         /**
+         * Personal master crypto key that can be used for encrypting and decrypting all non reference related data.
+         */
+        // TODO: decrypt key before using. a key for decryption the key is required. store in cookie?
+        val personalKey: ByteArray
+            get() = instance?.userInfo?.personalKeyBase64?.fromBase64() ?: error("No key available")
+
+        /**
+         * Factory for [AuthenticationRepository] implementation.
+         */
+        private val authRepo: AuthenticationRepository
+            get() = AuthenticationRepositoryImpl
+
+        /**
          * Send login request to the server.
          */
         suspend fun login(email: String, passwordPlain: String) {
-            val userInfo = RequestAuthentication.login(email, passwordPlain)
+            val userInfo = authRepo.login(email, passwordPlain)
             instance = Session(userInfo).apply {
                 connectWebSocket()
                 logger.info { "Logged in as: " + userInfo.fullName }
@@ -135,7 +141,7 @@ class Session(val userInfo: ServerUserInfoDto) :
          * Send register request to the server.
          */
         suspend fun register(firstName: String, email: String, passwordPlain: String) {
-            val userInfo = RequestAuthentication.register(firstName, email, passwordPlain)
+            val userInfo = authRepo.register(firstName, email, passwordPlain)
             instance = Session(userInfo).apply {
                 connectWebSocket()
                 logger.info { "Registered as: " + userInfo.fullName }
@@ -150,7 +156,7 @@ class Session(val userInfo: ServerUserInfoDto) :
          */
         suspend fun restore(): Boolean {
             return try {
-                val userInfo = RequestAuthentication.restore() // No email passed: not known yet, determined by server
+                val userInfo = authRepo.restore() // No email passed: not known yet, determined by server
                 instance = Session(userInfo).apply {
                     connectWebSocket()
                     logger.info { "Restored session for: " + userInfo.fullName }

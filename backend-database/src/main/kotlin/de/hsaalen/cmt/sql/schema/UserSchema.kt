@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.sql.schema
 
+import de.crusader.extensions.toHexStr
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
@@ -20,6 +21,7 @@ object UserTable : UUIDTable("user") {
     val dateFirstLogin = datetime("date_first_login")
     val datePasswordChange = datetime("date_password_change")
     val totalLogins = long("total_logins")
+    val personalEncryptedKey = binary("personal_encrypted_key")
 }
 
 /**
@@ -39,10 +41,11 @@ class UserDao(id: EntityID<UUID>) : UUIDEntity(id) {
     var dateFirstLogin by UserTable.dateFirstLogin
     var datePasswordChange by UserTable.datePasswordChange
     var totalLogins by UserTable.totalLogins
+    var personalEncryptedKey by UserTable.personalEncryptedKey
 
     /**
      * Convert to data transfer object.
      */
-    fun toServerUserInfoDto() = ServerUserInfoDto(fullName, email)
+    fun toServerUserInfoDto() = ServerUserInfoDto(fullName, email, personalEncryptedKey.toHexStr())
 
 }

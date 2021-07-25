@@ -7,6 +7,7 @@ import de.hsaalen.cmt.environment.DEFAULT_CREDENTIAL_VALUE
 import de.hsaalen.cmt.environment.JWT_HMAC512_SECRET_KEY
 import de.hsaalen.cmt.environment.JWT_ISSUER
 import de.hsaalen.cmt.environment.JWT_MAX_AGE_MS
+import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.utils.SerializeHelper
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -90,6 +91,21 @@ fun JWTCredential.toPayload(): JwtPayload = SerializeHelper.decodeJson(payload.g
  */
 fun ApplicationRequest.readJwtCookie() = call.authentication.principal<JwtPayload>()
     ?: throw SecurityException("Unable to extract payload from JWT cookie")
+
+/**
+ * Extension function to generate JWT token based on [ServerUserInfoDto].
+ */
+fun ServerUserInfoDto.generateJwtToken(): String {
+    val payload = JwtPayload(fullName, email)
+    var token = jwtToken
+    if (token.isBlank()) {
+        // Inject new JWT token in ServerUserInfoDto
+        token = JwtCookie.generateToken(payload)
+        jwtToken = token
+    }
+    return token
+}
+
 
 /**
  * Extension method to update a HTTP cookie with new valid JWT token.

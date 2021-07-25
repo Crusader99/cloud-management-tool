@@ -49,7 +49,6 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
 
                 this.dateCreation = now
                 this.dateLastAccess = now
-                this.comment = request.comment
                 this.creator = creator
                 this.accessCount = 0
             }

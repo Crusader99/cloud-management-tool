@@ -9,5 +9,6 @@ import kotlinx.serialization.Serializable
 data class ClientRegisterDto(
     val fullName: String,
     val email: String,
-    val passwordHashed: String
+    val passwordHashed: String,
+    val personalEncryptedKey: String, // Base64 of the encrypted personal key
 ) : ClientDto

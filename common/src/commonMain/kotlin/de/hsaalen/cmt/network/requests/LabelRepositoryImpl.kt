@@ -1,18 +1,20 @@
 package de.hsaalen.cmt.network.requests
 
+import de.hsaalen.cmt.crypto.decrypt
 import de.hsaalen.cmt.network.apiPathListLabels
 import de.hsaalen.cmt.network.dto.objects.LabelChangeMode
 import de.hsaalen.cmt.network.dto.objects.UUID
 import de.hsaalen.cmt.network.dto.websocket.LabelUpdateDto
 import de.hsaalen.cmt.network.session.Client
 import de.hsaalen.cmt.network.session.Session
+import de.hsaalen.cmt.network.utils.ClientSupport
 import de.hsaalen.cmt.repository.LabelRepository
 import io.ktor.http.*
 
 /**
  * Provides access to server side label functionality.
  */
-internal interface RequestLabel : Request, LabelRepository {
+internal interface LabelRepositoryImpl : ClientSupport, LabelRepository {
 
     /**
      * Add label to an existing reference by it's [UUID].
@@ -35,9 +37,10 @@ internal interface RequestLabel : Request, LabelRepository {
      */
     override suspend fun listLabels(): List<String> {
         val url = Url("$apiEndpoint$apiPathListLabels")
-        return Client.request(url) {
+        val encryptedLabels: List<String> = Client.request(url) {
             method = HttpMethod.Get
         }
+        return encryptedLabels.decrypt()
     }
 
 }

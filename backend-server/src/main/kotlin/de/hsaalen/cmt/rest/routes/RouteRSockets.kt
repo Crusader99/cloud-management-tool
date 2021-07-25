@@ -3,7 +3,7 @@ package de.hsaalen.cmt.rest.routes
 import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.apiPathRSocket
 import de.hsaalen.cmt.session.jwt.JwtCookie
-import de.hsaalen.cmt.websocket.Connection
+import de.hsaalen.cmt.rsocket.Connection
 import io.ktor.auth.*
 import io.ktor.routing.*
 import io.ktor.utils.io.core.*

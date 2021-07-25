@@ -74,9 +74,10 @@ internal object Client {
                     acceptor {
                         RSocketRequestHandler {
                             fireAndForget { payload ->
-                                println("# Received fire and forgot")
+                                logger.info { "Receive encrypted DTO" }
                                 val dto: LiveDto = payload.decodeProtobufData()
-                                GlobalEventDispatcher.notify(dto)
+                                logger.info { "Decrypt DTO and dispatch event" }
+                                GlobalEventDispatcher.notify(dto.decrypt())
                             }
                             requestResponse { it } //echo request payload
                         }

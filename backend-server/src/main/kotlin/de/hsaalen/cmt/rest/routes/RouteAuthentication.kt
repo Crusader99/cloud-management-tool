@@ -1,15 +1,16 @@
 package de.hsaalen.cmt.rest.routes
 
+import de.hsaalen.cmt.crypto.fromBase64
 import de.hsaalen.cmt.network.*
 import de.hsaalen.cmt.network.dto.client.ClientLoginDto
 import de.hsaalen.cmt.network.dto.client.ClientRegisterDto
 import de.hsaalen.cmt.repository.AuthenticationRepository
-import de.hsaalen.cmt.rest.generateJwtToken
+import de.hsaalen.cmt.rsocket.WebSocketManager
 import de.hsaalen.cmt.session.getWithSession
 import de.hsaalen.cmt.session.jwt.JwtCookie
+import de.hsaalen.cmt.session.jwt.generateJwtToken
 import de.hsaalen.cmt.session.jwt.readJwtCookie
 import de.hsaalen.cmt.session.jwt.updateJwtCookie
-import de.hsaalen.cmt.websocket.WebSocketManager
 import io.ktor.application.*
 import io.ktor.request.*
 import io.ktor.response.*
@@ -39,7 +40,8 @@ fun Routing.routeAuthentication() = route("/" + RestPaths.base) {
     post(apiPathAuthRegister) {
         val request: ClientRegisterDto = call.receive()
         logger.info("Register new account with e-mail= " + request.email)
-        val user = repo.register(request.fullName, request.email, request.passwordHashed)
+        val personalKey = request.personalEncryptedKey.fromBase64()
+        val user = repo.register(request.fullName, request.email, request.passwordHashed, personalKey)
         call.response.updateJwtCookie(user.generateJwtToken())
         call.respond(user)
     }

@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.websocket
+package de.hsaalen.cmt.rsocket
 
 import de.hsaalen.cmt.network.dto.websocket.LiveDto
 import de.hsaalen.cmt.utils.SerializeHelper

@@ -2,11 +2,12 @@ package de.hsaalen.cmt.network.requests
 
 import de.hsaalen.cmt.network.apiPathImport
 import de.hsaalen.cmt.network.session.Client
+import de.hsaalen.cmt.network.utils.ClientSupport
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 
 // TODO: remove
-internal interface RequestImport : Request {
+internal interface RequestImport : ClientSupport {
 
     suspend fun import(fileName: String, fileContent: ByteArray): String {
         val url = Url("$apiEndpoint$apiPathImport")

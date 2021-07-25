@@ -1,7 +1,7 @@
 package de.hsaalen.cmt.events
 
 import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateEvent
-import de.hsaalen.cmt.websocket.WebSocketManager
+import de.hsaalen.cmt.rsocket.WebSocketManager
 
 /**
  * Contains handlers for events that should be synchronized over different websocket instances.

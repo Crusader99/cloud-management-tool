@@ -1,5 +1,8 @@
 package de.hsaalen.cmt.network.dto.objects
 
+import de.hsaalen.cmt.crypto.Encryptable
+import de.hsaalen.cmt.crypto.decrypt
+import de.hsaalen.cmt.crypto.encrypt
 import kotlinx.serialization.Serializable
 
 /**
@@ -14,4 +17,14 @@ data class Reference(
     val dateCreation: Long,
     val dateLastAccess: Long,
     val labels: List<String>
-)
+) : Encryptable<Reference> {
+    /**
+     * Encrypt sensible information using personal session key and return new encrypted instance.
+     */
+    override fun encrypt() = copy(labels = labels.encrypt())
+
+    /**
+     * Decrypt sensible information using personal session key and return new decrypted instance.
+     */
+    override fun decrypt() = copy(labels = labels.decrypt())
+}

@@ -26,7 +26,12 @@ internal object AuthenticationRepositoryImpl : AuthenticationRepository {
      * Handles register request and provides a ServerUserInfoDto when successfully logged in or throws an exception when
      * operation fails.
      */
-    override suspend fun register(fullName: String, email: String, passwordPlain: String): ServerUserInfoDto {
+    override suspend fun register(
+        fullName: String,
+        email: String,
+        passwordPlain: String,
+        personalKey: ByteArray
+    ): ServerUserInfoDto {
         try {
             // Check user input and throw exception when invalid.
             email.validateEmailAndThrow()
@@ -55,6 +60,7 @@ internal object AuthenticationRepositoryImpl : AuthenticationRepository {
                 this.dateFirstLogin = now
                 this.datePasswordChange = now
                 this.totalLogins = 1
+                this.personalEncryptedKey = personalKey
             }.toServerUserInfoDto()
         }
     }

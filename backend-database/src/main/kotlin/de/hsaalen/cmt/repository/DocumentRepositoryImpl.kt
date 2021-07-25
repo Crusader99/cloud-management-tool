@@ -22,7 +22,7 @@ internal object DocumentRepositoryImpl : DocumentRepository {
     override suspend fun modifyDocument(request: DocumentChangeDto) {
         val c = MongoDB.collection ?: return
         val id = request.uuid
-        val newLine = request.lineContentEncrypted
+        val newLine = request.lineContent
         val allLines = TextDocument::lines
         val targetLine = allLines.colProperty.memberWithAdditionalPath(request.lineNumber.toString())
         when (request.lineChangeMode) {

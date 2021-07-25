@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.websocket
+package de.hsaalen.cmt.rsocket
 
 import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
 import de.hsaalen.cmt.network.dto.websocket.LiveDto

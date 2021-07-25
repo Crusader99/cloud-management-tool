@@ -1,5 +1,7 @@
 package de.hsaalen.cmt.network.dto.websocket
 
+import de.hsaalen.cmt.crypto.decrypt
+import de.hsaalen.cmt.crypto.encrypt
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode
 import de.hsaalen.cmt.network.dto.objects.UUID
 import kotlinx.serialization.Serializable
@@ -11,6 +13,16 @@ import kotlinx.serialization.Serializable
 data class DocumentChangeDto(
     val uuid: UUID,
     val lineNumber: Int,
-    val lineContentEncrypted: String,
+    val lineContent: String,
     val lineChangeMode: LineChangeMode,
-) : LiveDto()
+) : LiveDto() {
+    /**
+     * Encrypt sensible information using personal session key and return new encrypted instance.
+     */
+    override fun encrypt() = copy(lineContent = encrypt(lineContent))
+
+    /**
+     * Decrypt sensible information using personal session key and return new decrypted instance.
+     */
+    override fun decrypt() = copy(lineContent = decrypt(lineContent))
+}
