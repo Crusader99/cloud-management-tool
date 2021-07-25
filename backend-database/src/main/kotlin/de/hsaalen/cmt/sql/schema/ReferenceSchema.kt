@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.sql.schema
 
+import de.hsaalen.cmt.network.dto.objects.ContentType
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.utils.toUUID
 import org.jetbrains.exposed.dao.UUIDEntity
@@ -14,7 +15,7 @@ import java.util.*
 object ReferenceTable : UUIDTable("reference") {
     val accessCode = varchar("access_code", 32) //.uniqueIndex()
     val displayName = varchar("display_name", 512)
-    val contentType = varchar("content_type", 32)
+    val contentType = enumeration("content_type", ContentType::class)
     // val latestRevision = reference("latest_revision", RevisionTable, onDelete = ReferenceOption.RESTRICT)
     // TODO fix initialization problem
 }

@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.test
 
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
+import de.hsaalen.cmt.network.dto.objects.ContentType
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode.*
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
@@ -21,7 +22,7 @@ import kotlin.test.assertEquals
  */
 @TestInstance(Lifecycle.PER_CLASS)
 class ReferenceInfrastructureTest {
-    lateinit var ref: Reference
+    private lateinit var ref: Reference
 
     /**
      * Connect to databases created by docker in gradle test task and create default user.
@@ -37,13 +38,14 @@ class ReferenceInfrastructureTest {
     fun testCreateReferenceWithLabels() {
         runBlockingWithSession {
             val labelNames = listOf("a", "b", "c")
-            val info = ClientCreateReferenceDto("test", labels = labelNames)
+            val info = ClientCreateReferenceDto("test", contentType = ContentType.TEXT, labels = labelNames)
             val refRepo = ReferenceRepositoryImpl
+            val docRepo = DocumentRepositoryImpl
             ref = refRepo.createReference(info)
 
             suspend fun validate() {
                 assertEquals(info.displayName, ref.displayName)
-                assertEquals("", refRepo.downloadContent(ref.uuid))
+                assertEquals("", docRepo.downloadContent(ref.uuid))
                 assertContentEquals(info.labels, labelNames)
             }
 
@@ -65,22 +67,22 @@ class ReferenceInfrastructureTest {
             ref = refRepo.listReferences().references.single { it.uuid == ref.uuid }
 
             docRepo.modifyDocument(DocumentChangeDto(ref.uuid, 0, "line-1", MODIFY))
-            assertEquals("line-1", refRepo.downloadContent(ref.uuid))
+            assertEquals("line-1", docRepo.downloadContent(ref.uuid))
 
             docRepo.modifyDocument(DocumentChangeDto(ref.uuid, 1, "line-2", ADD))
-            assertEquals("line-1\nline-2", refRepo.downloadContent(ref.uuid))
+            assertEquals("line-1\nline-2", docRepo.downloadContent(ref.uuid))
 
             docRepo.modifyDocument(DocumentChangeDto(ref.uuid, 0, "line-0", ADD))
-            assertEquals("line-0\nline-1\nline-2", refRepo.downloadContent(ref.uuid))
+            assertEquals("line-0\nline-1\nline-2", docRepo.downloadContent(ref.uuid))
 
             docRepo.modifyDocument(DocumentChangeDto(ref.uuid, 1, "x", ADD))
-            assertEquals("line-0\nx\nline-1\nline-2", refRepo.downloadContent(ref.uuid))
+            assertEquals("line-0\nx\nline-1\nline-2", docRepo.downloadContent(ref.uuid))
 
             docRepo.modifyDocument(DocumentChangeDto(ref.uuid, 1, "y", MODIFY))
-            assertEquals("line-0\ny\nline-1\nline-2", refRepo.downloadContent(ref.uuid))
+            assertEquals("line-0\ny\nline-1\nline-2", docRepo.downloadContent(ref.uuid))
 
             docRepo.modifyDocument(DocumentChangeDto(ref.uuid, 1, "", DELETE))
-            assertEquals("line-0\nline-1\nline-2", refRepo.downloadContent(ref.uuid))
+            assertEquals("line-0\nline-1\nline-2", docRepo.downloadContent(ref.uuid))
         }
     }
 

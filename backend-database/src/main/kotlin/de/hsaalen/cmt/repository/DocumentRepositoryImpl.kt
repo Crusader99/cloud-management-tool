@@ -6,6 +6,7 @@ import de.hsaalen.cmt.events.UserDocumentChangeEvent
 import de.hsaalen.cmt.mongo.MongoDB
 import de.hsaalen.cmt.mongo.TextDocument
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode.*
+import de.hsaalen.cmt.network.dto.objects.UUID
 import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
 import de.hsaalen.cmt.session.currentSession
 import de.hsaalen.cmt.session.senderSocketId
@@ -37,5 +38,10 @@ internal object DocumentRepositoryImpl : DocumentRepository {
         val event = UserDocumentChangeEvent(request, currentSession.userMail, currentSession.senderSocketId)
         GlobalEventDispatcher.notify(event)
     }
+
+    /**
+     * Download the content of a specific reference by uuid.
+     */
+    override suspend fun downloadContent(uuid: UUID): String = MongoDB.getDocumentContent(uuid.value)
 
 }

@@ -13,9 +13,9 @@ private val logger = KotlinLogging.logger { }.apply {
 }
 
 /**
- * The default value for user name and password when not configured over sy
+ * The default value for user name and password when not configured over system environment variables
  */
-const val DEFAULT_CREDENTIAL_VALUE = "admin"
+const val DEFAULT_CREDENTIAL_VALUE = "admin123"
 
 /**
  * Port to be used for REST API server.
@@ -86,6 +86,27 @@ val MONGO_USER = envOrDefault("MONGO_USER", DEFAULT_CREDENTIAL_VALUE)
  * User name for mongo database authentication.
  */
 val MONGO_PASSWORD = envOrDefault("MONGO_PASSWORD", DEFAULT_CREDENTIAL_VALUE)
+
+/**
+ * The API endpoint to be used for S3 file storage.
+ */
+val S3_ENDPOINT = envOrDefault("S3_ENDPOINT", "http://localhost:9000")
+
+/**
+ * The user name or access key of the S3 file storage.
+ */
+val S3_USER = envOrDefault("S3_USER", DEFAULT_CREDENTIAL_VALUE)
+
+/**
+ * The password or secret key of the S3 file storage.
+ */
+val S3_PASSWORD = envOrDefault("S3_PASSWORD", DEFAULT_CREDENTIAL_VALUE)
+
+/**
+ * The name of the bucket where the files should be stored.
+ */
+val S3_BUCKET = envOrDefault("S3_BUCKET", "file")
+
 
 /**
  * Reads a system environment variable or throws an exception when not available.

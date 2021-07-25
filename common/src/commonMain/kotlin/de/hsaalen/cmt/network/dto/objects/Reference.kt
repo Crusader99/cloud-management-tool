@@ -13,7 +13,7 @@ data class Reference(
     val uuid: UUID,
     val accessCode: String?,
     val displayName: String,
-    val contentType: String,
+    val contentType: ContentType,
     val dateCreation: Long,
     val dateLastAccess: Long,
     val labels: List<String>

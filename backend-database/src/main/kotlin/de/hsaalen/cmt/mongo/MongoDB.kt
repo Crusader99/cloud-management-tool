@@ -64,6 +64,13 @@ internal object MongoDB {
     }
 
     /**
+     * Delete document by given UUID.
+     */
+    suspend fun deleteDocument(uuid: String) {
+        collection?.deleteOneById(uuid)
+    }
+
+    /**
      * Search in collection for document.
      */
     private suspend fun findDocument(uuid: String): TextDocument {

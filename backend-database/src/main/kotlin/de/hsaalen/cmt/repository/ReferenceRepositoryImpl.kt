@@ -5,6 +5,7 @@ import de.hsaalen.cmt.mongo.MongoDB
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientDeleteReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
+import de.hsaalen.cmt.network.dto.objects.ContentType
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.objects.UUID
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
@@ -14,6 +15,7 @@ import de.hsaalen.cmt.session.currentSession
 import de.hsaalen.cmt.sql.schema.ReferenceDao
 import de.hsaalen.cmt.sql.schema.RevisionDao
 import de.hsaalen.cmt.sql.schema.UserDao
+import de.hsaalen.cmt.storage.StorageS3
 import de.hsaalen.cmt.utils.id
 import de.hsaalen.cmt.utils.toUUID
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -41,7 +43,7 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
             val reference = ReferenceDao.new {
                 this.accessCode = "ACCESS_CODE"
                 this.displayName = request.displayName
-                this.contentType = "document"
+                this.contentType = request.contentType
             }
             val revision = RevisionDao.new {
                 this.item = reference
@@ -99,23 +101,30 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
     }
 
     /**
-     * Download the content of a specific reference by uuid.
-     */
-    override suspend fun downloadContent(uuid: UUID): String = MongoDB.getDocumentContent(uuid.value)
-
-    /**
-     * Delete a reference by the given reference uuid.
+     * Delete a reference by the given reference [UUID].
      */
     override suspend fun deleteReference(request: ClientDeleteReferenceDto) {
         val uuid = request.uuid
+        lateinit var contentType: ContentType
+
+        // Delete reference from SQL database
         newSuspendedTransaction {
-            ReferenceDao.findById(uuid.id)
-                ?.delete()
-                ?: throw IllegalArgumentException("No reference with uuid=$uuid found!")
+            val ref = ReferenceDao.findById(uuid.id) ?: error("No reference with uuid=$uuid found!")
+            contentType = ref.contentType
+            ref.delete()
         }
 
-        // Call event handlers
-        GlobalEventDispatcher.notify(ReferenceUpdateRemoveDto(uuid))
+        try {
+            when (contentType) {
+                ContentType.TEXT -> MongoDB.deleteDocument(uuid.value)  // Delete document content from MongoDB
+                ContentType.FILE -> StorageS3.deleteFile(uuid)  // Delete related file from S3 storage.
+            }
+        } catch (ex: Exception) {
+            throw IllegalStateException("Unable to delete reference content", ex)
+        } finally {
+            // Call event handlers
+            GlobalEventDispatcher.notify(ReferenceUpdateRemoveDto(uuid))
+        }
     }
 
 }

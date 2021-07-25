@@ -44,6 +44,29 @@ services:
       ADMINER_DEFAULT_SERVER: postgres
     ports:
       - "${ADMINER_PORT}:8080"
+  file-storage: # Minio is a S3 compatible file storage (https://docs.min.io/docs/deploy-minio-on-docker-compose.html)
+    image: minio/minio
+    restart: always
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+    expose:
+      - 9000
+    volumes:
+        - s3:/data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
   prometheus: # Provides easy to use web interface to manage mongodb
     image: prom/prometheus:v2.26.0
     volumes:
@@ -78,6 +101,7 @@ services:
       - 80:80
       - 8092:8080 # Dashboard: http://localhost:8082
 volumes:
-  prometheus:
   postgres:
   mongodb:
+  s3:
+  prometheus:

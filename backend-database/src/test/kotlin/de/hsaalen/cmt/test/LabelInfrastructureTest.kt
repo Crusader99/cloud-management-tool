@@ -1,6 +1,5 @@
 package de.hsaalen.cmt.test
 
-import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.repository.LabelRepositoryImpl
 import de.hsaalen.cmt.repository.ReferenceRepositoryImpl
@@ -34,7 +33,7 @@ class LabelInfrastructureTest {
 
         // Create reference
         runBlockingWithSession {
-            ref = refRepo.createReference(ClientCreateReferenceDto("Reference"))
+            ref = refRepo.createReferenceToDocument("Reference")
             logger.info("Created reference: $ref")
         }
 
@@ -79,8 +78,8 @@ class LabelInfrastructureTest {
         val labelRepo = LabelRepositoryImpl
 
         // Create references with default label
-        val ref1 = refRepo.createReference(ClientCreateReferenceDto("Reference1", labels = listOf("1")))
-        val ref2 = refRepo.createReference(ClientCreateReferenceDto("Reference2", labels = listOf("2")))
+        val ref1 = refRepo.createReferenceToDocument("Reference1", labels = listOf("1"))
+        val ref2 = refRepo.createReferenceToDocument("Reference2", labels = listOf("2"))
 
         // Replace labels
         labelRepo.addLabel(ref1, "3")

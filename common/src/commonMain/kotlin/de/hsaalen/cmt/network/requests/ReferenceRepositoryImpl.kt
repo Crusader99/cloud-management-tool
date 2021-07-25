@@ -1,6 +1,5 @@
 package de.hsaalen.cmt.network.requests
 
-import de.hsaalen.cmt.crypto.decrypt
 import de.hsaalen.cmt.network.apiPathCreateReference
 import de.hsaalen.cmt.network.apiPathDeleteReference
 import de.hsaalen.cmt.network.apiPathListReferences
@@ -8,7 +7,6 @@ import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientDeleteReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.Reference
-import de.hsaalen.cmt.network.dto.objects.UUID
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.network.session.Client
 import de.hsaalen.cmt.network.utils.ClientSupport
@@ -54,19 +52,6 @@ internal interface ReferenceRepositoryImpl : ClientSupport, ReferenceRepository 
             method = HttpMethod.Post
             body = request
         }
-    }
-
-    /**
-     * Download the content of a specific reference by uuid.
-     */
-    override suspend fun downloadContent(uuid: UUID): String {
-        val url = Url("$apiEndpoint/download/$uuid")
-        val encryptedText: String = Client.request(url) {
-            method = HttpMethod.Get
-        }
-
-        // Get key and decrypt line by line
-        return encryptedText.lineSequence().decrypt().joinToString("\n")
     }
 
 }

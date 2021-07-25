@@ -296,7 +296,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
             val session = Session.instance!!
             when {
                 name == "notes.json" -> SimpleNoteImportJson.import(content).forEach { session.createReference(it) }
-                name.endsWith(".txt", true) -> session.createReference(name, content)
+                name.endsWith(".txt", true) -> session.createReferenceToDocument(name, content)
                 else -> throw UnsupportedOperationException("File format unsupported: $name")
             }
         }
@@ -331,7 +331,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                 button = "Create"
             ) ?: return@launch
             logger.info { "Selected display name: $displayName" }
-            Session.instance?.createReference(displayName)
+            Session.instance?.createReferenceToDocument(displayName)
         }
     }
 

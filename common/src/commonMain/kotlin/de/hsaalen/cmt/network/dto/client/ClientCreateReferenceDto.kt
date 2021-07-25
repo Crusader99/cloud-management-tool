@@ -3,6 +3,7 @@ package de.hsaalen.cmt.network.dto.client
 import de.hsaalen.cmt.crypto.Encryptable
 import de.hsaalen.cmt.crypto.decrypt
 import de.hsaalen.cmt.crypto.encrypt
+import de.hsaalen.cmt.network.dto.objects.ContentType
 import kotlinx.serialization.Serializable
 
 /**
@@ -11,6 +12,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ClientCreateReferenceDto(
     val displayName: String,
+    val contentType: ContentType,
     val content: String = "",
     val labels: List<String> = emptyList(),
 ) : ClientDto, Encryptable<ClientCreateReferenceDto> {

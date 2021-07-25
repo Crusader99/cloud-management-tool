@@ -26,6 +26,9 @@ dependencies {
     // Mongo DB driver to support live edit in text documents
     implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.2.8")
 
+    // Import Amazon AWS S3 driver for accessing Minio file storage
+    implementation("software.amazon.awssdk:s3:2.17.4")
+
     // Statistics & logging frameworks
     // See https://github.com/MicroUtils/kotlin-logging
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.10")
@@ -45,8 +48,8 @@ configurations.all {
 }
 
 val dockerPostgres by tasks.registering(DockerRunTask::class) {
-    environment["POSTGRES_USER"] = "admin"
-    environment["POSTGRES_PASSWORD"] = "admin"
+    environment["POSTGRES_USER"] = "admin123"
+    environment["POSTGRES_PASSWORD"] = "admin123"
     environment["POSTGRES_DB"] = "postgres"
     addPort(freeHostSystemPort, 5432)
     args("-itd")
@@ -54,11 +57,20 @@ val dockerPostgres by tasks.registering(DockerRunTask::class) {
 }
 
 val dockerMongoDB by tasks.registering(DockerRunTask::class) {
-    environment["MONGO_INITDB_ROOT_USERNAME"] = "admin"
-    environment["MONGO_INITDB_ROOT_PASSWORD"] = "admin"
+    environment["MONGO_INITDB_ROOT_USERNAME"] = "admin123"
+    environment["MONGO_INITDB_ROOT_PASSWORD"] = "admin123"
     addPort(freeHostSystemPort, 27017)
     args("-itd")
     image("mongo:4.4")
+}
+
+val dockerMinio by tasks.registering(DockerRunTask::class) {
+    environment["MINIO_ROOT_USER"] = "admin123"
+    environment["MINIO_ROOT_PASSWORD"] = "admin123"
+    addPort(freeHostSystemPort, 9000)
+    args("-itd")
+    image("minio/minio")
+    command("server /data")
 }
 
 val dockerStop by tasks.registering(DockerStopTask::class) {
@@ -67,19 +79,21 @@ val dockerStop by tasks.registering(DockerStopTask::class) {
 }
 
 tasks.test {
-    dependsOn(dockerPostgres, dockerMongoDB)
+    dependsOn(dockerPostgres, dockerMongoDB, dockerMinio)
     finalizedBy(dockerStop)
 
     environment["PASSWORD_SALT"] = "salt"
 
-    environment["POSTGRESQL_USER"] = "admin"
-    environment["POSTGRESQL_PASSWORD"] = "admin"
+    environment["POSTGRESQL_USER"] = "admin123"
+    environment["POSTGRESQL_PASSWORD"] = "admin123"
     environment["POSTGRESQL_DB"] = "postgres"
     environment["POSTGRESQL_PORT"] = dockerPostgres.firstPublishedPort
 
-    environment["MONGO_USER"] = "admin"
-    environment["MONGO_PASSWORD"] = "admin"
+    environment["MONGO_USER"] = "admin123"
+    environment["MONGO_PASSWORD"] = "admin123"
     environment["MONGO_PORT"] = dockerMongoDB.firstPublishedPort
+
+    environment["S3_ENDPOINT"] = "http://localhost:" + dockerMinio.firstPublishedPort
 
     useJUnitPlatform()
     timeout.set(Duration.ofSeconds(60L))
