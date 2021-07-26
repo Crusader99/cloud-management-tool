@@ -53,3 +53,11 @@ fun String.validateFullNameAndGetError(): String? {
     }
     return null
 }
+
+fun String.prohibitLineBreaks(): String {
+    val lineNumbers = lineSequence().count()
+    if (lineNumbers > 1) {
+        throw IllegalStateException("Found $lineNumbers line numbers, but no line breaks allowed")
+    }
+    return this
+}

@@ -30,10 +30,10 @@ interface ReferenceRepository {
      */
     suspend fun createReferenceToDocument(
         displayName: String,
-        content: String = "",
+        textLines: String = "",
         labels: List<String> = emptyList()
     ): Reference {
-        val dto = ClientCreateReferenceDto(displayName, contentType = ContentType.TEXT, content, labels)
+        val dto = ClientCreateReferenceDto(displayName, contentType = ContentType.TEXT, textLines.lines(), labels)
         return createReference(dto)
     }
 

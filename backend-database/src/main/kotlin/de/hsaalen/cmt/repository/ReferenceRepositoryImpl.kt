@@ -71,7 +71,7 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
 
         // Create document in mongo-db
         try {
-            MongoDB.createDocument(ref.uuid.value, request.content)
+            MongoDB.createDocument(ref.uuid.value, request.documentLines)
         } catch (ex: Exception) {
             deleteReference(ref) // Cleanup also in SQL on failure
             throw IllegalStateException("Unable to create document for new reference", ex)

@@ -89,12 +89,6 @@ class Session(val userInfo: ServerUserInfoDto) : ReferenceRepositoryImpl, LabelR
         instance = null
         rSocket = null
         try {
-            authRepo.logout()
-        } catch (t: Throwable) {
-            // Ignore any errors
-            logger.error(t) { "Unable to perform logout" }
-        }
-        try {
             withTimeout(2_000) {
                 rSocket?.job?.cancelAndJoin()
                 client.close()
@@ -102,6 +96,12 @@ class Session(val userInfo: ServerUserInfoDto) : ReferenceRepositoryImpl, LabelR
         } catch (t: Throwable) {
             // Ignore any errors
             logger.error(t) { "Unable to close clients of session" }
+        }
+        try {
+            authRepo.logout()
+        } catch (t: Throwable) {
+            // Ignore any errors
+            logger.error(t) { "Unable to perform logout" }
         }
         logger.info { "Closed session" }
     }

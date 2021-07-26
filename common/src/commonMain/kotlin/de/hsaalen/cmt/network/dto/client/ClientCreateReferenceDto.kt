@@ -13,16 +13,17 @@ import kotlinx.serialization.Serializable
 data class ClientCreateReferenceDto(
     val displayName: String,
     val contentType: ContentType,
-    val content: String = "",
+    val documentLines: List<String> = emptyList(),
     val labels: List<String> = emptyList(),
 ) : ClientDto, Encryptable<ClientCreateReferenceDto> {
+
     /**
      * Encrypt sensible information using personal session key and return new encrypted instance.
      */
-    override fun encrypt() = copy(content = encrypt(content), labels = labels.encrypt())
+    override fun encrypt() = copy(documentLines = documentLines.encrypt(), labels = labels.encrypt())
 
     /**
      * Decrypt sensible information using personal session key and return new decrypted instance.
      */
-    override fun decrypt() = copy(content = decrypt(content), labels = labels.decrypt())
+    override fun decrypt() = copy(documentLines = documentLines.decrypt(), labels = labels.decrypt())
 }

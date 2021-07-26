@@ -7,7 +7,7 @@ import de.hsaalen.cmt.network.dto.objects.UUID
 import de.hsaalen.cmt.network.dto.websocket.LabelUpdateDto
 import de.hsaalen.cmt.network.session.Client
 import de.hsaalen.cmt.network.session.Session
-import de.hsaalen.cmt.network.utils.ClientSupport
+import de.hsaalen.cmt.utils.ClientSupport
 import de.hsaalen.cmt.repository.LabelRepository
 import io.ktor.http.*
 

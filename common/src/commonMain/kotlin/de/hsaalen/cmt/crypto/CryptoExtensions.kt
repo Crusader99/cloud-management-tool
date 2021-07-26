@@ -3,16 +3,17 @@ package de.hsaalen.cmt.crypto
 import com.soywiz.krypto.encoding.fromBase64
 import com.soywiz.krypto.encoding.toBase64
 import de.hsaalen.cmt.network.session.Session
+import de.hsaalen.cmt.utils.prohibitLineBreaks
 
 /**
  * Decrypt [List] of [String]'s using users personal session key.
  */
-fun List<String>.decrypt() = map { decrypt(it) }
+fun List<String>.decrypt() = map { decrypt(it).prohibitLineBreaks() }
 
 /**
  * Decrypt [Sequence] of [String]'s using users personal session key.
  */
-fun Sequence<String>.decrypt() = map { decrypt(it) }
+fun Sequence<String>.decrypt() = map { decrypt(it).prohibitLineBreaks() }
 
 /**
  * Decrypt [String]'s using users personal session key.
@@ -24,12 +25,12 @@ fun decrypt(encrypted: String): String {
 /**
  * Encrypt [List] of [String]'s using users personal session key.
  */
-fun List<String>.encrypt() = map { encrypt(it) }
+fun List<String>.encrypt() = map { encrypt(it.prohibitLineBreaks()) }
 
 /**
  * Encrypt [Sequence] of [String]'s using users personal session key.
  */
-fun Sequence<String>.encrypt() = map { encrypt(it) }
+fun Sequence<String>.encrypt() = map { encrypt(it.prohibitLineBreaks()) }
 
 /**
  * Encrypt [String]'s using users personal session key.

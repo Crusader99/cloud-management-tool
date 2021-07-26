@@ -40,9 +40,9 @@ internal object MongoDB {
     /**
      * Create new document by given content.
      */
-    suspend fun createDocument(uuid: String, content: String = "") {
+    suspend fun createDocument(uuid: String, documentLines: List<String> = emptyList()) {
         logger.info("Creating new text document in mongo-db...")
-        val lines = content.lines().toTypedArray()
+        val lines = documentLines.toTypedArray()
         collection?.insertOne(TextDocument(uuid, *lines))
     }
 

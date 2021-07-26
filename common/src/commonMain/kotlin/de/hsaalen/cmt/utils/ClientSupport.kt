@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.network.utils
+package de.hsaalen.cmt.utils
 
 import de.hsaalen.cmt.network.RestPaths
 

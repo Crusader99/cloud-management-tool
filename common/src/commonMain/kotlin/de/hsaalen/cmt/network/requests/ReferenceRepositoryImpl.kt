@@ -9,7 +9,7 @@ import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.network.session.Client
-import de.hsaalen.cmt.network.utils.ClientSupport
+import de.hsaalen.cmt.utils.ClientSupport
 import de.hsaalen.cmt.repository.ReferenceRepository
 import io.ktor.http.*
 
