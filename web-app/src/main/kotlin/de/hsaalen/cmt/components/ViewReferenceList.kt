@@ -1,9 +1,7 @@
 package de.hsaalen.cmt.components
 
+import com.ccfraser.muirwik.components.*
 import com.ccfraser.muirwik.components.button.mIconButton
-import com.ccfraser.muirwik.components.mChip
-import com.ccfraser.muirwik.components.mPaper
-import com.ccfraser.muirwik.components.mTooltip
 import com.ccfraser.muirwik.components.table.*
 import de.crusader.extensions.toDate
 import de.crusader.objects.color.Color
@@ -12,14 +10,13 @@ import de.hsaalen.cmt.extensions.ReferenceListener
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.toCssColor
-import kotlinx.css.Cursor
-import kotlinx.css.backgroundColor
-import kotlinx.css.cursor
+import kotlinx.css.*
 import react.RBuilder
 import react.RComponent
 import react.RProps
 import react.RState
 import styled.css
+import styled.styledDiv
 
 /**
  * Wrapper function to simplify creation of this react component.
@@ -29,6 +26,7 @@ fun RBuilder.referenceList(
     onItemOpen: ReferenceListener,
     onItemDownload: ReferenceListener,
     onItemDelete: ReferenceListener,
+    onLabelAdd: ReferenceListener,
     onLabelRemove: LabelEditListener,
 ) = child(ViewReferenceList::class) {
     attrs {
@@ -36,6 +34,7 @@ fun RBuilder.referenceList(
         this.onItemOpen = onItemOpen
         this.onItemDownload = onItemDownload
         this.onItemDelete = onItemDelete
+        this.onLabelAdd = onLabelAdd
         this.onLabelRemove = onLabelRemove
     }
 }
@@ -49,6 +48,7 @@ external interface ViewReferenceListProps : RProps {
     var onItemOpen: ReferenceListener
     var onItemDownload: ReferenceListener
     var onItemDelete: ReferenceListener
+    var onLabelAdd: ReferenceListener
     var onLabelRemove: LabelEditListener
 }
 
@@ -125,10 +125,29 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
 
         mTableCell { +ref.displayName }
         mTableCell {
-            for (label in ref.labels) {
-                mChip(label, onDelete = { props.onLabelRemove(it, ref, label) }) {
-                    attrs {
-                        asDynamic().clickable = true
+            styledDiv {
+                css {
+                    display = Display.flex
+                }
+                for (label in ref.labels) {
+                    mChip(label, onDelete = { props.onLabelRemove(it, ref, label) }) {
+                        attrs {
+                            asDynamic().clickable = true
+                        }
+                    }
+                }
+                mTooltip("Add label") {
+                    mAvatar {
+                        attrs {
+                            onClick = { props.onLabelAdd(it, ref) }
+                        }
+                        css {
+                            width = 3.spacingUnits
+                            height = 3.spacingUnits
+                            marginTop = LinearDimension.auto
+                            marginBottom = LinearDimension.auto
+                        }
+                        mIcon("add")
                     }
                 }
             }

@@ -1,5 +1,8 @@
 package de.hsaalen.cmt.pages
 
+import de.hsaalen.cmt.components.dialogs.InputDialogComponent
+import de.hsaalen.cmt.components.dialogs.renderInputDialog
+import de.hsaalen.cmt.components.dialogs.show
 import de.hsaalen.cmt.components.referenceList
 import de.hsaalen.cmt.events.GlobalEventDispatcher
 import de.hsaalen.cmt.extensions.ReferenceListener
@@ -46,6 +49,11 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
     private val logger = KotlinLogging.logger("OverviewPage")
 
     /**
+     * Reference to create dialog for requesting user to type a specific reference name.
+     */
+    private val refCreateLabelDialog = createRef<InputDialogComponent>()
+
+    /**
      * Initialize state of the [OverviewPage].
      */
     override fun OverviewPageState.init() {
@@ -73,11 +81,13 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
+        renderInputDialog(refCreateLabelDialog)
         referenceList(
             dto = state.dto,
             onItemOpen = props.onItemOpen,
             onItemDelete = ::onItemDelete,
             onItemDownload = ::onItemDownload,
+            onLabelAdd = ::onLabelAdd,
             onLabelRemove = ::onLabelRemove
         )
     }
@@ -114,6 +124,22 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
         event.stopPropagation() // Prevent parent to receive onClick event, which would open the reference
         coroutines.launch {
             Session.instance?.deleteReference(ref)
+        }
+    }
+
+    /**
+     * Called when user removes a label from a reference.
+     */
+    private fun onLabelAdd(event: Event, ref: Reference) {
+        event.stopPropagation() // Prevent parent to receive onClick event, which would open the reference
+        coroutines.launch {
+            val labelName = refCreateLabelDialog.current?.show(
+                title = "Add label to \"" + ref.displayName + "\":",
+                placeholder = "label name",
+                button = "Add"
+            ) ?: return@launch
+            logger.info { "Add label name: $labelName" }
+            Session.instance?.addLabel(ref, labelName)
         }
     }
 
