@@ -57,7 +57,8 @@ fun String.validateFullNameAndGetError(): String? {
 fun String.prohibitLineBreaks(): String {
     val lineNumbers = lineSequence().count()
     if (lineNumbers > 1) {
-        throw IllegalStateException("Found $lineNumbers line numbers, but no line breaks allowed")
+        val append = if (length < 256) ": $this" else ""
+        throw IllegalStateException("Found $lineNumbers line numbers, but no line breaks allowed$append")
     }
     return this
 }

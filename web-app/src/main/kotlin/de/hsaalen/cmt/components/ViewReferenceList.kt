@@ -7,6 +7,8 @@ import com.ccfraser.muirwik.components.mTooltip
 import com.ccfraser.muirwik.components.table.*
 import de.crusader.extensions.toDate
 import de.crusader.objects.color.Color
+import de.hsaalen.cmt.extensions.LabelEditListener
+import de.hsaalen.cmt.extensions.ReferenceListener
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.toCssColor
@@ -24,15 +26,17 @@ import styled.css
  */
 fun RBuilder.referenceList(
     dto: ServerReferenceListDto?,
-    onItemOpen: (Reference) -> Unit,
-    onItemDownload: (Reference) -> Unit,
-    onItemDelete: (Reference) -> Unit
+    onItemOpen: ReferenceListener,
+    onItemDownload: ReferenceListener,
+    onItemDelete: ReferenceListener,
+    onLabelRemove: LabelEditListener,
 ) = child(ViewReferenceList::class) {
     attrs {
         this.dto = dto
         this.onItemOpen = onItemOpen
         this.onItemDownload = onItemDownload
         this.onItemDelete = onItemDelete
+        this.onLabelRemove = onLabelRemove
     }
 }
 
@@ -41,9 +45,11 @@ fun RBuilder.referenceList(
  */
 external interface ViewReferenceListProps : RProps {
     var dto: ServerReferenceListDto?
-    var onItemOpen: (Reference) -> Unit
-    var onItemDownload: (Reference) -> Unit
-    var onItemDelete: (Reference) -> Unit
+
+    var onItemOpen: ReferenceListener
+    var onItemDownload: ReferenceListener
+    var onItemDelete: ReferenceListener
+    var onLabelRemove: LabelEditListener
 }
 
 /**
@@ -109,7 +115,7 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
         }
         attrs {
             if (ref != null) {
-                onClick = { props.onItemOpen(ref) }
+                onClick = { props.onItemOpen(it, ref) }
             }
         }
         if (ref == null) {
@@ -120,7 +126,7 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
         mTableCell { +ref.displayName }
         mTableCell {
             for (label in ref.labels) {
-                mChip(label) {
+                mChip(label, onDelete = { props.onLabelRemove(it, ref, label) }) {
                     attrs {
                         asDynamic().clickable = true
                     }
@@ -130,16 +136,10 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
         mTableCell { +ref.dateLastAccess.toDate().toDateString() }
         mTableCell(align = MTableCellAlign.right) {
             mTooltip("Download") {
-                mIconButton("download", onClick = {
-                    it.stopPropagation() // Prevent parent to receive onClick event, which would open the reference
-                    props.onItemDownload(ref)
-                })
+                mIconButton("download", onClick = { props.onItemDownload(it, ref) })
             }
             mTooltip("Delete") {
-                mIconButton("delete", onClick = {
-                    it.stopPropagation() // Prevent parent to receive onClick event, which would open the reference
-                    props.onItemDelete(ref)
-                })
+                mIconButton("delete", onClick = { props.onItemDelete(it, ref) })
             }
         }
     }

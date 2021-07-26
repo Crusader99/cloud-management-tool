@@ -2,16 +2,20 @@ package de.hsaalen.cmt.pages
 
 import de.hsaalen.cmt.components.referenceList
 import de.hsaalen.cmt.events.GlobalEventDispatcher
+import de.hsaalen.cmt.extensions.ReferenceListener
 import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.file.openFileSaver
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
+import de.hsaalen.cmt.network.dto.objects.LabelChangeMode
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
+import de.hsaalen.cmt.network.dto.websocket.LabelUpdateDto
 import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateAddDto
 import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateRemoveDto
 import de.hsaalen.cmt.network.session.Session
-import kotlinx.browser.window
 import kotlinx.coroutines.launch
+import mu.KotlinLogging
+import org.w3c.dom.events.Event
 import react.*
 
 /**
@@ -19,7 +23,7 @@ import react.*
  */
 external interface OverviewPageProps : RProps {
     var session: Session
-    var onItemOpen: (Reference) -> Unit
+    var onItemOpen: ReferenceListener
 }
 
 /**
@@ -37,6 +41,11 @@ external interface OverviewPageState : RState {
 class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
 
     /**
+     * Logging instance for this class.
+     */
+    private val logger = KotlinLogging.logger("OverviewPage")
+
+    /**
      * Initialize state of the [OverviewPage].
      */
     override fun OverviewPageState.init() {
@@ -45,8 +54,12 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
         coroutines.launch {
             updateReferences()
         }
+    }
+
+    override fun componentDidMount() {
         GlobalEventDispatcher.register(::onAddedReference)
         GlobalEventDispatcher.register(::onRemovedReference)
+        GlobalEventDispatcher.register(::onLabelRemoved)
     }
 
     /**
@@ -64,7 +77,8 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
             dto = state.dto,
             onItemOpen = props.onItemOpen,
             onItemDelete = ::onItemDelete,
-            onItemDownload = ::onItemDownload
+            onItemDownload = ::onItemDownload,
+            onLabelRemove = ::onLabelRemove
         )
     }
 
@@ -81,11 +95,12 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
     /**
      * Allow downloading selected reference to local computer.
      */
-    private fun onItemDownload(ref: Reference) {
+    private fun onItemDownload(event: Event, ref: Reference) {
+        event.stopPropagation() // Prevent parent to receive onClick event, which would open the reference
         coroutines.launch {
             val content = Session.instance?.downloadContent(ref.uuid)
             if (content == null) {
-                window.alert("Content not available. Check server connection.")
+                logger.error { "Content not available. Check server connection." }
             } else {
                 openFileSaver(ref.displayName + ".txt", content)
             }
@@ -95,9 +110,20 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
     /**
      * Request server to delete a reference.
      */
-    private fun onItemDelete(ref: Reference) {
+    private fun onItemDelete(event: Event, ref: Reference) {
+        event.stopPropagation() // Prevent parent to receive onClick event, which would open the reference
         coroutines.launch {
             Session.instance?.deleteReference(ref)
+        }
+    }
+
+    /**
+     * Called when user removes a label from a reference.
+     */
+    private fun onLabelRemove(event: Event, ref: Reference, label: String) {
+        event.stopPropagation() // Prevent parent to receive onClick event, which would open the reference
+        coroutines.launch {
+            Session.instance?.removeLabel(ref, label)
         }
     }
 
@@ -105,6 +131,7 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
      * Event called by server after new reference added.
      */
     private fun onAddedReference(ref: ReferenceUpdateAddDto) {
+        logger.info { "Received ReferenceUpdateAddDto" }
         setState {
             val new = listOf(ref.reference)
             val old = dto?.references ?: emptyList()
@@ -116,9 +143,24 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
      * Event called by server after a reference got deleted.
      */
     private fun onRemovedReference(ref: ReferenceUpdateRemoveDto) {
+        logger.info { "Received ReferenceUpdateRemoveDto" }
         setState {
             val old = dto?.references ?: emptyList()
             dto = ServerReferenceListDto(old.filter { it.uuid != ref.uuid })
+        }
+    }
+
+    /**
+     * Event called by server after a label was added / removed.
+     */
+    private fun onLabelRemoved(event: LabelUpdateDto) {
+        logger.info { "Received LabelUpdateDto" }
+        setState {
+            val ref = dto?.references?.find { it.uuid == event.reference } ?: return@setState
+            when (event.mode) {
+                LabelChangeMode.ADD -> ref.labels += event.labelName
+                LabelChangeMode.REMOVE -> ref.labels -= event.labelName
+            }
         }
     }
 

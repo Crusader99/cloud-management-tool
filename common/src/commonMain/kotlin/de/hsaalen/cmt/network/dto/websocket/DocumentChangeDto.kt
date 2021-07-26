@@ -16,6 +16,7 @@ data class DocumentChangeDto(
     val lineContent: String,
     val lineChangeMode: LineChangeMode,
 ) : LiveDto() {
+
     /**
      * Encrypt sensible information using personal session key and return new encrypted instance.
      */
@@ -25,4 +26,5 @@ data class DocumentChangeDto(
      * Decrypt sensible information using personal session key and return new decrypted instance.
      */
     override fun decrypt() = copy(lineContent = decrypt(lineContent))
+
 }

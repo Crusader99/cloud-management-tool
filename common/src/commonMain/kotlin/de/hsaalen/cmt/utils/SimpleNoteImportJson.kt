@@ -35,7 +35,7 @@ data class SimpleNote(
     val creationDate: String,
     val lastModified: String,
     val markdown: Boolean = false,
-    val tags: List<String> = emptyList(),
+    val tags: Set<String> = emptySet(),
 ) {
 
     /**

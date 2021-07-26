@@ -1,10 +1,8 @@
 package de.hsaalen.cmt.storage
 
-import de.hsaalen.cmt.environment.S3_BUCKET
-import de.hsaalen.cmt.environment.S3_ENDPOINT
-import de.hsaalen.cmt.environment.S3_PASSWORD
-import de.hsaalen.cmt.environment.S3_USER
+import de.hsaalen.cmt.environment.*
 import de.hsaalen.cmt.network.dto.objects.UUID
+import mu.KotlinLogging
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import software.amazon.awssdk.core.sync.RequestBody
@@ -21,6 +19,11 @@ import java.net.URI
 internal object StorageS3 {
 
     /**
+     * Local logger instance for this class.
+     */
+    private val logger = KotlinLogging.logger { }
+
+    /**
      * Local client instance.
      */
     lateinit var client: S3Client
@@ -29,6 +32,10 @@ internal object StorageS3 {
      * Configure the client and test connection with server.
      */
     fun configure() {
+        if (S3_PASSWORD == DEFAULT_CREDENTIAL_VALUE) {
+            logger.warn("Please configure a secure password for S3 via system environment variables!")
+        }
+
         try {
             val credentials = StaticCredentialsProvider.create(AwsBasicCredentials.create(S3_USER, S3_PASSWORD))
             client = S3Client.builder()
@@ -39,6 +46,7 @@ internal object StorageS3 {
         } catch (ex: Exception) {
             throw IllegalStateException("Unable to configure S3 client", ex)
         }
+
         try {
             client.createBucket {
                 it.bucket(S3_BUCKET)

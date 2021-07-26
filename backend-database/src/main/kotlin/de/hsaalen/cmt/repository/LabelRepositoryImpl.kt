@@ -75,7 +75,7 @@ internal object LabelRepositoryImpl : LabelRepository {
         }
 
         // Call event handlers
-        val dto = LabelUpdateDto(reference, labelName, LabelChangeMode.DELETE)
+        val dto = LabelUpdateDto(reference, labelName, LabelChangeMode.REMOVE)
         GlobalEventDispatcher.notify(LabelChangeEvent(dto, userEmail))
     }
 

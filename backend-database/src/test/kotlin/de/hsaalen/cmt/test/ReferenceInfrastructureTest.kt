@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle
 import kotlin.test.Test
-import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 /**
@@ -37,7 +36,7 @@ class ReferenceInfrastructureTest {
     @Order(0)
     fun testCreateReferenceWithLabels() {
         runBlockingWithSession {
-            val labelNames = listOf("a", "b", "c")
+            val labelNames = setOf("a", "b", "c")
             val info = ClientCreateReferenceDto("test", contentType = ContentType.TEXT, labels = labelNames)
             val refRepo = ReferenceRepositoryImpl
             val docRepo = DocumentRepositoryImpl
@@ -46,7 +45,7 @@ class ReferenceInfrastructureTest {
             suspend fun validate() {
                 assertEquals(info.displayName, ref.displayName)
                 assertEquals("", docRepo.downloadContent(ref.uuid))
-                assertContentEquals(info.labels, labelNames)
+                assertEquals(info.labels, labelNames)
             }
 
             validate()

@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.extensions
 
 import kotlinx.browser.window
+import kotlinx.coroutines.CoroutineExceptionHandler
 import mu.KotlinLogging
 import org.w3c.dom.ErrorEvent
 import org.w3c.dom.events.Event
@@ -14,6 +15,13 @@ object ExceptionHandler {
      * Local logging instance.
      */
     private val logger = KotlinLogging.logger { }
+
+    /**
+     * Handler for exceptions that occurred in coroutine context.
+     */
+    val handler = CoroutineExceptionHandler { _, throwable ->
+        onError(throwable)
+    }
 
     /**
      * Install global error handler.
@@ -33,6 +41,14 @@ object ExceptionHandler {
         if (error !is Throwable) {
             return
         }
+        event.preventDefault()
+        onError(error)
+    }
+
+    /**
+     * Called every time any unhandled exception occurred.
+     */
+    private fun onError(error: Throwable) {
         val errorType = error::class.simpleName?.removeSuffix("Exception") ?: ""
         val errorMessage = ("$errorType: " + error.message).trim()
         if (error.cause == null) {
@@ -40,7 +56,6 @@ object ExceptionHandler {
         } else {
             logger.warn(error.cause) { errorMessage }
         }
-        event.preventDefault()
     }
 
 }

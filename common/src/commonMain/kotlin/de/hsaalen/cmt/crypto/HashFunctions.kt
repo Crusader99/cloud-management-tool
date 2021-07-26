@@ -22,16 +22,19 @@ fun hashSHA256(input: String): String {
 /**
  * Padding is used to fill the remaining bytes.
  */
-private val padding = Padding.ISO10126Padding
+private val defaultSecurePadding = Padding.ISO10126Padding
 
 /**
  * Encrypt input data with key using AES. The algorithm used
  * padding and every time the encryption is called on the same
  * input data, different output data will be generated. This
  * will prevent equality checks from attacker.
+ *
+ * @param secureRandomizedPadding - Generates different output for same input, which is more secure. Enabled by default.
  */
-fun encrypt(decrypted: ByteArray, key: ByteArray): ByteArray {
+fun encrypt(decrypted: ByteArray, key: ByteArray, secureRandomizedPadding: Boolean = true): ByteArray {
     try {
+        val padding = if (secureRandomizedPadding) defaultSecurePadding else Padding.ZeroPadding
         return AES.encryptAes128Cbc(decrypted, key, padding)
     } catch (ex: Throwable) {
         throw IllegalStateException("Encryption failed", ex)
@@ -40,9 +43,12 @@ fun encrypt(decrypted: ByteArray, key: ByteArray): ByteArray {
 
 /**
  * Decrypt a encrypted [ByteArray] by given key using AES.
+ *
+ * @param secureRandomizedPadding - Generates different output for same input, which is more secure. Enabled by default.
  */
-fun decrypt(encrypted: ByteArray, key: ByteArray): ByteArray {
+fun decrypt(encrypted: ByteArray, key: ByteArray, secureRandomizedPadding: Boolean = true): ByteArray {
     try {
+        val padding = if (secureRandomizedPadding) defaultSecurePadding else Padding.ZeroPadding
         return AES.decryptAes128Cbc(encrypted, key, padding)
     } catch (ex: Throwable) {
         throw IllegalStateException("Decryption failed", ex)

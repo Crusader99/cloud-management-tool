@@ -141,7 +141,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                 child(OverviewPage::class) {
                     attrs {
                         session = localSession
-                        onItemOpen = { ref ->
+                        onItemOpen = { _, ref ->
                             setState {
                                 reference = ref
                                 page = EnumPageType.EDIT_DOCUMENT
@@ -158,6 +158,11 @@ class WebApp : RComponent<RProps, WebAppState>() {
                     attrs {
                         session = localSession
                         reference = ref
+                        onExit = {
+                            setState {
+                                page = EnumPageType.OVERVIEW
+                            }
+                        }
                     }
                 }
             }

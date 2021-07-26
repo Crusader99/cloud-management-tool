@@ -78,8 +78,8 @@ class LabelInfrastructureTest {
         val labelRepo = LabelRepositoryImpl
 
         // Create references with default label
-        val ref1 = refRepo.createReferenceToDocument("Reference1", labels = listOf("1"))
-        val ref2 = refRepo.createReferenceToDocument("Reference2", labels = listOf("2"))
+        val ref1 = refRepo.createReferenceToDocument("Reference1", labels = setOf("1"))
+        val ref2 = refRepo.createReferenceToDocument("Reference2", labels = setOf("2"))
 
         // Replace labels
         labelRepo.addLabel(ref1, "3")

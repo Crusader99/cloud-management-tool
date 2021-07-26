@@ -65,7 +65,7 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
                 contentType = reference.contentType,
                 dateCreation = revision.dateCreation.millis,
                 dateLastAccess = revision.dateLastAccess.millis,
-                labels = request.labels
+                labels = request.labels.toMutableSet()
             )
         }
 

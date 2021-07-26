@@ -39,7 +39,7 @@ class ReferenceDao(id: EntityID<UUID>) : UUIDEntity(id) {
      */
     fun toReference(): Reference {
         val now = System.currentTimeMillis()
-        val labels = labels.map { it.labelName }
+        val labels = labels.map { it.labelName }.toMutableSet()
         return Reference(id.toUUID(), accessCode, displayName, contentType, now, now, labels)
     }
 }

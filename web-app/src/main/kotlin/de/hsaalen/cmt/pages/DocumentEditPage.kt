@@ -8,6 +8,7 @@ import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
+import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateRemoveDto
 import de.hsaalen.cmt.network.session.Session
 import kotlinx.coroutines.launch
 import kotlinx.css.*
@@ -24,6 +25,7 @@ import styled.styledTextarea
 external interface DocumentEditPageProps : RProps {
     var session: Session
     var reference: Reference
+    var onExit: () -> Unit
 }
 
 /**
@@ -66,6 +68,7 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
             }
 
             GlobalEventDispatcher.register(::onDocumentChangedRemote)
+            GlobalEventDispatcher.register(::onRemovedReference)
         }
     }
 
@@ -132,6 +135,17 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
             LineChangeMode.ADD -> engine.addLine(dto.lineNumber, lineContentDecrypted)
             LineChangeMode.DELETE -> engine.deleteLine(dto.lineNumber)
         }
+    }
+
+    /**
+     * Event called by server after a reference got deleted.
+     */
+    private fun onRemovedReference(ref: ReferenceUpdateRemoveDto) {
+        if (ref.uuid != props.reference.uuid) {
+            return
+        }
+        // Currently open document reference was removed
+        props.onExit()
     }
 
 }

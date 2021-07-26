@@ -15,13 +15,19 @@ data class LabelUpdateDto(
     val labelName: String,
     val mode: LabelChangeMode
 ) : LiveDto() {
+
     /**
      * Encrypt sensible information using personal session key and return new encrypted instance.
+     * Note that for labels the secureRandomizedPadding is disabled because encrypted data has to be the same every time.
+     * This is required because of features like the search by label function.
      */
-    override fun encrypt() = copy(labelName = encrypt(labelName))
+    override fun encrypt() = copy(labelName = encrypt(labelName, secureRandomizedPadding = false))
 
     /**
      * Decrypt sensible information using personal session key and return new decrypted instance.
+     * Note that for labels the secureRandomizedPadding is disabled because encrypted data has to be the same every time.
+     * This is required because of features like the search by label function.
      */
-    override fun decrypt() = copy(labelName = decrypt(labelName))
+    override fun decrypt() = copy(labelName = decrypt(labelName, secureRandomizedPadding = false))
+
 }

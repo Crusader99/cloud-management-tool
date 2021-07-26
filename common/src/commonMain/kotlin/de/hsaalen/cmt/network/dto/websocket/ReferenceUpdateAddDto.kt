@@ -20,4 +20,5 @@ data class ReferenceUpdateAddDto(
      * Decrypt sensible information using personal session key and return new decrypted instance.
      */
     override fun decrypt() = copy(reference = reference.decrypt())
+
 }

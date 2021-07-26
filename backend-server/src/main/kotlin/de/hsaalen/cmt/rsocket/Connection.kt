@@ -1,8 +1,11 @@
 package de.hsaalen.cmt.rsocket
 
+import de.hsaalen.cmt.network.dto.objects.LabelChangeMode
 import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
+import de.hsaalen.cmt.network.dto.websocket.LabelUpdateDto
 import de.hsaalen.cmt.network.dto.websocket.LiveDto
 import de.hsaalen.cmt.repository.DocumentRepository
+import de.hsaalen.cmt.repository.LabelRepository
 import de.hsaalen.cmt.session.jwt.JwtPayload
 import de.hsaalen.cmt.session.withWebSocketSession
 import de.hsaalen.cmt.utils.SerializeHelper
@@ -54,13 +57,19 @@ class Connection(socket: RSocket, private val payload: JwtPayload, val jwtToken:
         fireAndForget { payload ->
             logger.info("got fireAndForget")
             withWebSocketSession(userEmail, socketId) {
-                val repo: DocumentRepository by route.inject()
                 val dto: LiveDto = payload.decodeProtobufData()
                 logger.debug("websocket: received: " + SerializeHelper.encodeJson(dto))
                 if (dto is DocumentChangeDto) {
+                    val repo: DocumentRepository by route.inject()
                     repo.modifyDocument(dto)
+                } else if (dto is LabelUpdateDto) {
+                    val repo: LabelRepository by route.inject()
+                    when (dto.mode) {
+                        LabelChangeMode.ADD -> repo.addLabel(dto.reference, dto.labelName)
+                        LabelChangeMode.REMOVE -> repo.removeLabel(dto.reference, dto.labelName)
+                    }
                 } else {
-                    logger.warn("Unknown data received!")
+                    logger.warn("Unknown data received: " + dto::class.simpleName)
                 }
             }
         }

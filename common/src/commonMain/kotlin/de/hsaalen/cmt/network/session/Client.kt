@@ -75,9 +75,9 @@ internal object Client {
                         RSocketRequestHandler {
                             fireAndForget { payload ->
                                 try {
-                                    logger.info { "Receive encrypted DTO" }
+                                    logger.info { "Received encrypted DTO from server over RSocket" }
                                     val dto: LiveDto = payload.decodeProtobufData()
-                                    logger.info { "Decrypt DTO and dispatch event" }
+                                    logger.info { "Decrypt DTO and dispatch event: " + dto::class.simpleName }
                                     GlobalEventDispatcher.notify(dto.decrypt())
                                 } catch (t: Throwable) {
                                     logger.error(t) { "Unable to handle received DTO" }

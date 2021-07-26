@@ -1,5 +1,7 @@
 package de.hsaalen.cmt.test.crypto
 
+import de.crusader.extensions.decodeBase64
+import de.crusader.extensions.encodeBase64
 import de.crusader.extensions.toHexStr
 import de.hsaalen.cmt.crypto.decrypt
 import de.hsaalen.cmt.crypto.encrypt
@@ -31,7 +33,7 @@ class TestCrypto {
      * Ensure that when same content is encrypted multiple times, different output is generated.
      */
     @Test
-    fun testEncryption2() {
+    fun testSecureRandomizedPadding() {
         val key = generateCryptoKey()
         val encrypted1 = encrypt("123456".encodeToByteArray(), key)
         println("Encrypted content 1: " + encrypted1.toHexStr())
@@ -45,6 +47,20 @@ class TestCrypto {
         }
 
         throw SecurityException("Same plain content will return same encrypted content after 5 tries")
+    }
+
+    /**
+     * Ensure exact same output is generated when encrypting with zero padding (without secure-randomized-padding).
+     */
+    @Test
+    fun testZeroPadding() {
+        val key = generateCryptoKey()
+        val plain = "123456"
+        val out1 = encrypt(plain.encodeToByteArray(), key, secureRandomizedPadding = false).encodeBase64()
+        val out2 = encrypt(plain.encodeToByteArray(), key, secureRandomizedPadding = false).encodeBase64()
+        assertEquals(out1, out2, "Without secure-randomized-padding the result should always be the same")
+
+        assertEquals(plain, decrypt(out1.decodeBase64(), key, secureRandomizedPadding = false).decodeToString())
     }
 
 }

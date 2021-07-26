@@ -31,7 +31,7 @@ interface ReferenceRepository {
     suspend fun createReferenceToDocument(
         displayName: String,
         textLines: String = "",
-        labels: List<String> = emptyList()
+        labels: Set<String> = emptySet()
     ): Reference {
         val dto = ClientCreateReferenceDto(displayName, contentType = ContentType.TEXT, textLines.lines(), labels)
         return createReference(dto)
