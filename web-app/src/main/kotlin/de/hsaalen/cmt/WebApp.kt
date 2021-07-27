@@ -11,7 +11,7 @@ import de.hsaalen.cmt.components.features.renderSnackbar
 import de.hsaalen.cmt.components.features.show
 import de.hsaalen.cmt.components.login.Credentials
 import de.hsaalen.cmt.extensions.coroutines
-import de.hsaalen.cmt.file.openFileSelector
+import de.hsaalen.cmt.file.FileSelector
 import de.hsaalen.cmt.file.readText
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.exceptions.ConnectException
@@ -311,7 +311,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                 setState {
                     isLoading = true
                 }
-                for (file in openFileSelector()) {
+                for (file in FileSelector.openDialog()) {
                     logger.info { "Importing " + file.name + "..." }
                     val text = file.readText()
                     importFile(file.name, text)

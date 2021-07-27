@@ -22,14 +22,15 @@ object GlobalEventDispatcher {
      * Create new child bundle in which new listeners can be registered. When the listeners
      * are no longer required all listeners of a bundle can be removed at once.
      */
-    fun createBundle(caller: Any, block: ListenerBundle.() -> Unit = {}) = createBundle(caller::class, block)
+    fun createBundle(caller: Any, block: ListenerBundle.() -> Unit = {}) =
+        createBundle(callerClass = caller::class, block)
 
     /**
      * Create new child bundle in which new listeners can be registered. When the listeners
      * are no longer required all listeners of a bundle can be removed at once.
      */
-    fun createBundle(caller: KClass<*>, block: ListenerBundle.() -> Unit = {}): ListenerBundle {
-        val child = ListenerBundle(caller)
+    fun createBundle(callerClass: KClass<*>? = null, block: ListenerBundle.() -> Unit = {}): ListenerBundle {
+        val child = ListenerBundle(callerClass)
         children += child
         child.block()
         return child
@@ -45,7 +46,7 @@ object GlobalEventDispatcher {
                     listener.invoke(event)
                 } catch (t: Throwable) {
                     val eventName = listener.parentClass.simpleName
-                    val handlerClass = child.caller.simpleName
+                    val handlerClass = child.caller?.simpleName ?: "unknown"
                     logger.error(t) { "Unexpected behaviour in handler '$handlerClass' for event '$eventName'" }
                 }
             }

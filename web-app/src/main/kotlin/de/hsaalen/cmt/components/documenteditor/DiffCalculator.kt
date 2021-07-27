@@ -21,7 +21,7 @@ class DiffCalculator(
     /**
      * Local logging instance.
      */
-    private val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger("DiffCalculator")
 
     /**
      * The last document lines before call of [findChangedLines] function.

@@ -1,16 +1,23 @@
 package de.hsaalen.cmt.events
 
+import io.ktor.utils.io.core.*
 import kotlin.reflect.KClass
 
 /**
  * This is a concrete subject of the observer pattern.
  */
-class ListenerBundle(val caller: KClass<*>) {
+class ListenerBundle(val caller: KClass<*>?) {
 
     /**
      * Registered event listeners to be notified when event occurs.
      */
     val listeners = mutableListOf<EventHandler>()
+
+    /**
+     * Provides extended functionality for example registering DOM event listeners in an easy way.
+     * Includes support for unregistering multiple events from a [ListenerBundle].
+     */
+    val scopeElements = mutableListOf<Closeable>()
 
     /**
      * Add listener for handling received DTOs.
@@ -27,8 +34,13 @@ class ListenerBundle(val caller: KClass<*>) {
      * Removes the all listeners of this bundle from the [GlobalEventDispatcher].
      */
     fun unregisterAll() {
-        listeners.clear()
-        GlobalEventDispatcher.children -= this
+        try {
+            listeners.clear()
+            scopeElements.forEach { it.close() }
+            scopeElements.clear()
+        } finally {
+            GlobalEventDispatcher.children -= this
+        }
     }
 
 }
