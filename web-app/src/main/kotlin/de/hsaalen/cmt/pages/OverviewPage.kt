@@ -49,6 +49,15 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
     private val logger = KotlinLogging.logger("OverviewPage")
 
     /**
+     * Register events for this component.
+     */
+    private val events = GlobalEventDispatcher.createBundle(this) {
+        register(::onAddedReference)
+        register(::onRemovedReference)
+        register(::onLabelRemoved)
+    }
+
+    /**
      * Reference to create dialog for requesting user to type a specific reference name.
      */
     private val refCreateLabelDialog = createRef<InputDialogComponent>()
@@ -64,17 +73,11 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
         }
     }
 
-    override fun componentDidMount() {
-        GlobalEventDispatcher.register(::onAddedReference)
-        GlobalEventDispatcher.register(::onRemovedReference)
-        GlobalEventDispatcher.register(::onLabelRemoved)
-    }
-
     /**
      * Remove registered event handlers.
      */
     override fun componentWillUnmount() {
-        GlobalEventDispatcher.unregisterAll(this::class)
+        events.unregisterAll()
     }
 
     /**
@@ -128,7 +131,7 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
     }
 
     /**
-     * Called when user removes a label from a reference.
+     * Called when user adds a label to a reference.
      */
     private fun onLabelAdd(event: Event, ref: Reference) {
         event.stopPropagation() // Prevent parent to receive onClick event, which would open the reference
@@ -189,5 +192,4 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
             }
         }
     }
-
 }

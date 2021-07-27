@@ -56,6 +56,14 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
     private val engine: Engine = TextareaEngine(textarea)
 
     /**
+     * Register events for this component.
+     */
+    private val events = GlobalEventDispatcher.createBundle(this) {
+        register(::onDocumentChangedRemote)
+        register(::onRemovedReference)
+    }
+
+    /**
      * Initialize state of the [DocumentEditPage].
      */
     override fun DocumentEditPageState.init() {
@@ -66,9 +74,6 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
             setState {
                 defaultText = text
             }
-
-            GlobalEventDispatcher.register(::onDocumentChangedRemote)
-            GlobalEventDispatcher.register(::onRemovedReference)
         }
     }
 
@@ -76,7 +81,7 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
      * Remove registered event handlers.
      */
     override fun componentWillUnmount() {
-        GlobalEventDispatcher.unregisterAll(this::class)
+        events.unregisterAll()
     }
 
     /**

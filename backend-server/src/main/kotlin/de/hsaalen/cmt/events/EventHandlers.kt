@@ -12,9 +12,11 @@ object EventHandlers {
      * Initialize required event handlers for synchronization.
      */
     fun init() {
-        GlobalEventDispatcher.register(::handleReferenceUpdate)
-        GlobalEventDispatcher.register(::handleDocumentChange)
-        GlobalEventDispatcher.register(::handleLabelChange)
+        GlobalEventDispatcher.createBundle(this) {
+            register(::handleReferenceUpdate)
+            register(::handleDocumentChange)
+            register(::handleLabelChange)
+        }
     }
 
     /**

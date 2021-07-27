@@ -54,6 +54,9 @@ fun String.validateFullNameAndGetError(): String? {
     return null
 }
 
+/**
+ * Protect [String] from line breaks by throwing an exception when any line break detected.
+ */
 fun String.prohibitLineBreaks(): String {
     val lineNumbers = lineSequence().count()
     if (lineNumbers > 1) {
@@ -61,4 +64,11 @@ fun String.prohibitLineBreaks(): String {
         throw IllegalStateException("Found $lineNumbers line numbers, but no line breaks allowed$append")
     }
     return this
+}
+
+/**
+ * Check if string can be used as label name.
+ */
+fun String.isValidLabelString(): Boolean {
+    return isNotBlank() && length < 20 && ' ' !in this
 }

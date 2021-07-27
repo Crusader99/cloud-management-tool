@@ -9,6 +9,7 @@ import de.hsaalen.cmt.network.session.Client
 import de.hsaalen.cmt.network.session.Session
 import de.hsaalen.cmt.repository.LabelRepository
 import de.hsaalen.cmt.utils.ClientSupport
+import de.hsaalen.cmt.utils.isValidLabelString
 import io.ktor.http.*
 
 /**
@@ -20,6 +21,9 @@ internal interface LabelRepositoryImpl : ClientSupport, LabelRepository {
      * Add label to an existing reference by it's [UUID].
      */
     override suspend fun addLabel(reference: UUID, labelName: String) {
+        if (!labelName.isValidLabelString()) {
+            error("Label name does not match expected format")
+        }
         val dto = LabelUpdateDto(reference, labelName, LabelChangeMode.ADD)
         Session.instance?.sendLiveDTO(dto)
     }

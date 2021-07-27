@@ -25,19 +25,19 @@ object WebSocketManager {
     /**
      * Broadcast a DTO to all web-socket clients except to the (own) client.
      */
-    suspend fun broadcastExcept(excludeSocketId: String, dto: LiveDto) {
-        val payload = dto.toPayload()
-        for (others in connections.filter { it.socketId != excludeSocketId }) {
-            others.fireAndForget(payload)
-        }
+    suspend fun broadcastExcept(excludeSocketId: String, dto: LiveDto) = broadcast(dto) {
+        filter { it.socketId != excludeSocketId }
     }
 
     /**
      * Broadcast a DTO to all web-socket clients.
      */
-    suspend fun broadcast(dto: LiveDto) {
-        val payload = dto.toPayload()
-        for (others in connections) {
+    suspend fun broadcast(dto: LiveDto, filter: Iterable<Connection>.() -> Iterable<Connection> = { this }) {
+        logger.debug("broadcast: " + this::class.simpleName)
+        logger.debug(SerializeHelper.encodeJson(dto))
+        for (others in connections.filter()) {
+            // Note: A new payload has to be built for each client
+            val payload = dto.buildPayload()
             others.fireAndForget(payload)
         }
     }
@@ -53,12 +53,12 @@ object WebSocketManager {
 
     /**
      * Convert LiveDto to payload that can be used for rSocket transmission.
+     * Note: A new payload has to be built for each client.
      */
-    private fun LiveDto.toPayload(): Payload {
-        logger.debug("broadcast: " + this::class.simpleName)
-        logger.debug(SerializeHelper.encodeJson(this))
+    private fun LiveDto.buildPayload(): Payload {
+        val dto = this
         return buildPayload {
-            protobufData(this@toPayload)
+            protobufData(dto)
         }
     }
 }

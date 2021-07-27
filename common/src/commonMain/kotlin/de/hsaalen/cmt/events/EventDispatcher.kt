@@ -5,7 +5,7 @@ import kotlin.reflect.KClass
 /**
  * This is a concrete subject of the observer pattern.
  */
-object GlobalEventDispatcher {
+class ListenerBundle(val caller: KClass<*>) {
 
     /**
      * Registered event listeners to be notified when event occurs.
@@ -24,19 +24,12 @@ object GlobalEventDispatcher {
     }
 
     /**
-     * Remove registered event handler of a specific class.
+     * Removes the all listeners of this bundle from the [GlobalEventDispatcher].
      */
-    fun unregisterAll(listenerClass: KClass<*>) {
-        listeners.removeAll { it.parentClass == listenerClass }
-    }
-
-    /**
-     * Notify registered listeners about new event data.
-     */
-    suspend fun notify(event: Event) {
-        for (listener in listeners) {
-            listener.invoke(event)
-        }
+    fun unregisterAll() {
+        listeners.clear()
+        GlobalEventDispatcher.children -= this
     }
 
 }
+
