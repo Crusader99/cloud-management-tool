@@ -25,9 +25,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import mu.KotlinLogging
 import org.w3c.dom.events.Event
 import react.*
 import react.dom.header
+import kotlin.coroutines.coroutineContext
 
 /**
  * React properties of the [WebApp] component.
@@ -43,6 +45,11 @@ external interface WebAppState : RState {
  */
 @JsExport
 class WebApp : RComponent<RProps, WebAppState>() {
+
+    /**
+     * Logging instance for this class.
+     */
+    private val logger = KotlinLogging.logger {}
 
     /**
      * Reference to overview page, required for refreshing references.
@@ -72,22 +79,17 @@ class WebApp : RComponent<RProps, WebAppState>() {
         isLoading = true
         page = EnumPageType.CONNECTING
         reference = null
-        Session.instance = null
 
         coroutines.launch {
             try {
+                logger.info { "Try restoring session...." }
                 val restoredSession = Session.restore()
                 setState {
+                    // Only print overview page when session restore was successful
+                    page = if (restoredSession) EnumPageType.OVERVIEW else EnumPageType.AUTHENTICATION
                     isLoading = false
-                    if (restoredSession == null) {
-                        // Not logged in
-                        page = EnumPageType.AUTHENTICATION
-                    } else {
-                        // Logged in
-                        Session.instance = restoredSession
-                        page = EnumPageType.OVERVIEW
-                    }
                 }
+                launch { runKeepAliveJob() }
             } catch (ex: ConnectException) {
                 delay(2000)
                 setState {
@@ -96,6 +98,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                 }
             } catch (ex: Exception) {
                 // Ignore other errors
+                logger.error(ex) { "Unable to restore session" }
             }
         }
     }
@@ -138,7 +141,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                 child(OverviewPage::class) {
                     attrs {
                         session = localSession
-                        onItemOpen = { ref ->
+                        onItemOpen = { _, ref ->
                             setState {
                                 reference = ref
                                 page = EnumPageType.EDIT_DOCUMENT
@@ -155,6 +158,11 @@ class WebApp : RComponent<RProps, WebAppState>() {
                     attrs {
                         session = localSession
                         reference = ref
+                        onExit = {
+                            setState {
+                                page = EnumPageType.OVERVIEW
+                            }
+                        }
                     }
                 }
             }
@@ -191,10 +199,9 @@ class WebApp : RComponent<RProps, WebAppState>() {
                 setState {
                     isLoading = true
                 }
-                val newSession: Session
                 withTimeout(5_000) { // Timeout after 5 seconds
                     delay(2000)
-                    newSession = if (isRegistration) {
+                    if (isRegistration) {
                         Session.register(
                             credentials.fullName,
                             credentials.email,
@@ -205,40 +212,47 @@ class WebApp : RComponent<RProps, WebAppState>() {
                     }
                 }
                 setState {
-                    Session.instance = newSession // Equivalent to isLoggedIn = true
                     isLoading = false
                     page = EnumPageType.OVERVIEW
                 }
                 launch {
                     refSnackBar.current?.show("Successfully logged in!", MAlertSeverity.success)
                 }
-                launch {
-                    try {
-                        while (isActive) {
-                            val client = Session.instance ?: break
-                            check(client.isConnected) { "Disconnect from server" }
-                            delay(1000)
-                        }
-                    } catch (t: Throwable) {
-                        if (Session.instance != null) {
-                            setState {
-                                Session.instance = null
-                                page = EnumPageType.UNAVAILABLE
-                            }
-                            val errorMessage = t.message ?: "Unknown error occurred"
-                            refSnackBar.current?.show(errorMessage, MAlertSeverity.warning)
-                        }
-                    }
-                }
+                launch { runKeepAliveJob() }
             } catch (ex: Throwable) {
                 val failMessage = "Login failed: " + ex.message
-                println(failMessage)
+                logger.warn { failMessage }
                 setState {
                     isLoading = false
                 }
                 coroutines.launch {
                     refSnackBar.current?.show(failMessage, MAlertSeverity.error)
                 }
+            }
+        }
+    }
+
+    /**
+     * Suspending function that checks working connection with backend.
+     * Shows backend-unavailable page when connection broken.
+     */
+    private suspend fun runKeepAliveJob() {
+        try {
+            logger.debug { "Started keep-alive job" }
+            while (coroutineContext.isActive) {
+                val client = Session.instance ?: break
+                check(client.isConnected) { "Disconnected from server" }
+                delay(1000)
+            }
+            logger.debug { "Job no longer active. Logged out?" }
+        } catch (t: Throwable) {
+            if (Session.instance != null && state.page.isLoggedIn) {
+                setState {
+                    page = EnumPageType.UNAVAILABLE
+                }
+                val errorMessage = t.message ?: "Unknown error occurred"
+                logger.info(t) { "Backend seems to be unavailable: $errorMessage" }
+                refSnackBar.current?.show(errorMessage, MAlertSeverity.warning)
             }
         }
     }
@@ -254,7 +268,6 @@ class WebApp : RComponent<RProps, WebAppState>() {
                 }
                 Session.instance?.logout()
                 setState {
-                    Session.instance = null
                     page = EnumPageType.AUTHENTICATION
                 }
                 coroutines.launch {
@@ -263,7 +276,6 @@ class WebApp : RComponent<RProps, WebAppState>() {
                 delay(400)
             } finally {
                 setState {
-                    Session.instance = null
                     page = EnumPageType.AUTHENTICATION
                     isLoading = false
                 }
@@ -285,11 +297,11 @@ class WebApp : RComponent<RProps, WebAppState>() {
      */
     private fun onImportData() {
         suspend fun importFile(name: String, content: String) {
-            println("importing...")
+            logger.info { "importing..." }
             val session = Session.instance!!
             when {
                 name == "notes.json" -> SimpleNoteImportJson.import(content).forEach { session.createReference(it) }
-                name.endsWith(".txt", true) -> session.createReference(name, content)
+                name.endsWith(".txt", true) -> session.createReferenceToDocument(name, content)
                 else -> throw UnsupportedOperationException("File format unsupported: $name")
             }
         }
@@ -300,10 +312,10 @@ class WebApp : RComponent<RProps, WebAppState>() {
                     isLoading = true
                 }
                 for (file in openFileSelector()) {
-                    println("Importing " + file.name + "...")
+                    logger.info { "Importing " + file.name + "..." }
                     val text = file.readText()
                     importFile(file.name, text)
-                    println(file.name + " successfully imported")
+                    logger.info { file.name + " successfully imported" }
                 }
             } finally {
                 setState {
@@ -323,8 +335,8 @@ class WebApp : RComponent<RProps, WebAppState>() {
                 placeholder = "Display name",
                 button = "Create"
             ) ?: return@launch
-            println("Selected display name: $displayName")
-            Session.instance?.createReference(displayName)
+            logger.info { "Selected display name: $displayName" }
+            Session.instance?.createReferenceToDocument(displayName)
         }
     }
 

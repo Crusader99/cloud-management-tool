@@ -42,7 +42,7 @@ internal object LabelRepositoryImpl : LabelRepository {
                 }
             }
         } catch (ex: Exception) {
-            throw IllegalStateException("Can not add label to reference")
+            throw IllegalStateException("Can not add label to reference", ex)
         }
 
         // Call event handlers
@@ -75,7 +75,7 @@ internal object LabelRepositoryImpl : LabelRepository {
         }
 
         // Call event handlers
-        val dto = LabelUpdateDto(reference, labelName, LabelChangeMode.DELETE)
+        val dto = LabelUpdateDto(reference, labelName, LabelChangeMode.REMOVE)
         GlobalEventDispatcher.notify(LabelChangeEvent(dto, userEmail))
     }
 
@@ -102,8 +102,8 @@ internal object LabelRepositoryImpl : LabelRepository {
 
     /**
      * Find a [ReferenceDao] instance from database by given [UUID].
-     * Will return null when no found in database.
+     * Will return null when no found in database or reference corresponds to different user.
      */
-    private fun findReference(uuid: UUID) = ReferenceDao.findById(uuid.id)
+    private fun findReference(uuid: UUID) = ReferenceDao.findById(uuid.id)?.takeIf { it.owner.email == userEmail }
 
 }

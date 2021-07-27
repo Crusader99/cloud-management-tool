@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.repository
 
+import de.hsaalen.cmt.crypto.generateCryptoKey
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 
 /**
@@ -12,7 +13,12 @@ interface AuthenticationRepository {
     /**
      * Send register request to the server.
      */
-    suspend fun register(fullName: String, email: String, passwordPlain: String): ServerUserInfoDto
+    suspend fun register(
+        fullName: String,
+        email: String,
+        passwordPlain: String,
+        personalKey: ByteArray = generateCryptoKey()
+    ): ServerUserInfoDto
 
     /**
      * Send login request to the server.

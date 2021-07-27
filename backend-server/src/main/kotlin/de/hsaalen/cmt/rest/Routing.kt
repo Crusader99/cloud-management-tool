@@ -1,8 +1,7 @@
 package de.hsaalen.cmt.rest
 
 import de.hsaalen.cmt.network.RestPaths
-import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
-import de.hsaalen.cmt.session.jwt.JwtPayload
+import de.hsaalen.cmt.rest.routes.*
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -15,14 +14,9 @@ fun Application.registerRoutes() = routing {
         call.respondText("Hello world from backend! :-)")
     }
 
-    this@routing.routeAuthentication()
-    this@routing.routeReferences()
-    this@routing.routeLabels()
-    this@routing.routeMetrics()
-    this@routing.routeWebSockets()
+    routeAuthentication()
+    routeReferences()
+    routeLabels()
+    routeMetrics()
+    routeWebSockets()
 }
-
-/**
- * Generate JWT payload based on [ServerUserInfoDto].
- */
-fun ServerUserInfoDto.toJwtPayload() = JwtPayload(fullName, email)

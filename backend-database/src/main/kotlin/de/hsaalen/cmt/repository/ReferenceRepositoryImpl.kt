@@ -5,6 +5,7 @@ import de.hsaalen.cmt.mongo.MongoDB
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientDeleteReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
+import de.hsaalen.cmt.network.dto.objects.ContentType
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.objects.UUID
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
@@ -12,10 +13,13 @@ import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateAddDto
 import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateRemoveDto
 import de.hsaalen.cmt.session.currentSession
 import de.hsaalen.cmt.sql.schema.ReferenceDao
+import de.hsaalen.cmt.sql.schema.ReferenceTable
 import de.hsaalen.cmt.sql.schema.RevisionDao
 import de.hsaalen.cmt.sql.schema.UserDao
+import de.hsaalen.cmt.storage.StorageS3
 import de.hsaalen.cmt.utils.id
 import de.hsaalen.cmt.utils.toUUID
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.joda.time.DateTime
 
@@ -41,7 +45,8 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
             val reference = ReferenceDao.new {
                 this.accessCode = "ACCESS_CODE"
                 this.displayName = request.displayName
-                this.contentType = "document"
+                this.contentType = request.contentType
+                this.owner = creator
             }
             val revision = RevisionDao.new {
                 this.item = reference
@@ -49,7 +54,6 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
 
                 this.dateCreation = now
                 this.dateLastAccess = now
-                this.comment = request.comment
                 this.creator = creator
                 this.accessCount = 0
             }
@@ -61,13 +65,13 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
                 contentType = reference.contentType,
                 dateCreation = revision.dateCreation.millis,
                 dateLastAccess = revision.dateLastAccess.millis,
-                labels = request.labels
+                labels = request.labels.toMutableSet()
             )
         }
 
         // Create document in mongo-db
         try {
-            MongoDB.createDocument(ref.uuid.value, request.content)
+            MongoDB.createDocument(ref.uuid.value, request.documentLines)
         } catch (ex: Exception) {
             deleteReference(ref) // Cleanup also in SQL on failure
             throw IllegalStateException("Unable to create document for new reference", ex)
@@ -93,30 +97,41 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
      */
     override suspend fun listReferences(query: ClientReferenceQueryDto): ServerReferenceListDto {
         val refs = newSuspendedTransaction {
-            // TODO: filter only files that user owns
-            ReferenceDao.all().map { it.toReference() }
+            val creator = UserDao.findUserByEmail(userEmail)
+            ReferenceDao.find(ReferenceTable.owner eq creator.id).map { it.toReference() }
         }
         return ServerReferenceListDto(refs)
     }
 
     /**
-     * Download the content of a specific reference by uuid.
-     */
-    override suspend fun downloadContent(uuid: UUID): String = MongoDB.getDocumentContent(uuid.value)
-
-    /**
-     * Delete a reference by the given reference uuid.
+     * Delete a reference by the given reference [UUID].
      */
     override suspend fun deleteReference(request: ClientDeleteReferenceDto) {
         val uuid = request.uuid
+        lateinit var contentType: ContentType
+
+        // Delete reference from SQL database
         newSuspendedTransaction {
-            ReferenceDao.findById(uuid.id)
-                ?.delete()
-                ?: throw IllegalArgumentException("No reference with uuid=$uuid found!")
+            val ref = ReferenceDao.findById(uuid.id) ?: error("No reference with uuid=$uuid found!")
+            if (ref.owner.email != userEmail) {
+                throw SecurityException("Can not delete references from different users!")
+            }
+
+            contentType = ref.contentType
+            ref.delete()
         }
 
-        // Call event handlers
-        GlobalEventDispatcher.notify(ReferenceUpdateRemoveDto(uuid))
+        try {
+            when (contentType) {
+                ContentType.TEXT -> MongoDB.deleteDocument(uuid.value)  // Delete document content from MongoDB
+                ContentType.FILE -> StorageS3.deleteFile(uuid)  // Delete related file from S3 storage.
+            }
+        } catch (ex: Exception) {
+            throw IllegalStateException("Unable to delete reference content", ex)
+        } finally {
+            // Call event handlers
+            GlobalEventDispatcher.notify(ReferenceUpdateRemoveDto(uuid))
+        }
     }
 
 }

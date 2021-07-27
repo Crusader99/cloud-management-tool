@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.utils
 
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
+import de.hsaalen.cmt.network.dto.objects.ContentType
 import kotlinx.serialization.Serializable
 
 /**
@@ -16,9 +17,9 @@ data class SimpleNoteImportJson(
          * Import data from simplenote json format.
          */
         fun import(json: String): List<ClientCreateReferenceDto> {
-            val data: SimpleNoteImportJson = JsonHelper.decode(json)
+            val data: SimpleNoteImportJson = SerializeHelper.decodeJson(json)
             return data.activeNotes.map { note ->
-                ClientCreateReferenceDto(note.title, content = note.content, labels = note.tags)
+                ClientCreateReferenceDto(note.title, ContentType.TEXT, note.content.lines(), labels = note.tags)
             }
         }
     }
@@ -34,7 +35,7 @@ data class SimpleNote(
     val creationDate: String,
     val lastModified: String,
     val markdown: Boolean = false,
-    val tags: List<String> = emptyList(),
+    val tags: Set<String> = emptySet(),
 ) {
 
     /**

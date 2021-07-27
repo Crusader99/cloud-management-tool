@@ -1,7 +1,7 @@
 package de.hsaalen.cmt.events
 
 import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateEvent
-import de.hsaalen.cmt.websocket.WebSocketManager
+import de.hsaalen.cmt.rsocket.WebSocketManager
 
 /**
  * Contains handlers for events that should be synchronized over different websocket instances.
@@ -12,9 +12,11 @@ object EventHandlers {
      * Initialize required event handlers for synchronization.
      */
     fun init() {
-        GlobalEventDispatcher.register(::handleReferenceUpdate)
-        GlobalEventDispatcher.register(::handleDocumentChange)
-        GlobalEventDispatcher.register(::handleLabelChange)
+        GlobalEventDispatcher.createBundle(this) {
+            register(::handleReferenceUpdate)
+            register(::handleDocumentChange)
+            register(::handleLabelChange)
+        }
     }
 
     /**

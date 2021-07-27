@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.rest
+package de.hsaalen.cmt.rest.routes
 
 import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.apiPathListLabels

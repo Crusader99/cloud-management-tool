@@ -1,12 +1,11 @@
 package de.hsaalen.cmt.rest
 
-import com.auth0.jwt.JWT
 import de.crusader.extensions.initialCause
 import de.hsaalen.cmt.DatabaseModules
+import de.hsaalen.cmt.network.dto.server.ServerErrorDto
 import de.hsaalen.cmt.session.jwt.JwtCookie
 import de.hsaalen.cmt.session.jwt.toPayload
-import de.hsaalen.cmt.network.dto.server.ServerErrorDto
-import de.hsaalen.cmt.utils.JsonHelper
+import de.hsaalen.cmt.utils.SerializeHelper
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -22,6 +21,7 @@ import io.ktor.server.engine.*
 import io.ktor.websocket.*
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
+import io.rsocket.kotlin.transport.ktor.server.RSocketSupport
 import mu.KotlinLogging
 import org.koin.ktor.ext.Koin
 import org.koin.logger.slf4jLogger
@@ -60,12 +60,13 @@ fun Application.module() {
     }
     install(ContentNegotiation) {
         // Configure the JSON serializer
-        json(JsonHelper.configured)
+        json(SerializeHelper.configured)
     }
     install(WebSockets) { // Define settings for the web socket connection
-        pingPeriod = Duration.ofSeconds(10)
-        timeout = Duration.ofSeconds(15)
+        pingPeriod = Duration.ofSeconds(5)
+        timeout = Duration.ofSeconds(30)
     }
+    install(RSocketSupport)
     install(MicrometerMetrics) {
         // Required to provide metrics for prometheus and grafana
         // More details on https://ktor.io/docs/micrometer-metrics.html#prometheus_endpoint
@@ -100,11 +101,7 @@ fun Application.module() {
         // Examples used from https://ktor.io/docs/jwt.html
         jwt {
             realm = "test"
-            verifier(
-                JWT.require(JwtCookie.algorithm)
-                    .withIssuer(JwtCookie.issuer)
-                    .build()
-            )
+            verifier(JwtCookie.verifier)
             validate { it.toPayload() } // Parse payload object from JSON
             authHeader {
                 // Read JWT token from cookie and provide as authorization header

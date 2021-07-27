@@ -19,6 +19,9 @@ services:
       MONGO_HOST: mongodb
       MONGO_USER: ${MONGO_USER}
       MONGO_PASSWORD: ${MONGO_PASSWORD}
+      S3_ENDPOINT: http://file-storage:9000
+      S3_USER: ${S3_USER}
+      S3_PASSWORD: ${S3_PASSWORD}
       JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8686
   postgres:
     image: postgres:13.3-alpine
@@ -29,6 +32,9 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+  redis:
+    image: redis
+    restart: always
   mongodb: # For encrypted text documents to allow update only one line
     image: mongo:4.4
     restart: always
@@ -44,6 +50,29 @@ services:
       ADMINER_DEFAULT_SERVER: postgres
     ports:
       - "${ADMINER_PORT}:8080"
+  file-storage: # Minio is a S3 compatible file storage (https://docs.min.io/docs/deploy-minio-on-docker-compose.html)
+    image: minio/minio
+    restart: always
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: ${S3_USER}
+      MINIO_ROOT_PASSWORD: ${S3_PASSWORD}
+    expose:
+      - 9000
+    volumes:
+        - s3:/data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
   prometheus: # Provides easy to use web interface to manage mongodb
     image: prom/prometheus:v2.26.0
     volumes:
@@ -78,6 +107,7 @@ services:
       - 80:80
       - 8092:8080 # Dashboard: http://localhost:8082
 volumes:
-  prometheus:
   postgres:
   mongodb:
+  s3:
+  prometheus:

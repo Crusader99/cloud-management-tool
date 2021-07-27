@@ -1,11 +1,13 @@
 package de.hsaalen.cmt.repository
 
 import de.hsaalen.cmt.crypto.hashSHA256
+import de.hsaalen.cmt.environment.DEFAULT_CREDENTIAL_VALUE
 import de.hsaalen.cmt.environment.PASSWORD_SALT
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.sql.schema.UserDao
 import de.hsaalen.cmt.sql.schema.UserTable
 import de.hsaalen.cmt.utils.validateEmailAndThrow
+import mu.KotlinLogging
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.joda.time.DateTime
@@ -16,10 +18,20 @@ import org.joda.time.DateTime
 internal object AuthenticationRepositoryImpl : AuthenticationRepository {
 
     /**
+     * Local logger instance for this class.
+     */
+    private val logger = KotlinLogging.logger { }
+
+    /**
      * Handles register request and provides a ServerUserInfoDto when successfully logged in or throws an exception when
      * operation fails.
      */
-    override suspend fun register(fullName: String, email: String, passwordPlain: String): ServerUserInfoDto {
+    override suspend fun register(
+        fullName: String,
+        email: String,
+        passwordPlain: String,
+        personalKey: ByteArray
+    ): ServerUserInfoDto {
         try {
             // Check user input and throw exception when invalid.
             email.validateEmailAndThrow()
@@ -48,6 +60,7 @@ internal object AuthenticationRepositoryImpl : AuthenticationRepository {
                 this.dateFirstLogin = now
                 this.datePasswordChange = now
                 this.totalLogins = 1
+                this.personalEncryptedKey = personalKey
             }.toServerUserInfoDto()
         }
     }
@@ -93,6 +106,10 @@ internal object AuthenticationRepositoryImpl : AuthenticationRepository {
      * Salt and hash the given password parameter.
      */
     private fun hashPassword(password: String): String {
+        if (PASSWORD_SALT == DEFAULT_CREDENTIAL_VALUE) {
+            logger.warn("Please configure a unique salt for password storage via system environment variables!")
+        }
+
         // Salt password with system environment variable
         val saltedPassword = password + PASSWORD_SALT
 

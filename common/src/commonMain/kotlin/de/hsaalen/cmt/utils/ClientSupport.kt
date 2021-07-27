@@ -1,8 +1,11 @@
-package de.hsaalen.cmt.network.requests
+package de.hsaalen.cmt.utils
 
 import de.hsaalen.cmt.network.RestPaths
 
-internal interface Request {
+/**
+ * Provide easy access to api endpoint.
+ */
+internal interface ClientSupport {
 
     /**
      * The url to use for requests to REST API server

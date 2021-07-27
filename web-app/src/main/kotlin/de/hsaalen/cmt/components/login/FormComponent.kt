@@ -2,7 +2,10 @@ package de.hsaalen.cmt.components.login
 
 import kotlinx.html.js.onSubmitFunction
 import org.w3c.dom.events.Event
-import react.*
+import react.RBuilder
+import react.RComponent
+import react.RProps
+import react.RState
 import react.dom.attrs
 import react.dom.form
 import react.dom.h3

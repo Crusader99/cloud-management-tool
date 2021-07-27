@@ -1,6 +1,8 @@
 package de.hsaalen.cmt.network.requests
 
+import de.hsaalen.cmt.crypto.encrypt
 import de.hsaalen.cmt.crypto.hashSHA256
+import de.hsaalen.cmt.crypto.toBase64
 import de.hsaalen.cmt.network.apiPathAuthLogin
 import de.hsaalen.cmt.network.apiPathAuthLogout
 import de.hsaalen.cmt.network.apiPathAuthRegister
@@ -9,6 +11,7 @@ import de.hsaalen.cmt.network.dto.client.ClientLoginDto
 import de.hsaalen.cmt.network.dto.client.ClientRegisterDto
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.network.session.Client
+import de.hsaalen.cmt.utils.ClientSupport
 import de.hsaalen.cmt.repository.AuthenticationRepository
 import io.ktor.http.*
 
@@ -16,7 +19,7 @@ import io.ktor.http.*
  * Collection of all HTTP requests used by web-app and android-app.
  * Provides full multi-platform support by using ktor clients.
  */
-internal object RequestAuthentication : Request, AuthenticationRepository {
+internal object AuthenticationRepositoryImpl : ClientSupport, AuthenticationRepository {
 
     /**
      * Send register request to the server.
@@ -24,13 +27,15 @@ internal object RequestAuthentication : Request, AuthenticationRepository {
     override suspend fun register(
         fullName: String,
         email: String,
-        passwordPlain: String
+        passwordPlain: String,
+        personalKey: ByteArray
     ): ServerUserInfoDto {
+        val encryptedPersonalKey = encrypt(personalKey, passwordPlain.encodeToByteArray()).toBase64()
         val passwordHashed = hashPassword(passwordPlain)
         val url = Url("$apiEndpoint$apiPathAuthRegister")
         return Client.request(url) {
             method = HttpMethod.Post
-            body = ClientRegisterDto(fullName, email, passwordHashed)
+            body = ClientRegisterDto(fullName, email, passwordHashed, encryptedPersonalKey)
         }
     }
 

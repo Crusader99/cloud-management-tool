@@ -3,16 +3,16 @@ package de.hsaalen.cmt.test.rest
 import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.apiPathDownload
 import de.hsaalen.cmt.network.dto.objects.UUID
-import de.hsaalen.cmt.repository.ReferenceRepository
+import de.hsaalen.cmt.repository.DocumentRepository
 import de.hsaalen.cmt.test.networkTest
 import de.hsaalen.cmt.test.passAuthenticationHeader
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.mockk.coEvery
 import io.mockk.mockkObject
-import org.junit.jupiter.api.Test
 import org.koin.test.KoinTest
 import org.koin.test.inject
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /**
@@ -29,7 +29,7 @@ class TestDownload : KoinTest {
         val fileContent = "content-of\nthe-file"
 
         // Mock object (will be un-mocked by network test automatically)
-        val repo: ReferenceRepository by inject()
+        val repo: DocumentRepository by inject()
         mockkObject(repo)
         coEvery { repo.downloadContent(uuid) } returns fileContent
 

@@ -9,4 +9,16 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ReferenceUpdateRemoveDto(
     val uuid: UUID,
-) : ReferenceUpdateDto()
+) : ReferenceUpdateDto() {
+
+    /**
+     * Encrypt sensible information using personal session key and return new encrypted instance.
+     */
+    override fun encrypt() = this
+
+    /**
+     * Decrypt sensible information using personal session key and return new decrypted instance.
+     */
+    override fun decrypt() = this
+
+}

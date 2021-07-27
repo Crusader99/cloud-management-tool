@@ -1,4 +1,3 @@
-import de.hsaalen.cmt.components.documenteditor.DiffCalculator
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode
 import kotlin.test.Test
 

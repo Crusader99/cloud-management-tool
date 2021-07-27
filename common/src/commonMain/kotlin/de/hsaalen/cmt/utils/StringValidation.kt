@@ -48,8 +48,27 @@ fun String.validateEmailAndGetError(): String? {
 fun String.validateFullNameAndGetError(): String? {
     if (length < 2) {
         return "Name too short"
-    }else   if (length > 40) {
+    } else if (length > 40) {
         return "Name too long"
     }
     return null
+}
+
+/**
+ * Protect [String] from line breaks by throwing an exception when any line break detected.
+ */
+fun String.prohibitLineBreaks(): String {
+    val lineNumbers = lineSequence().count()
+    if (lineNumbers > 1) {
+        val append = if (length < 256) ": $this" else ""
+        throw IllegalStateException("Found $lineNumbers line numbers, but no line breaks allowed$append")
+    }
+    return this
+}
+
+/**
+ * Check if string can be used as label name.
+ */
+fun String.isValidLabelString(): Boolean {
+    return isNotBlank() && length < 20 && ' ' !in this
 }

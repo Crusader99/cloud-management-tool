@@ -9,4 +9,16 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ReferenceUpdateAddDto(
     val reference: Reference,
-) : ReferenceUpdateDto()
+) : ReferenceUpdateDto() {
+
+    /**
+     * Encrypt sensible information using personal session key and return new encrypted instance.
+     */
+    override fun encrypt() = copy(reference = reference.encrypt())
+
+    /**
+     * Decrypt sensible information using personal session key and return new decrypted instance.
+     */
+    override fun decrypt() = copy(reference = reference.decrypt())
+
+}

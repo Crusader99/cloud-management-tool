@@ -1,10 +1,11 @@
-package de.hsaalen.cmt.rest
+package de.hsaalen.cmt.rest.routes
 
 import de.hsaalen.cmt.network.*
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientDeleteReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.UUID
+import de.hsaalen.cmt.repository.DocumentRepository
 import de.hsaalen.cmt.repository.ReferenceRepository
 import de.hsaalen.cmt.session.getWithSession
 import de.hsaalen.cmt.session.postWithSession
@@ -43,7 +44,8 @@ fun Routing.routeReferences() = route("/" + RestPaths.base) {
     }
     getWithSession("$apiPathDownload/{uuid}") {
         val uuid: String by call.parameters
-        val stream = repo.downloadContent(UUID(uuid)).byteInputStream()
+        val docRepo: DocumentRepository by call.inject()
+        val stream = docRepo.downloadContent(UUID(uuid)).byteInputStream()
         call.response.header(HttpHeaders.ContentDisposition, "attachment")
         call.respondOutputStream {
             stream.copyTo(this)

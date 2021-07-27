@@ -33,6 +33,9 @@ dependencies {
     implementation("io.ktor:ktor-auth:1.6.1")
     implementation("io.ktor:ktor-auth-jwt:1.6.1")
 
+    // Use RSocket as better alternative to plain websockets (https://rsocket.io/)
+    implementation("io.rsocket.kotlin:rsocket-transport-ktor-server:0.13.1")
+
     // Statistics & logging frameworks
     implementation("ch.qos.logback:logback-classic:1.2.3") {
         because("Ktor depends on this library and has issues when missing")
@@ -43,12 +46,22 @@ dependencies {
     // Use Koin as dependency injection framework
     implementation("io.insert-koin:koin-ktor:3.1.2")
 
-    // JUnit test framework
+    // JUnit test frameworks
+    testImplementation(kotlin("test"))
+    testImplementation("io.insert-koin:koin-test:3.1.2")
+    testImplementation("io.mockk:mockk:1.12.0")
     testImplementation("io.ktor:ktor-server-test-host:1.6.1")
     testImplementation("de.crusader:webscraper-selenium:3.1.0")
     testImplementation("de.crusader:webscraper-htmlunit:3.1.0")
-    testImplementation("io.insert-koin:koin-test-junit5:3.1.2")
-    testImplementation("io.mockk:mockk:1.12.0")
+    testImplementation("io.ktor:ktor-client-core:1.6.1")
+    testImplementation("io.ktor:ktor-client-cio:1.6.1")
+    testImplementation("io.rsocket.kotlin:rsocket-transport-ktor-client:0.13.1")
+
+}
+
+// Exclude conflicting junit5 test dependency from ktor
+configurations {
+    testImplementation.get().exclude("org.jetbrains.kotlin", "kotlin-test-junit")
 }
 
 tasks.test {

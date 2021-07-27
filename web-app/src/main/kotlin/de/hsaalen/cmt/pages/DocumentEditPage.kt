@@ -8,6 +8,7 @@ import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
+import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateRemoveDto
 import de.hsaalen.cmt.network.session.Session
 import kotlinx.coroutines.launch
 import kotlinx.css.*
@@ -24,6 +25,7 @@ import styled.styledTextarea
 external interface DocumentEditPageProps : RProps {
     var session: Session
     var reference: Reference
+    var onExit: () -> Unit
 }
 
 /**
@@ -54,18 +56,24 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
     private val engine: Engine = TextareaEngine(textarea)
 
     /**
+     * Register events for this component.
+     */
+    private val events = GlobalEventDispatcher.createBundle(this) {
+        register(::onDocumentChangedRemote)
+        register(::onRemovedReference)
+    }
+
+    /**
      * Initialize state of the [DocumentEditPage].
      */
     override fun DocumentEditPageState.init() {
         coroutines.launch {
-            val text = Session.instance?.download(props.reference.uuid) ?: return@launch
+            val text = Session.instance?.downloadContent(props.reference.uuid) ?: return@launch
             diffCalculator.setText(text)
             engine.text = text
             setState {
                 defaultText = text
             }
-
-            GlobalEventDispatcher.register(::onDocumentChangedRemote)
         }
     }
 
@@ -73,7 +81,7 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
      * Remove registered event handlers.
      */
     override fun componentWillUnmount() {
-        GlobalEventDispatcher.unregisterAll(this::class)
+        events.unregisterAll()
     }
 
     /**
@@ -126,12 +134,23 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
             return
         }
         println("Received text change: $dto")
-        val lineContentDecrypted = dto.lineContentEncrypted
+        val lineContentDecrypted = dto.lineContent
         when (dto.lineChangeMode) {
             LineChangeMode.MODIFY -> engine.modifyLine(dto.lineNumber, lineContentDecrypted)
             LineChangeMode.ADD -> engine.addLine(dto.lineNumber, lineContentDecrypted)
             LineChangeMode.DELETE -> engine.deleteLine(dto.lineNumber)
         }
+    }
+
+    /**
+     * Event called by server after a reference got deleted.
+     */
+    private fun onRemovedReference(ref: ReferenceUpdateRemoveDto) {
+        if (ref.uuid != props.reference.uuid) {
+            return
+        }
+        // Currently open document reference was removed
+        props.onExit()
     }
 
 }

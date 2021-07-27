@@ -3,6 +3,7 @@ package de.hsaalen.cmt
 import de.hsaalen.cmt.mongo.MongoDB
 import de.hsaalen.cmt.repository.*
 import de.hsaalen.cmt.sql.Postgresql
+import de.hsaalen.cmt.storage.StorageS3
 import org.koin.dsl.module
 
 /**
@@ -20,6 +21,7 @@ object DatabaseModules {
 
         MongoDB.configure()
         Postgresql.configure()
+        StorageS3.configure()
     }
 
     /**
