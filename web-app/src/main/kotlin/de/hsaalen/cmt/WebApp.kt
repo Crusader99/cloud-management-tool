@@ -49,7 +49,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
     /**
      * Logging instance for this class.
      */
-    private val logger = KotlinLogging.logger {}
+    private val logger = KotlinLogging.logger("WebApp")
 
     /**
      * Reference to overview page, required for refreshing references.

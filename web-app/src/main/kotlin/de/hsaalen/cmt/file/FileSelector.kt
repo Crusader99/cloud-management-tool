@@ -35,7 +35,7 @@ object FileSelector {
     /**
      * Logging instance for this class.
      */
-    private val logger = KotlinLogging.logger {}
+    private val logger = KotlinLogging.logger("FileSelector")
 
     /**
      * Suspend function for asking the user to select files.
