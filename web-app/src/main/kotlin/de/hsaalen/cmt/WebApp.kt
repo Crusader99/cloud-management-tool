@@ -270,7 +270,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                 setState {
                     page = EnumPageType.AUTHENTICATION
                 }
-                coroutines.launch {
+                launch {
                     refSnackBar.current?.show("Logged out", MAlertSeverity.success)
                 }
                 delay(400)

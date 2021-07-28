@@ -3,7 +3,7 @@ package de.hsaalen.cmt.network.session
 import de.hsaalen.cmt.events.GlobalEventDispatcher
 import de.hsaalen.cmt.network.dto.server.ServerErrorDto
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
-import de.hsaalen.cmt.network.dto.websocket.LiveDto
+import de.hsaalen.cmt.network.dto.rsocket.LiveDto
 import de.hsaalen.cmt.network.exceptions.ConnectException
 import de.hsaalen.cmt.network.exceptions.ServerException
 import de.hsaalen.cmt.network.exceptions.UnauthorizedException

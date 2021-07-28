@@ -1,10 +1,10 @@
 package de.hsaalen.cmt.repository
 
 import de.hsaalen.cmt.events.GlobalEventDispatcher
-import de.hsaalen.cmt.events.LabelChangeEvent
+import de.hsaalen.cmt.events.server.LabelChangeEvent
 import de.hsaalen.cmt.network.dto.objects.LabelChangeMode
 import de.hsaalen.cmt.network.dto.objects.UUID
-import de.hsaalen.cmt.network.dto.websocket.LabelUpdateDto
+import de.hsaalen.cmt.network.dto.rsocket.LabelUpdateDto
 import de.hsaalen.cmt.session.currentSession
 import de.hsaalen.cmt.sql.schema.*
 import de.hsaalen.cmt.utils.id

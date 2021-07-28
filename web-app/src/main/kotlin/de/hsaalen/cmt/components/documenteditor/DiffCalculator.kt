@@ -16,7 +16,7 @@ class DiffCalculator(
     /**
      * Event to be called when line is changed.
      */
-    private val onChangeLine: (lineNumber: Int, lineContent: String, changeMode: LineChangeMode) -> Unit
+    private val onChangeLine: suspend (lineNumber: Int, lineContent: String, changeMode: LineChangeMode) -> Unit
 ) {
     /**
      * Local logging instance.
@@ -32,7 +32,7 @@ class DiffCalculator(
      * Algorithm to detect changes, inserts or deletion in a text document. This is used for text documents to improve
      * performance when sending changes to server/mongo-database.
      */
-    fun findChangedLines(newText: String) {
+    suspend fun findChangedLines(newText: String) {
         // Split the text document in lines
         val currentLines = newText.split("\n")
         try {
@@ -54,7 +54,7 @@ class DiffCalculator(
      * Algorithm to detect changes, inserts or deletion in a text document. This is used for text documents to improve
      * performance when sending changes to server/mongo-database.
      */
-    private fun findChangedLines(currentLines: List<String>) {
+    private suspend fun findChangedLines(currentLines: List<String>) {
         val changedRange = findDiffRange(currentLines)
         var lineDiff = currentLines.size - previousLines.size
         logger.info {

@@ -4,7 +4,7 @@ import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.objects.ContentType
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode.*
 import de.hsaalen.cmt.network.dto.objects.Reference
-import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
+import de.hsaalen.cmt.network.dto.rsocket.DocumentChangeDto
 import de.hsaalen.cmt.repository.DocumentRepositoryImpl
 import de.hsaalen.cmt.repository.ReferenceRepositoryImpl
 import org.junit.jupiter.api.BeforeAll

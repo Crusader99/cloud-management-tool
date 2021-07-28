@@ -11,12 +11,12 @@ import de.crusader.extensions.toFullString
 import de.crusader.objects.Point
 import de.crusader.objects.color.Color
 import de.crusader.painter.impl.AndroidCanvasPainter
+import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.views.api.MPView
 import de.hsaalen.cmt.views.components.TestView
 import de.hsaalen.cmt.views.events.MPKeyboardEvent
 import de.hsaalen.cmt.views.events.MPMouseButton
 import de.hsaalen.cmt.views.events.MPMouseEvent
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -42,7 +42,7 @@ constructor(
     init {
         isFocusable = true
         isFocusableInTouchMode = true
-        GlobalScope.launch {
+        coroutines.launch {
             while (isActive) {
                 delay(60) // Reduce delay to get higher fps
                 invalidate()

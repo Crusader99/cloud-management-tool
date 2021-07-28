@@ -4,7 +4,7 @@ import de.hsaalen.cmt.crypto.decrypt
 import de.hsaalen.cmt.network.apiPathListLabels
 import de.hsaalen.cmt.network.dto.objects.LabelChangeMode
 import de.hsaalen.cmt.network.dto.objects.UUID
-import de.hsaalen.cmt.network.dto.websocket.LabelUpdateDto
+import de.hsaalen.cmt.network.dto.rsocket.LabelUpdateDto
 import de.hsaalen.cmt.network.session.Client
 import de.hsaalen.cmt.network.session.Session
 import de.hsaalen.cmt.repository.LabelRepository

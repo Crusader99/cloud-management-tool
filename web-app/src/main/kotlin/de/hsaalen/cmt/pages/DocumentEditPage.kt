@@ -5,11 +5,14 @@ import de.hsaalen.cmt.components.documenteditor.Engine
 import de.hsaalen.cmt.components.documenteditor.TextareaEngine
 import de.hsaalen.cmt.events.GlobalEventDispatcher
 import de.hsaalen.cmt.extensions.coroutines
+import de.hsaalen.cmt.extensions.launch
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode
 import de.hsaalen.cmt.network.dto.objects.Reference
-import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
-import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateRemoveDto
+import de.hsaalen.cmt.network.dto.rsocket.DocumentChangeDto
+import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateRemoveDto
 import de.hsaalen.cmt.network.session.Session
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.css.*
 import kotlinx.html.js.onInputFunction
@@ -56,23 +59,24 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
     private val engine: Engine = TextareaEngine(textarea)
 
     /**
+     * Output channel for changed that will be sent to server.
+     */
+    private var channelSend = Channel<DocumentChangeDto>()
+
+    /**
      * Register events for this component.
      */
     private val events = GlobalEventDispatcher.createBundle(this) {
-        register(::onDocumentChangedRemote)
         register(::onRemovedReference)
-    }
-
-    /**
-     * Initialize state of the [DocumentEditPage].
-     */
-    override fun DocumentEditPageState.init() {
-        coroutines.launch {
-            val text = Session.instance?.downloadContent(props.reference.uuid) ?: return@launch
+        launch {
+            val text = ""
             diffCalculator.setText(text)
             engine.text = text
             setState {
                 defaultText = text
+            }
+            Session.instance?.modifyDocument(props.reference.uuid, channelSend)?.collect { event ->
+                onDocumentChangedRemote(event)
             }
         }
     }
@@ -82,6 +86,7 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
      */
     override fun componentWillUnmount() {
         events.unregisterAll()
+        channelSend.close()
     }
 
     /**
@@ -112,16 +117,21 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
      * Called after every key the user pressed.
      */
     private fun onTextChanged(newText: String) {
-        diffCalculator.findChangedLines(newText)
+        coroutines.launch {
+            diffCalculator.findChangedLines(newText)
+        }
     }
 
     /**
      * Called when any line change detected that has to be transmitted to server.
      */
-    private fun onDocumentChangedLocal(lineNumber: Int, lineContent: String, changeMode: LineChangeMode) {
+    private suspend fun onDocumentChangedLocal(lineNumber: Int, lineContent: String, changeMode: LineChangeMode) {
         val dto = DocumentChangeDto(props.reference.uuid, lineNumber, lineContent, changeMode)
-        coroutines.launch {
-            Session.instance?.modifyDocument(dto)
+        try {
+            textarea.current?.readOnly = true
+            channelSend.send(dto)
+        } finally {
+            textarea.current?.readOnly = false
         }
     }
 
@@ -140,6 +150,7 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
             LineChangeMode.ADD -> engine.addLine(dto.lineNumber, lineContentDecrypted)
             LineChangeMode.DELETE -> engine.deleteLine(dto.lineNumber)
         }
+        diffCalculator.setText(engine.text)
     }
 
     /**

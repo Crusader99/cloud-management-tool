@@ -1,24 +1,24 @@
-package de.hsaalen.cmt.network.dto.websocket
+package de.hsaalen.cmt.network.dto.rsocket
 
 import de.hsaalen.cmt.network.dto.objects.UUID
 import kotlinx.serialization.Serializable
 
 /**
- * Data transfer object when any reference has been removed.
+ * Request server to provide content to a specific document.
  */
 @Serializable
-data class ReferenceUpdateRemoveDto(
-    val uuid: UUID,
+data class RequestDocumentDto(
+    val reference: UUID,
 ) : ReferenceUpdateDto() {
 
     /**
      * Encrypt sensible information using personal session key and return new encrypted instance.
      */
-    override fun encrypt() = this
+    override fun encrypt() = this // No sensible information here
 
     /**
      * Decrypt sensible information using personal session key and return new decrypted instance.
      */
-    override fun decrypt() = this
+    override fun decrypt() = this // No sensible information here
 
 }

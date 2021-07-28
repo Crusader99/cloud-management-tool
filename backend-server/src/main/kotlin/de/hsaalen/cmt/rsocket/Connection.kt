@@ -1,19 +1,26 @@
 package de.hsaalen.cmt.rsocket
 
+import de.hsaalen.cmt.events.GlobalEventDispatcher
+import de.hsaalen.cmt.events.server.UserDocumentChangeEvent
+import de.hsaalen.cmt.extensions.launch
 import de.hsaalen.cmt.network.dto.objects.LabelChangeMode
-import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
-import de.hsaalen.cmt.network.dto.websocket.LabelUpdateDto
-import de.hsaalen.cmt.network.dto.websocket.LiveDto
+import de.hsaalen.cmt.network.dto.objects.LineChangeMode
+import de.hsaalen.cmt.network.dto.rsocket.DocumentChangeDto
+import de.hsaalen.cmt.network.dto.rsocket.LabelUpdateDto
+import de.hsaalen.cmt.network.dto.rsocket.LiveDto
+import de.hsaalen.cmt.network.dto.rsocket.RequestDocumentDto
 import de.hsaalen.cmt.repository.DocumentRepository
 import de.hsaalen.cmt.repository.LabelRepository
 import de.hsaalen.cmt.session.jwt.JwtPayload
 import de.hsaalen.cmt.session.withWebSocketSession
 import de.hsaalen.cmt.utils.SerializeHelper
+import de.hsaalen.cmt.utils.buildPayload
 import de.hsaalen.cmt.utils.decodeProtobufData
 import io.ktor.routing.*
 import io.rsocket.kotlin.RSocket
 import io.rsocket.kotlin.RSocketRequestHandler
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withTimeout
 import mu.KLogger
 import mu.KotlinLogging
@@ -39,7 +46,7 @@ class Connection(socket: RSocket, private val payload: JwtPayload, val jwtToken:
     /**
      * A unique id for this socket instance.
      */
-    val socketId: String
+    private val socketId: String
 
     init {
         // Calculate unique id of this connection
@@ -71,6 +78,48 @@ class Connection(socket: RSocket, private val payload: JwtPayload, val jwtToken:
                 } else {
                     logger.warn("Unknown data received: " + dto::class.simpleName)
                 }
+            }
+        }
+
+        requestChannel { init, input ->
+            logger.info("got requestChannel")
+            withWebSocketSession(userEmail, socketId) {
+                val request: RequestDocumentDto = init.decodeProtobufData()
+                val documentUUID = request.reference
+                val docRepo: DocumentRepository by route.inject()
+                val events = GlobalEventDispatcher.createBundle(this)
+
+                events.launch {
+                    withWebSocketSession(userEmail, socketId) {
+                        input.collect {
+                            try {
+                                val dto: DocumentChangeDto = it.decodeProtobufData()
+                                docRepo.modifyDocument(dto)
+                            } catch (ex: Exception) {
+                                logger.error("Unable to handle document change", ex)
+                            }
+                        }
+                    }
+                }
+
+                val documentFlow = docRepo.downloadContent(documentUUID)
+                    .lineSequence()
+                    .mapIndexed { index, line ->
+                        val mode = if (index == 0) LineChangeMode.MODIFY else LineChangeMode.ADD
+                        DocumentChangeDto(documentUUID, index, line, mode)
+                    }.asFlow()
+                val eventFlow = events.receiveEventsAsFlow<UserDocumentChangeEvent>()
+                    .filter { it.senderSocketId != socketId }
+                    .map { it.modification }
+                    .filter { it.uuid == documentUUID }
+
+                channelFlow {
+                    documentFlow.collect { send(it) }
+                    eventFlow.collect { send(it) }
+                }.onCompletion {
+                    logger.info("Cancel document editing")
+                    events.unregisterAll()
+                }.map { it.buildPayload() }
             }
         }
         job.invokeOnCompletion {

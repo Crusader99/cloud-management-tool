@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.network.dto.websocket
+package de.hsaalen.cmt.network.dto.rsocket
 
 import de.hsaalen.cmt.crypto.Encryptable
 import de.hsaalen.cmt.events.Event

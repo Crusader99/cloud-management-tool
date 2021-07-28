@@ -1,7 +1,7 @@
 package de.hsaalen.cmt.repository
 
 import de.hsaalen.cmt.network.dto.objects.UUID
-import de.hsaalen.cmt.network.dto.websocket.DocumentChangeDto
+import de.hsaalen.cmt.network.dto.rsocket.DocumentChangeDto
 
 /**
  * Repository port for providing specific document infrastructure. This can be implemented by the server using Mongo db

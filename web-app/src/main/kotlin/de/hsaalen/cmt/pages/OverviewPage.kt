@@ -12,9 +12,9 @@ import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.LabelChangeMode
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
-import de.hsaalen.cmt.network.dto.websocket.LabelUpdateDto
-import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateAddDto
-import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateRemoveDto
+import de.hsaalen.cmt.network.dto.rsocket.LabelUpdateDto
+import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateAddDto
+import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateRemoveDto
 import de.hsaalen.cmt.network.session.Session
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
