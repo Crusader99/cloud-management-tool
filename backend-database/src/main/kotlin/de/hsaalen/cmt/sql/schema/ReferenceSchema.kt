@@ -18,8 +18,6 @@ object ReferenceTable : UUIDTable("reference") {
     val displayName = varchar("display_name", 512)
     val contentType = enumeration("content_type", ContentType::class)
     val owner = reference("owner", UserTable, onDelete = ReferenceOption.CASCADE)
-    // val latestRevision = reference("latest_revision", RevisionTable, onDelete = ReferenceOption.RESTRICT)
-    // TODO fix initialization problem
 }
 
 /**

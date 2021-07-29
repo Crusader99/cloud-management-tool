@@ -51,17 +51,4 @@ fun Routing.routeReferences() = route("/" + RestPaths.base) {
             stream.copyTo(this)
         }
     }
-    postWithSession(apiPathImport) { // TODO: update or remove
-        val multipart = call.receiveMultipart()
-        multipart.forEachPart { part ->
-            // Get all file parts of this multipart
-            if (part is PartData.FileItem) {
-                val fileName = part.originalFileName ?: "unknown"
-                val fileContent = part.streamProvider()
-            }
-            // Close part to prevent memory leaks
-            part.dispose()
-        }
-        call.respondText("Imported")
-    }
 }

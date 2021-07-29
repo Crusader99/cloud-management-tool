@@ -15,6 +15,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.css.*
+import kotlinx.css.properties.BoxShadows
 import kotlinx.html.js.onInputFunction
 import org.w3c.dom.HTMLTextAreaElement
 import react.*
@@ -96,13 +97,15 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
         styledTextarea {
             css {
                 width = 100.pct
-                height = 100.pct
+                height = 90.pct
                 top = 64.px
                 left = 0.px
                 right = 0.px
                 bottom = 0.px
                 position = Position.fixed
                 resize = Resize.none
+                outline = Outline.none
+                boxShadow = BoxShadows.none
                 border = "0"
             }
             attrs {

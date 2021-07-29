@@ -3,6 +3,7 @@ package de.hsaalen.cmt.events
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlin.reflect.KClass
 
@@ -49,7 +50,7 @@ class ListenerBundle(val caller: KClass<*>?) {
                 ch.close()
             }
         }
-        return ch.receiveAsFlow()
+        return ch.consumeAsFlow()
     }
 
     /**

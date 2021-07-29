@@ -30,6 +30,9 @@ class TextareaEngine(private val textarea: RReadableRef<HTMLTextAreaElement>) : 
             text = lines.joinToString("\n")
         }
 
+    /**
+     * Can be called to modify a line at a specific position.
+     */
     override fun modifyLine(lineNumber: Int, newContent: String) {
         val lines = this.lines.toMutableList()
         try {
@@ -40,6 +43,9 @@ class TextareaEngine(private val textarea: RReadableRef<HTMLTextAreaElement>) : 
         }
     }
 
+    /**
+     * Insert a new line in the given line number.
+     */
     override fun addLine(lineNumber: Int, lineContent: String) {
         val lines = this.lines.toMutableList()
         try {
@@ -50,6 +56,9 @@ class TextareaEngine(private val textarea: RReadableRef<HTMLTextAreaElement>) : 
         }
     }
 
+    /**
+     * Remove the line at the given line number.
+     */
     override fun deleteLine(lineNumber: Int) {
         val lines = this.lines.toMutableList()
         try {
