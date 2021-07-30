@@ -9,8 +9,8 @@ import de.hsaalen.cmt.network.dto.objects.ContentType
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.objects.UUID
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
-import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateAddDto
-import de.hsaalen.cmt.network.dto.websocket.ReferenceUpdateRemoveDto
+import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateAddDto
+import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateRemoveDto
 import de.hsaalen.cmt.session.currentSession
 import de.hsaalen.cmt.sql.schema.ReferenceDao
 import de.hsaalen.cmt.sql.schema.ReferenceTable

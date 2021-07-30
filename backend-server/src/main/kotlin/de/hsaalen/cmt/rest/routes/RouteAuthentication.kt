@@ -1,16 +1,19 @@
 package de.hsaalen.cmt.rest.routes
 
 import de.hsaalen.cmt.crypto.fromBase64
+import de.hsaalen.cmt.events.GlobalEventDispatcher
+import de.hsaalen.cmt.events.server.SessionCloseEvent
 import de.hsaalen.cmt.network.*
 import de.hsaalen.cmt.network.dto.client.ClientLoginDto
 import de.hsaalen.cmt.network.dto.client.ClientRegisterDto
 import de.hsaalen.cmt.repository.AuthenticationRepository
-import de.hsaalen.cmt.rsocket.WebSocketManager
+import de.hsaalen.cmt.session.currentSession
 import de.hsaalen.cmt.session.getWithSession
 import de.hsaalen.cmt.session.jwt.JwtCookie
 import de.hsaalen.cmt.session.jwt.generateJwtToken
 import de.hsaalen.cmt.session.jwt.readJwtCookie
 import de.hsaalen.cmt.session.jwt.updateJwtCookie
+import de.hsaalen.cmt.session.postWithSession
 import io.ktor.application.*
 import io.ktor.request.*
 import io.ktor.response.*
@@ -37,6 +40,7 @@ fun Routing.routeAuthentication() = route("/" + RestPaths.base) {
         call.response.updateJwtCookie(user.generateJwtToken())
         call.respond(user)
     }
+
     post(apiPathAuthRegister) {
         val request: ClientRegisterDto = call.receive()
         logger.info("Register new account with e-mail= " + request.email)
@@ -45,23 +49,20 @@ fun Routing.routeAuthentication() = route("/" + RestPaths.base) {
         call.response.updateJwtCookie(user.generateJwtToken())
         call.respond(user)
     }
-    post(apiPathAuthLogout) {
+
+    postWithSession(apiPathAuthLogout) { // Automatically checks if authorization cookie is valid
         // Disconnect currently connected web sockets
-        val jwtToken = call.request.cookies[JwtCookie.cookieName]
-        if (jwtToken != null) {
-            try {
-                JwtCookie.verifyToken(jwtToken) // Throws exception when JWT token invalid
-                WebSocketManager.disconnect(jwtToken) // Disconnect all web-sockets from this session
-            } catch (ex: Exception) {
-                logger.warn("Unable to disconnect websockets related to session", ex)
-            }
+        call.request.cookies[JwtCookie.cookieName]?.let { jwtToken ->
+            // Notify event handlers to allow disconnecting all web-sockets from this session
+            GlobalEventDispatcher.notify(SessionCloseEvent(currentSession.userMail, jwtToken))
         }
 
         // Reset cookie using http header
         call.response.cookies.appendExpired(name = JwtCookie.cookieName, path = "/", domain = "")
         call.respond(Unit)
     }
-    // Check authorization cookie is set and refresh JWT token when logged in
+
+    // Check authorization cookie is valid and refresh JWT token when logged in
     getWithSession(apiPathAuthRestore) {
         val payload = call.request.readJwtCookie()
         val user = repo.restore(payload.email)

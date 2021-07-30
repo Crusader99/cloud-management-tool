@@ -22,9 +22,9 @@ val SessionContext.senderSocketId: String
 /**
  * Build a websocket session context for the current coroutine.
  */
-suspend inline fun withWebSocketSession(userEmail: String, socketId: String, crossinline block: suspend () -> Unit) {
-    val context = WebSocketContextImpl(userEmail, socketId)
-    withContext(coroutineContext + SessionContext.threadLocal.asContextElement(context)) {
+suspend inline fun <R> withWebSocketSession(userMail: String, socketId: String, crossinline block: suspend () -> R): R {
+    val context = WebSocketContextImpl(userMail, socketId)
+    return withContext(coroutineContext + SessionContext.threadLocal.asContextElement(context)) {
         block()
     }
 }

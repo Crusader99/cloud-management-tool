@@ -74,5 +74,4 @@ abstract class FormComponent(props: FormComponentProps) : RComponent<FormCompone
         props.onSubmit(Credentials(state.fullName, state.email, state.password))
     }
 
-
 }

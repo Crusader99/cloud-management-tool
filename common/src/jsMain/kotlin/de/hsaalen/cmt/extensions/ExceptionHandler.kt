@@ -27,7 +27,7 @@ object ExceptionHandler {
      * Install global error handler.
      */
     fun install() {
-        window.addEventListener("error", ::onError)
+        window.addEventListener("error", ExceptionHandler::onError)
     }
 
     /**

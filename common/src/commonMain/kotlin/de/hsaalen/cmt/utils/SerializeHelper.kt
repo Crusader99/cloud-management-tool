@@ -1,6 +1,6 @@
 package de.hsaalen.cmt.utils
 
-import de.hsaalen.cmt.network.dto.websocket.LiveDto
+import de.hsaalen.cmt.network.dto.rsocket.LiveDto
 import io.ktor.utils.io.core.*
 import io.rsocket.kotlin.payload.Payload
 import io.rsocket.kotlin.payload.PayloadBuilder
@@ -42,12 +42,24 @@ object SerializeHelper {
  * Add [LiveDto] data to rSocket payload.
  */
 inline fun <reified DTO : LiveDto> PayloadBuilder.protobufData(dto: DTO) {
-    data(ProtoBuf.encodeToByteArray(dto))
+    data(ProtoBuf.encodeToByteArray(dto as LiveDto))
 }
 
 /**
  * Read [LiveDto] data from rSocket payload.
  */
 inline fun <reified DTO : LiveDto> Payload.decodeProtobufData(): DTO {
-    return ProtoBuf.decodeFromByteArray(data.readBytes())
+    val dto: LiveDto = ProtoBuf.decodeFromByteArray(data.readBytes())
+    return dto as DTO
+}
+
+/**
+ * Convert LiveDto to payload that can be used for rSocket transmission.
+ * Note: A new payload has to be built for each client.
+ */
+fun LiveDto.buildPayload(): Payload {
+    val dto = this
+    return io.rsocket.kotlin.payload.buildPayload {
+        protobufData(dto)
+    }
 }

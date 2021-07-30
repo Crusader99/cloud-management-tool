@@ -1,6 +1,7 @@
-package de.hsaalen.cmt.events
+package de.hsaalen.cmt.events.server
 
-import de.hsaalen.cmt.network.dto.websocket.LabelUpdateDto
+import de.hsaalen.cmt.events.Event
+import de.hsaalen.cmt.network.dto.rsocket.LabelUpdateDto
 
 /**
  * Event to be called when a user modified a line of a document.

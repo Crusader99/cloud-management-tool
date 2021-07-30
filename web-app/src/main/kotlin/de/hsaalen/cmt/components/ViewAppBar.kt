@@ -67,47 +67,45 @@ class ViewAppBar : RComponent<ViewAppBarProps, ViewAppBarState>() {
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        styledDiv {
-            mAppBar {
-                mToolbar {
-                    mTooltip("Menu") {
-                        mIconButton(iconName = "menu_icon", color = MColor.inherit, onClick = {
-                            setState {
-                                // Show drawer on side
-                                isDrawerVisible = true
-                            }
-                        })
+        mAppBar {
+            mToolbar {
+                mTooltip("Menu") {
+                    mIconButton(iconName = "menu_icon", color = MColor.inherit, onClick = {
+                        setState {
+                            // Show drawer on side
+                            isDrawerVisible = true
+                        }
+                    })
+                }
+                mTypography(text = "Cloud Management Tool", variant = MTypographyVariant.h6)
+                if (props.isLoggedIn) {
+                    styledDiv {
+                        css {
+                            flex(1.0, 1.0, FlexBasis.auto)
+                        }
                     }
-                    mTypography(text = "Cloud Management Tool", variant = MTypographyVariant.h6)
-                    if (props.isLoggedIn) {
-                        styledDiv {
-                            css {
-                                flex(1.0, 1.0, FlexBasis.auto)
+                    if (window.innerWidth > 500) {  // Only print user name when on large page
+                        Session.instance?.userInfo?.let { userInfo ->
+                            mTooltip("Logged in as " + userInfo.email) {
+                                p { +userInfo.fullName }
                             }
                         }
-                        if (window.innerWidth > 500) {  // Only print user name when on large page
-                            Session.instance?.userInfo?.let { userInfo ->
-                                mTooltip("Logged in as " + userInfo.email) {
-                                    p { +userInfo.fullName }
-                                }
-                            }
-                        }
-                        mTooltip("Logout") {
-                            mIconButton(
-                                iconName = "logout_icon",
-                                color = MColor.inherit,
-                                onClick = { props.onLogout() })
-                        }
+                    }
+                    mTooltip("Logout") {
+                        mIconButton(
+                            iconName = "logout_icon",
+                            color = MColor.inherit,
+                            onClick = { props.onLogout() })
                     }
                 }
-                mDrawer(open = state.isDrawerVisible, anchor = MDrawerAnchor.left, onClose = {
-                    setState {
-                        // Hide drawer on side
-                        isDrawerVisible = false
-                    }
-                }) {
-                    renderDrawer()
+            }
+            mDrawer(open = state.isDrawerVisible, anchor = MDrawerAnchor.left, onClose = {
+                setState {
+                    // Hide drawer on side
+                    isDrawerVisible = false
                 }
+            }) {
+                renderDrawer()
             }
         }
         h2 { br { } }

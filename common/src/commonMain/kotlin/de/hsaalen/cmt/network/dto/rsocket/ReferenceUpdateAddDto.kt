@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.network.dto.websocket
+package de.hsaalen.cmt.network.dto.rsocket
 
 import de.hsaalen.cmt.network.dto.objects.Reference
 import kotlinx.serialization.Serializable

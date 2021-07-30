@@ -10,7 +10,7 @@ import mu.KotlinLogging
 /**
  * Logging instance for this class.
  */
-private val logger = KotlinLogging.logger { }
+private val logger = KotlinLogging.logger("BackendLocator")
 
 /**
  * Opens a new dialog for configuring backend url for REST API in async mode.
