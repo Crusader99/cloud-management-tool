@@ -330,11 +330,12 @@ class WebApp : RComponent<RProps, WebAppState>() {
      */
     private fun onCreateReference() {
         coroutines.launch {
-            val displayName = refCreateReferenceDialog.current?.show(
+            val dialogResult = refCreateReferenceDialog.current?.show(
                 title = "Name for new reference",
                 placeholder = "Display name",
-                button = "Create"
+                buttons = listOf("Create document", "Upload file")
             ) ?: return@launch
+            val displayName = dialogResult.inputText
             logger.info { "Selected display name: $displayName" }
             Session.instance?.createReferenceToDocument(displayName)
         }
