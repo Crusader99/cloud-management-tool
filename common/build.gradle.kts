@@ -16,7 +16,7 @@ kotlin {
     jvm {
         attributes.attribute(attr, "jvm")
     }
-    js(BOTH) {
+    js(IR) {
         useCommonJs()
         browser {
             testTask {
@@ -49,16 +49,16 @@ kotlin {
                 }
 
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
-                implementation("io.ktor:ktor-client-core:1.6.1")
-                implementation("io.ktor:ktor-client-serialization:1.6.1")
-                implementation("io.ktor:ktor-client-websockets:1.6.1")
+                implementation("io.ktor:ktor-client-core:1.6.2")
+                implementation("io.ktor:ktor-client-serialization:1.6.2")
+                implementation("io.ktor:ktor-client-websockets:1.6.2")
 
                 // Use RSocket as better alternative to plain websockets (https://rsocket.io)
                 implementation("io.rsocket.kotlin:rsocket-transport-ktor-client:0.13.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.2.2")
 
                 // Kotlin crypto library for password hashing
-                implementation("com.soywiz.korlibs.krypto:krypto:2.2.0")
+                implementation("com.soywiz.korlibs.krypto:krypto:2.3.0")
             }
         }
         val commonTest by getting {
