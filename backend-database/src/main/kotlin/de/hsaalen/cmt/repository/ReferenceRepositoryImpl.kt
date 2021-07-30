@@ -8,9 +8,9 @@ import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.ContentType
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.objects.UUID
-import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateAddDto
 import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateRemoveDto
+import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.session.currentSession
 import de.hsaalen.cmt.sql.schema.ReferenceDao
 import de.hsaalen.cmt.sql.schema.ReferenceTable
@@ -19,6 +19,7 @@ import de.hsaalen.cmt.sql.schema.UserDao
 import de.hsaalen.cmt.storage.StorageS3
 import de.hsaalen.cmt.utils.id
 import de.hsaalen.cmt.utils.toUUID
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.joda.time.DateTime
@@ -43,10 +44,10 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
             val creator = UserDao.findUserByEmail(userEmail)
             val now = DateTime.now()
             val reference = ReferenceDao.new {
-                this.accessCode = "ACCESS_CODE"
                 this.displayName = request.displayName
                 this.contentType = request.contentType
                 this.owner = creator
+                this.dateLastModified = DateTime.now()
             }
             val revision = RevisionDao.new {
                 this.item = reference
@@ -60,7 +61,6 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
 
             Reference(
                 uuid = reference.id.toUUID(),
-                accessCode = reference.accessCode,
                 displayName = reference.displayName,
                 contentType = reference.contentType,
                 dateCreation = revision.dateCreation.millis,
@@ -98,7 +98,9 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
     override suspend fun listReferences(query: ClientReferenceQueryDto): ServerReferenceListDto {
         val refs = newSuspendedTransaction {
             val creator = UserDao.findUserByEmail(userEmail)
-            ReferenceDao.find(ReferenceTable.owner eq creator.id).map { it.toReference() }
+            ReferenceDao.find(ReferenceTable.owner eq creator.id)
+                .orderBy(ReferenceTable.dateLastModified to SortOrder.DESC)
+                .map { it.toReference() }
         }
         return ServerReferenceListDto(refs)
     }

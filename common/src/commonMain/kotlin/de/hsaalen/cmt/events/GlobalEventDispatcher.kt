@@ -11,7 +11,7 @@ object GlobalEventDispatcher {
     /**
      * Logging instance for this class.
      */
-    private val logger = KotlinLogging.logger("event-dispatcher")
+    val logger = KotlinLogging.logger("event-dispatcher")
 
     /**
      * List of all currently registered child [ListenerBundle]'s.

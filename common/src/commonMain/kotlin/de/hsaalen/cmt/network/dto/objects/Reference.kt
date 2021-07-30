@@ -11,7 +11,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Reference(
     val uuid: UUID,
-    val accessCode: String?,
     val displayName: String,
     val contentType: ContentType,
     val dateCreation: Long,
