@@ -1,9 +1,11 @@
 package de.hsaalen.cmt.rest.routes
 
-import de.hsaalen.cmt.network.*
+import de.hsaalen.cmt.network.RestPaths
+import de.hsaalen.cmt.network.apiPathCreateReference
+import de.hsaalen.cmt.network.apiPathDeleteReference
+import de.hsaalen.cmt.network.apiPathDownload
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientDeleteReferenceDto
-import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.UUID
 import de.hsaalen.cmt.repository.DocumentRepository
 import de.hsaalen.cmt.repository.ReferenceRepository
@@ -11,7 +13,6 @@ import de.hsaalen.cmt.session.getWithSession
 import de.hsaalen.cmt.session.postWithSession
 import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -23,14 +24,6 @@ import org.koin.ktor.ext.inject
  */
 fun Routing.routeReferences() = route("/" + RestPaths.base) {
     val repo: ReferenceRepository by inject()
-    getWithSession(apiPathListReferences) {
-        val request = ClientReferenceQueryDto()
-        call.respond(repo.listReferences(request))
-    }
-    postWithSession(apiPathListReferences) {
-        val request: ClientReferenceQueryDto = call.receive()
-        call.respond(repo.listReferences(request))
-    }
     postWithSession(apiPathCreateReference) {
         val request: ClientCreateReferenceDto = call.receive()
         call.respond(repo.createReference(request))

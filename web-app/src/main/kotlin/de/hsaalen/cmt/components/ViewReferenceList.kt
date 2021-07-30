@@ -8,7 +8,6 @@ import de.crusader.objects.color.Color
 import de.hsaalen.cmt.extensions.LabelEditListener
 import de.hsaalen.cmt.extensions.ReferenceListener
 import de.hsaalen.cmt.network.dto.objects.Reference
-import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.toCssColor
 import kotlinx.css.*
 import react.RBuilder
@@ -22,7 +21,7 @@ import styled.styledDiv
  * Wrapper function to simplify creation of this react component.
  */
 fun RBuilder.referenceList(
-    dto: ServerReferenceListDto?,
+    references: List<Reference>,
     onItemOpen: ReferenceListener,
     onItemDownload: ReferenceListener,
     onItemDelete: ReferenceListener,
@@ -30,7 +29,7 @@ fun RBuilder.referenceList(
     onLabelRemove: LabelEditListener,
 ) = child(ViewReferenceList::class) {
     attrs {
-        this.dto = dto
+        this.references = references
         this.onItemOpen = onItemOpen
         this.onItemDownload = onItemDownload
         this.onItemDelete = onItemDelete
@@ -43,7 +42,7 @@ fun RBuilder.referenceList(
  * React properties of the [ViewReferenceList] component.
  */
 external interface ViewReferenceListProps : RProps {
-    var dto: ServerReferenceListDto?
+    var references: List<Reference>
 
     var onItemOpen: ReferenceListener
     var onItemDownload: ReferenceListener
@@ -96,33 +95,21 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
      * Called when the complete body of the table should be rendered.
      */
     private fun RBuilder.renderTableBody() = mTableBody {
-        val dto = props.dto
-        if (dto == null) {
-            renderTableBodyRow(null) // Currently no references loaded
-        } else {
-            for (ref in dto.references) {
-                renderTableBodyRow(ref)
-            }
+        for (ref in props.references) {
+            renderTableBodyRow(ref)
         }
     }
 
     /**
      * Called when the only a single row of the table body should be rendered.
      */
-    private fun RBuilder.renderTableBodyRow(ref: Reference?) = mTableRow(hover = true) {
+    private fun RBuilder.renderTableBodyRow(ref: Reference) = mTableRow(hover = true) {
         css {
             cursor = Cursor.pointer
         }
         attrs {
-            if (ref != null) {
-                onClick = { props.onItemOpen(it, ref) }
-            }
+            onClick = { props.onItemOpen(it, ref) }
         }
-        if (ref == null) {
-            mTableCell { +"Loading..." }
-            return@mTableRow
-        }
-
         mTableCell { +ref.displayName }
         mTableCell {
             styledDiv {

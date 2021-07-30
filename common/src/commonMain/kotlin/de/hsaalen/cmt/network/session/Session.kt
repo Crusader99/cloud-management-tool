@@ -24,8 +24,8 @@ import io.rsocket.kotlin.transport.ktor.client.rSocket
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.withTimeout
 import mu.KotlinLogging
 
@@ -45,7 +45,7 @@ class Session(
      *
      * @see {https://rsocket.io}
      */
-    private val rSocket: RSocket,
+    val rSocket: RSocket,
 
     ) : ReferenceRepositoryImpl, LabelRepositoryImpl, DocumentRepositoryImpl {
 
@@ -80,7 +80,7 @@ class Session(
      */
     fun modifyDocument(reference: UUID, sendChannel: Channel<DocumentChangeDto>): Flow<DocumentChangeDto> {
         val init = RequestDocumentDto(reference).encrypt().buildPayload()
-        val sendEvents = sendChannel.receiveAsFlow().map { it.encrypt().buildPayload() }
+        val sendEvents = sendChannel.consumeAsFlow().map { it.encrypt().buildPayload() }
         return rSocket.requestChannel(init, sendEvents).map { it.decodeProtobufData<DocumentChangeDto>().decrypt() }
     }
 

@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.repository
 
 import de.hsaalen.cmt.events.GlobalEventDispatcher
+import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.mongo.MongoDB
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientDeleteReferenceDto
@@ -8,10 +9,11 @@ import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.ContentType
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.objects.UUID
-import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateAddDto
 import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateRemoveDto
 import de.hsaalen.cmt.session.currentSession
+import de.hsaalen.cmt.session.senderSocketId
+import de.hsaalen.cmt.session.withWebSocketSession
 import de.hsaalen.cmt.sql.schema.ReferenceDao
 import de.hsaalen.cmt.sql.schema.ReferenceTable
 import de.hsaalen.cmt.sql.schema.RevisionDao
@@ -19,6 +21,9 @@ import de.hsaalen.cmt.sql.schema.UserDao
 import de.hsaalen.cmt.storage.StorageS3
 import de.hsaalen.cmt.utils.id
 import de.hsaalen.cmt.utils.toUUID
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.joda.time.DateTime
@@ -95,12 +100,21 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
     /**
      * Provide a list of all related references to search query.
      */
-    override suspend fun listReferences(query: ClientReferenceQueryDto): ServerReferenceListDto {
-        val refs = newSuspendedTransaction {
-            val creator = UserDao.findUserByEmail(userEmail)
-            ReferenceDao.find(ReferenceTable.owner eq creator.id).map { it.toReference() }
+    override suspend fun listReferences(query: ClientReferenceQueryDto): Flow<Reference> {
+        val data = Channel<Reference>()
+        val m = currentSession.userMail
+        val id = currentSession.senderSocketId
+        val job = coroutines.launch {
+            withWebSocketSession(m, id) {
+                newSuspendedTransaction {
+                    val creator = UserDao.findUserByEmail(userEmail)
+                    ReferenceDao.find(ReferenceTable.owner eq creator.id).asFlow().map { it.toReference() }.collect {
+                        data.send(it)
+                    }
+                }
+            }
         }
-        return ServerReferenceListDto(refs)
+        return data.consumeAsFlow()
     }
 
     /**

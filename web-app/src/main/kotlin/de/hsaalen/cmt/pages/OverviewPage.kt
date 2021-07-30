@@ -7,16 +7,20 @@ import de.hsaalen.cmt.components.referenceList
 import de.hsaalen.cmt.events.GlobalEventDispatcher
 import de.hsaalen.cmt.extensions.ReferenceListener
 import de.hsaalen.cmt.extensions.coroutines
+import de.hsaalen.cmt.extensions.launch
 import de.hsaalen.cmt.file.openFileSaver
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.LabelChangeMode
 import de.hsaalen.cmt.network.dto.objects.Reference
-import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.network.dto.rsocket.LabelUpdateDto
 import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateAddDto
 import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateRemoveDto
 import de.hsaalen.cmt.network.session.Session
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import mu.KotlinLogging
 import org.w3c.dom.events.Event
 import react.*
@@ -34,7 +38,7 @@ external interface OverviewPageProps : RProps {
  */
 external interface OverviewPageState : RState {
     var query: ClientReferenceQueryDto
-    var dto: ServerReferenceListDto?
+    var references: List<Reference>
 }
 
 /**
@@ -55,6 +59,7 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
         register(::onAddedReference)
         register(::onRemovedReference)
         register(::onLabelRemoved)
+        launch(::updateReferences)
     }
 
     /**
@@ -67,10 +72,7 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
      */
     override fun OverviewPageState.init() {
         query = ClientReferenceQueryDto()
-        dto = null
-        coroutines.launch {
-            updateReferences()
-        }
+        references = emptyList()
     }
 
     /**
@@ -86,7 +88,7 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
     override fun RBuilder.render() {
         renderInputDialog(refCreateLabelDialog)
         referenceList(
-            dto = state.dto,
+            references = state.references,
             onItemOpen = props.onItemOpen,
             onItemDelete = ::onItemDelete,
             onItemDownload = ::onItemDownload,
@@ -99,9 +101,11 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
      * Request a references update from server.
      */
     private suspend fun updateReferences() {
-        val received = props.session.listReferences(state.query)
-        setState {
-            dto = received
+        props.session.listReferences(state.query).collect {  loadedReference ->
+            setState {
+                references = listOf(loadedReference) + references
+            }
+            yield()
         }
     }
 
@@ -162,9 +166,7 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
     private fun onAddedReference(ref: ReferenceUpdateAddDto) {
         logger.info { "Received ReferenceUpdateAddDto" }
         setState {
-            val new = listOf(ref.reference)
-            val old = dto?.references ?: emptyList()
-            dto = ServerReferenceListDto(new + old)
+            references = listOf(ref.reference) + references
         }
     }
 
@@ -174,8 +176,7 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
     private fun onRemovedReference(ref: ReferenceUpdateRemoveDto) {
         logger.info { "Received ReferenceUpdateRemoveDto" }
         setState {
-            val old = dto?.references ?: emptyList()
-            dto = ServerReferenceListDto(old.filter { it.uuid != ref.uuid })
+            references = references.filter { it.uuid != ref.uuid }
         }
     }
 
@@ -185,7 +186,7 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
     private fun onLabelRemoved(event: LabelUpdateDto) {
         logger.info { "Received LabelUpdateDto" }
         setState {
-            val ref = dto?.references?.find { it.uuid == event.reference } ?: return@setState
+            val ref = references.find { it.uuid == event.reference } ?: return@setState
             when (event.mode) {
                 LabelChangeMode.ADD -> ref.labels += event.labelName
                 LabelChangeMode.REMOVE -> ref.labels -= event.labelName

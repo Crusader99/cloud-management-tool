@@ -3,14 +3,15 @@ package de.hsaalen.cmt.rsocket
 import de.hsaalen.cmt.events.GlobalEventDispatcher
 import de.hsaalen.cmt.events.server.UserDocumentChangeEvent
 import de.hsaalen.cmt.extensions.launch
+import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
+import de.hsaalen.cmt.network.dto.objects.ContentType
 import de.hsaalen.cmt.network.dto.objects.LabelChangeMode
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode
-import de.hsaalen.cmt.network.dto.rsocket.DocumentChangeDto
-import de.hsaalen.cmt.network.dto.rsocket.LabelUpdateDto
-import de.hsaalen.cmt.network.dto.rsocket.LiveDto
-import de.hsaalen.cmt.network.dto.rsocket.RequestDocumentDto
+import de.hsaalen.cmt.network.dto.objects.Reference
+import de.hsaalen.cmt.network.dto.rsocket.*
 import de.hsaalen.cmt.repository.DocumentRepository
 import de.hsaalen.cmt.repository.LabelRepository
+import de.hsaalen.cmt.repository.ReferenceRepository
 import de.hsaalen.cmt.session.jwt.JwtPayload
 import de.hsaalen.cmt.session.withWebSocketSession
 import de.hsaalen.cmt.utils.SerializeHelper
@@ -120,6 +121,14 @@ class Connection(socket: RSocket, private val payload: JwtPayload, val jwtToken:
                     logger.info("Cancel document editing")
                     events.unregisterAll()
                 }.map { it.buildPayload() }
+            }
+        }
+        requestStream { payload ->
+            logger.info("got requestStream")
+            withWebSocketSession(userEmail, socketId) {
+                val repo: ReferenceRepository by route.inject()
+                val request = ClientReferenceQueryDto()
+                repo.listReferences(request).map { ReferenceUpdateAddDto(it).buildPayload() }
             }
         }
         job.invokeOnCompletion {

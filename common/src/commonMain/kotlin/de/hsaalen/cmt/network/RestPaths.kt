@@ -21,8 +21,6 @@ const val apiPathDeleteReference = "/deleteReference"
 
 const val apiPathCreateReference = "/createReference"
 
-const val apiPathListReferences = "/listReferences"
-
 const val apiPathListLabels = "/listLabels"
 
 const val apiPathImport = "/import"

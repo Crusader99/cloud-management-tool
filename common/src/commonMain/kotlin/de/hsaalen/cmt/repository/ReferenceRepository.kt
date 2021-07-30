@@ -6,7 +6,7 @@ import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.ContentType
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.objects.UUID
-import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Repository port for providing reference infrastructure. This can be implemented by the server for Mongo database
@@ -18,7 +18,7 @@ interface ReferenceRepository {
     /**
      * Provide a list of all related references to search query.
      */
-    suspend fun listReferences(query: ClientReferenceQueryDto = ClientReferenceQueryDto()): ServerReferenceListDto
+    suspend fun listReferences(query: ClientReferenceQueryDto = ClientReferenceQueryDto()): Flow<Reference>
 
     /**
      * Send request to repository for creating a new reference.
