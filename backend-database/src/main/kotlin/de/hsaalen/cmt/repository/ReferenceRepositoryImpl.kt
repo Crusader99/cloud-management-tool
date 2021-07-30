@@ -10,6 +10,7 @@ import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.objects.UUID
 import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateAddDto
 import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateRemoveDto
+import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateRenameDto
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.session.currentSession
 import de.hsaalen.cmt.sql.schema.ReferenceDao
@@ -134,6 +135,22 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
             // Call event handlers
             GlobalEventDispatcher.notify(ReferenceUpdateRemoveDto(uuid))
         }
+    }
+
+    /**
+     * Give a new title name to a reference.
+     */
+    override suspend fun rename(uuid: UUID, newTitle: String) {
+        newSuspendedTransaction {
+            val ref = ReferenceDao.findById(uuid.id) ?: error("No reference with uuid=$uuid found!")
+            if (ref.owner.email != userEmail) {
+                throw SecurityException("Can not rename references from different users!")
+            }
+            ref.displayName = newTitle
+        }
+
+        // Call event handlers
+        GlobalEventDispatcher.notify(ReferenceUpdateRenameDto(uuid, newTitle))
     }
 
 }

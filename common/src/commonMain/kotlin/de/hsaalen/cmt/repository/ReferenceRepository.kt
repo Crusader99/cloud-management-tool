@@ -52,4 +52,9 @@ interface ReferenceRepository {
      */
     suspend fun deleteReference(request: ClientDeleteReferenceDto)
 
+    /**
+     * Give a new title name to a reference.
+     */
+    suspend fun rename(uuid: UUID, newTitle: String)
+
 }

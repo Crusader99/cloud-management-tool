@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Reference(
     val uuid: UUID,
-    val displayName: String,
+    var displayName: String, // Allow renaming the reference
     val contentType: ContentType,
     val dateCreation: Long,
     val dateLastAccess: Long,

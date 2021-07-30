@@ -19,6 +19,8 @@ object RestPaths {
 
 const val apiPathDeleteReference = "/deleteReference"
 
+const val apiPathRenameReference = "/renameReference"
+
 const val apiPathCreateReference = "/createReference"
 
 const val apiPathListReferences = "/listReferences"

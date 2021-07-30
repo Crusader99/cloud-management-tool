@@ -5,13 +5,13 @@ import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientDeleteReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.UUID
+import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateRenameDto
 import de.hsaalen.cmt.repository.DocumentRepository
 import de.hsaalen.cmt.repository.ReferenceRepository
 import de.hsaalen.cmt.session.getWithSession
 import de.hsaalen.cmt.session.postWithSession
 import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -38,6 +38,10 @@ fun Routing.routeReferences() = route("/" + RestPaths.base) {
     postWithSession(apiPathDeleteReference) {
         val request: ClientDeleteReferenceDto = call.receive()
         call.respond(repo.deleteReference(request))
+    }
+    postWithSession(apiPathRenameReference) {
+        val request: ReferenceUpdateRenameDto = call.receive()
+        call.respond(repo.rename(request.uuid, request.newName))
     }
     getWithSession("/upload") {
         call.respondText("Upload")

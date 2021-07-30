@@ -1,32 +1,29 @@
 package de.hsaalen.cmt.pages
 
-import de.hsaalen.cmt.components.dialogs.InputDialogComponent
-import de.hsaalen.cmt.components.dialogs.renderInputDialog
-import de.hsaalen.cmt.components.dialogs.show
+import com.ccfraser.muirwik.components.mTypography
 import de.hsaalen.cmt.components.referenceList
-import de.hsaalen.cmt.events.GlobalEventDispatcher
-import de.hsaalen.cmt.extensions.ReferenceListener
-import de.hsaalen.cmt.extensions.coroutines
+import de.hsaalen.cmt.events.*
+import de.hsaalen.cmt.extensions.launch
 import de.hsaalen.cmt.file.openFileSaver
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.LabelChangeMode
-import de.hsaalen.cmt.network.dto.objects.Reference
-import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.network.dto.rsocket.LabelUpdateDto
 import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateAddDto
 import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateRemoveDto
+import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateRenameDto
+import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.network.session.Session
-import kotlinx.coroutines.launch
+import kotlinx.css.TextAlign
+import kotlinx.css.textAlign
 import mu.KotlinLogging
-import org.w3c.dom.events.Event
 import react.*
+import styled.css
 
 /**
  * React properties of the [OverviewPage] component.
  */
 external interface OverviewPageProps : RProps {
     var session: Session
-    var onItemOpen: ReferenceListener
 }
 
 /**
@@ -34,7 +31,8 @@ external interface OverviewPageProps : RProps {
  */
 external interface OverviewPageState : RState {
     var query: ClientReferenceQueryDto
-    var dto: ServerReferenceListDto?
+    var dto: ServerReferenceListDto
+    var isLoading: Boolean
 }
 
 /**
@@ -52,25 +50,30 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
      * Register events for this component.
      */
     private val events = GlobalEventDispatcher.createBundle(this) {
-        register(::onAddedReference)
-        register(::onRemovedReference)
-        register(::onLabelRemoved)
-    }
+        // Serverside events
+        register(::onServerAddedReference)
+        register(::onServerDeleteReference)
+        register(::onServerRenamedReference)
+        register(::onServerLabelUpdate)
 
-    /**
-     * Reference to create dialog for requesting user to type a specific reference name.
-     */
-    private val refCreateLabelDialog = createRef<InputDialogComponent>()
+        // Clientside events
+        register(EventType.PRE_USER_DELETE_REFERENCE, ::onClientReferenceDelete)
+        register(EventType.PRE_USER_DOWNLOAD_REFERENCE, ::onClientReferenceDownload)
+        register(EventType.PRE_USER_RENAME_REFERENCE, ::onClientReferenceRename)
+        register(EventType.PRE_USER_ADD_LABEL, ::onClientLabelAdd)
+        register(EventType.PRE_USER_REMOVE_LABEL, ::onClientLabelRemove)
+
+        // Initialize reference list
+        launch(::updateReferences)
+    }
 
     /**
      * Initialize state of the [OverviewPage].
      */
     override fun OverviewPageState.init() {
+        isLoading = true
         query = ClientReferenceQueryDto()
-        dto = null
-        coroutines.launch {
-            updateReferences()
-        }
+        dto = ServerReferenceListDto(emptyList())
     }
 
     /**
@@ -84,86 +87,93 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        renderInputDialog(refCreateLabelDialog)
-        referenceList(
-            dto = state.dto,
-            onItemOpen = props.onItemOpen,
-            onItemDelete = ::onItemDelete,
-            onItemDownload = ::onItemDownload,
-            onLabelAdd = ::onLabelAdd,
-            onLabelRemove = ::onLabelRemove
-        )
+        referenceList(dto = state.dto)
+        if (state.dto.references.isEmpty() && !state.isLoading) {
+            mTypography("No references found. Open left side menu to create new references.") {
+                css {
+                    textAlign = TextAlign.center
+                }
+            }
+        }
     }
 
     /**
      * Request a references update from server.
      */
     private suspend fun updateReferences() {
-        val received = props.session.listReferences(state.query)
-        setState {
-            dto = received
+        GuiOperations.loading {
+            try {
+                val received = props.session.listReferences(state.query)
+                setState {
+                    dto = received
+                }
+            } finally {
+                setState {
+                    isLoading = false
+                }
+            }
         }
     }
 
     /**
      * Allow downloading selected reference to local computer.
      */
-    private fun onItemDownload(event: Event, ref: Reference) {
-        event.stopPropagation() // Prevent parent to receive onClick event, which would open the reference
-        coroutines.launch {
-            val content = Session.instance?.downloadContent(ref.uuid)
-            if (content == null) {
-                logger.error { "Content not available. Check server connection." }
-            } else {
-                openFileSaver(ref.displayName + ".txt", content)
-            }
+    private suspend fun onClientReferenceDownload(event: ReferenceEvent) {
+        val content = Session.instance?.downloadContent(event.reference.uuid)
+        if (content == null) {
+            logger.error { "Content not available. Check server connection." }
+        } else {
+            openFileSaver(event.reference.displayName + ".txt", content)
         }
     }
 
     /**
      * Request server to delete a reference.
      */
-    private fun onItemDelete(event: Event, ref: Reference) {
-        event.stopPropagation() // Prevent parent to receive onClick event, which would open the reference
-        coroutines.launch {
-            Session.instance?.deleteReference(ref)
+    private suspend fun onClientReferenceDelete(event: ReferenceEvent) {
+        Session.instance?.deleteReference(event.reference)
+    }
+
+    /**
+     * Request server to rename a reference.
+     */
+    private suspend fun onClientReferenceRename(event: ReferenceEvent) {
+        val oldTitle = event.reference.displayName
+        val message = "New title for reference '$oldTitle':"
+        val newTitle = GuiOperations.showInputDialog("Rename", message, defaultValue = oldTitle)
+        if (oldTitle != newTitle) {
+            Session.instance?.rename(event.reference.uuid, newTitle ?: return)
         }
     }
 
     /**
      * Called when user adds a label to a reference.
      */
-    private fun onLabelAdd(event: Event, ref: Reference) {
-        event.stopPropagation() // Prevent parent to receive onClick event, which would open the reference
-        coroutines.launch {
-            val labelName = refCreateLabelDialog.current?.show(
-                title = "Add label to \"" + ref.displayName + "\":",
-                placeholder = "label name",
-                button = "Add"
-            ) ?: return@launch
-            logger.info { "Add label name: $labelName" }
-            Session.instance?.addLabel(ref, labelName)
-        }
+    private suspend fun onClientLabelAdd(event: ReferenceEvent) {
+        val labelName = GuiOperations.showInputDialog(
+            title = "Add label to \"" + event.reference.displayName + "\":",
+            placeholder = "label name",
+            button = "Add"
+        ) ?: return
+        logger.info { "Add label name: $labelName" }
+        Session.instance?.addLabel(event.reference, labelName)
     }
 
     /**
      * Called when user removes a label from a reference.
      */
-    private fun onLabelRemove(event: Event, ref: Reference, label: String) {
-        event.stopPropagation() // Prevent parent to receive onClick event, which would open the reference
-        coroutines.launch {
-            Session.instance?.removeLabel(ref, label)
-        }
+    private suspend fun onClientLabelRemove(event: LabelEditEvent) {
+        Session.instance?.removeLabel(event.reference, event.labelName)
     }
 
     /**
      * Event called by server after new reference added.
      */
-    private fun onAddedReference(ref: ReferenceUpdateAddDto) {
+    private fun onServerAddedReference(ref: ReferenceUpdateAddDto) {
         logger.info { "Received ReferenceUpdateAddDto" }
         setState {
             val new = listOf(ref.reference)
-            val old = dto?.references ?: emptyList()
+            val old = dto.references
             dto = ServerReferenceListDto(new + old)
         }
     }
@@ -171,21 +181,34 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
     /**
      * Event called by server after a reference got deleted.
      */
-    private fun onRemovedReference(ref: ReferenceUpdateRemoveDto) {
+    private fun onServerDeleteReference(ref: ReferenceUpdateRemoveDto) {
         logger.info { "Received ReferenceUpdateRemoveDto" }
         setState {
-            val old = dto?.references ?: emptyList()
+            val old = dto.references
             dto = ServerReferenceListDto(old.filter { it.uuid != ref.uuid })
+        }
+    }
+
+    /**
+     * Event called by server after a reference got renamed.
+     */
+    private fun onServerRenamedReference(event: ReferenceUpdateRenameDto) {
+        logger.info { "Received ReferenceUpdateRenameDto" }
+        setState {
+            val referenceList = dto.references
+            val reference = referenceList.find { it.uuid == event.uuid } ?: return@setState
+            reference.displayName = event.newName
+            dto = ServerReferenceListDto(referenceList)
         }
     }
 
     /**
      * Event called by server after a label was added / removed.
      */
-    private fun onLabelRemoved(event: LabelUpdateDto) {
+    private fun onServerLabelUpdate(event: LabelUpdateDto) {
         logger.info { "Received LabelUpdateDto" }
         setState {
-            val ref = dto?.references?.find { it.uuid == event.reference } ?: return@setState
+            val ref = dto.references.find { it.uuid == event.reference } ?: return@setState
             when (event.mode) {
                 LabelChangeMode.ADD -> ref.labels += event.labelName
                 LabelChangeMode.REMOVE -> ref.labels -= event.labelName

@@ -1,5 +1,7 @@
 package de.hsaalen.cmt
 
+import de.hsaalen.cmt.events.handlers.AuthenticationEventHandlers
+import de.hsaalen.cmt.events.handlers.ReferenceEventHandlers
 import de.hsaalen.cmt.extensions.BackendLocator
 import de.hsaalen.cmt.extensions.ExceptionHandler
 import kotlinx.browser.document
@@ -13,7 +15,11 @@ fun main() {
     ExceptionHandler.install()
 
     // Configure location of REST-API backend
-    BackendLocator.execute()
+    BackendLocator.init()
+
+    // Initialize global event handlers for frontend
+    AuthenticationEventHandlers.init()
+    ReferenceEventHandlers.init()
 
     // Render web app
     render(document.getElementById("root")) {

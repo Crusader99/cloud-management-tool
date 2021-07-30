@@ -1,38 +1,17 @@
 package de.hsaalen.cmt.extensions
 
-import de.hsaalen.cmt.components.dialogs.InputDialogComponent
-import de.hsaalen.cmt.components.dialogs.show
+import de.hsaalen.cmt.events.EventType
+import de.hsaalen.cmt.events.GlobalEventDispatcher
+import de.hsaalen.cmt.events.GuiOperations
+import de.hsaalen.cmt.events.register
 import de.hsaalen.cmt.network.RestPaths
 import kotlinx.browser.window
-import kotlinx.coroutines.launch
 import mu.KotlinLogging
 
 /**
  * Logging instance for this class.
  */
 private val logger = KotlinLogging.logger("BackendLocator")
-
-/**
- * Opens a new dialog for configuring backend url for REST API in async mode.
- */
-fun InputDialogComponent.handleSwitchBackendDialog() {
-    coroutines.launch {
-        val messages = mutableListOf<String>()
-        messages += "Default API-Endpoint: " + BackendLocator.defaultBackend
-        if (BackendLocator.defaultBackend != BackendLocator.configuredBackend) {
-            messages += "Current API-Endpoint: " + BackendLocator.configuredBackend
-        }
-        val newURL = show(
-            title = "Define URL to REST API backend:",
-            message = messages.joinToString("\n"),
-            placeholder = "New API-Endpoint",
-            button = "Switch"
-        ) ?: return@launch
-        logger.debug { "Selected new API-Endpoint: $newURL" }
-        BackendLocator.configuredBackend = newURL
-        window.location.reload()
-    }
-}
 
 /**
  * Singleton class utils to configure backend path for REST-API
@@ -43,7 +22,7 @@ object BackendLocator {
     /**
      * Calculate default backend and configure path for client.
      */
-    fun execute() {
+    fun init() {
         val customApiEndpoint = window.sessionStorage.getItem(KEY_API_ENDPOINT)
         if (customApiEndpoint == null) {
             RestPaths.apiEndpoint = defaultBackend
@@ -51,6 +30,9 @@ object BackendLocator {
         } else {
             RestPaths.apiEndpoint = customApiEndpoint
             logger.debug { "Using configured REST API endpoint: $configuredBackend" }
+        }
+        GlobalEventDispatcher.createBundle {
+            register(EventType.PRE_SWITCH_BACKEND, ::handleSwitchBackendDialog)
         }
     }
 
@@ -79,5 +61,25 @@ object BackendLocator {
             RestPaths.apiEndpoint = value
             window.sessionStorage.setItem(KEY_API_ENDPOINT, value)
         }
+
+    /**
+     * Opens a new dialog for configuring backend url for REST API in async mode.
+     */
+    private suspend fun handleSwitchBackendDialog() {
+        val messages = mutableListOf<String>()
+        messages += "Default API-Endpoint: $defaultBackend"
+        if (defaultBackend != configuredBackend) {
+            messages += "Current API-Endpoint: $configuredBackend"
+        }
+        val newURL = GuiOperations.showInputDialog(
+            title = "Define URL to REST API backend:",
+            message = messages.joinToString("\n"),
+            placeholder = "New API-Endpoint",
+            button = "Switch"
+        ) ?: return
+        logger.debug { "Selected new API-Endpoint: $newURL" }
+        configuredBackend = newURL
+        window.location.reload()
+    }
 
 }

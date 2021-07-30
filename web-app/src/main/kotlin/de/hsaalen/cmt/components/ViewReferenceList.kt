@@ -5,8 +5,7 @@ import com.ccfraser.muirwik.components.button.mIconButton
 import com.ccfraser.muirwik.components.table.*
 import de.crusader.extensions.toDate
 import de.crusader.objects.color.Color
-import de.hsaalen.cmt.extensions.LabelEditListener
-import de.hsaalen.cmt.extensions.ReferenceListener
+import de.hsaalen.cmt.events.*
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.toCssColor
@@ -23,19 +22,9 @@ import styled.styledDiv
  */
 fun RBuilder.referenceList(
     dto: ServerReferenceListDto?,
-    onItemOpen: ReferenceListener,
-    onItemDownload: ReferenceListener,
-    onItemDelete: ReferenceListener,
-    onLabelAdd: ReferenceListener,
-    onLabelRemove: LabelEditListener,
 ) = child(ViewReferenceList::class) {
     attrs {
         this.dto = dto
-        this.onItemOpen = onItemOpen
-        this.onItemDownload = onItemDownload
-        this.onItemDelete = onItemDelete
-        this.onLabelAdd = onLabelAdd
-        this.onLabelRemove = onLabelRemove
     }
 }
 
@@ -44,12 +33,6 @@ fun RBuilder.referenceList(
  */
 external interface ViewReferenceListProps : RProps {
     var dto: ServerReferenceListDto?
-
-    var onItemOpen: ReferenceListener
-    var onItemDownload: ReferenceListener
-    var onItemDelete: ReferenceListener
-    var onLabelAdd: ReferenceListener
-    var onLabelRemove: LabelEditListener
 }
 
 /**
@@ -115,7 +98,7 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
         }
         attrs {
             if (ref != null) {
-                onClick = { props.onItemOpen(it, ref) }
+                onClick = { dispatch(it, EventType.PRE_USER_OPEN_REFERENCE, ReferenceEvent(ref)) }
             }
         }
         if (ref == null) {
@@ -130,7 +113,9 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
                     display = Display.flex
                 }
                 for (label in ref.labels) {
-                    mChip(label, onDelete = { props.onLabelRemove(it, ref, label) }) {
+                    mChip(label, onDelete = {
+                        dispatch(it, EventType.PRE_USER_REMOVE_LABEL, LabelEditEvent(ref, label))
+                    }) {
                         attrs {
                             asDynamic().clickable = true
                         }
@@ -139,7 +124,9 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
                 mTooltip("Add label") {
                     mAvatar {
                         attrs {
-                            onClick = { props.onLabelAdd(it, ref) }
+                            onClick = {
+                                dispatch(it, EventType.PRE_USER_ADD_LABEL, ReferenceEvent(ref))
+                            }
                         }
                         css {
                             width = 3.spacingUnits
@@ -155,11 +142,29 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
         mTableCell { +ref.dateLastAccess.toDate().toDateString() }
         mTableCell(align = MTableCellAlign.right) {
             mTooltip("Download") {
-                mIconButton("download", onClick = { props.onItemDownload(it, ref) })
+                mIconButton("download", onClick = {
+                    dispatch(it, EventType.PRE_USER_DOWNLOAD_REFERENCE, ReferenceEvent(ref))
+                })
+            }
+            mTooltip("Rename") {
+                mIconButton("edit", onClick = {
+                    dispatch(it, EventType.PRE_USER_RENAME_REFERENCE, ReferenceEvent(ref))
+                })
             }
             mTooltip("Delete") {
-                mIconButton("delete", onClick = { props.onItemDelete(it, ref) })
+                mIconButton("delete", onClick = {
+                    dispatch(it, EventType.PRE_USER_DELETE_REFERENCE, ReferenceEvent(ref))
+                })
             }
         }
+    }
+
+    /**
+     * Execute a custom event in asynchronous way.
+     * And prevent parent to receive onClick event, which would open the reference.
+     */
+    private fun dispatch(origin: org.w3c.dom.events.Event, type: EventType, event: Event) {
+        origin.stopPropagation() // Prevent parent to receive onClick event, which would open the reference
+        launchNotification(type, event)
     }
 }
