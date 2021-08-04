@@ -6,6 +6,7 @@ import de.hsaalen.cmt.events.*
 import de.hsaalen.cmt.extensions.launch
 import de.hsaalen.cmt.file.openFileSaver
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
+import de.hsaalen.cmt.network.dto.objects.ContentType
 import de.hsaalen.cmt.network.dto.objects.LabelChangeMode
 import de.hsaalen.cmt.network.dto.rsocket.LabelUpdateDto
 import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateAddDto
@@ -119,12 +120,12 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
      * Allow downloading selected reference to local computer.
      */
     private suspend fun onClientReferenceDownload(event: ReferenceEvent) {
-        val content = Session.instance?.downloadContent(event.reference.uuid)
-        if (content == null) {
-            logger.error { "Content not available. Check server connection." }
-        } else {
-            openFileSaver(event.reference.displayName + ".txt", content)
+        val session = Session.instance ?: return
+        val content = when (event.reference.contentType) {
+            ContentType.TEXT -> session.downloadDocument(event.reference.uuid)
+            ContentType.FILE -> session.download(event.reference.uuid).decodeToString()
         }
+        openFileSaver(event.reference.displayName + ".txt", content)
     }
 
     /**

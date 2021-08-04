@@ -47,7 +47,7 @@ suspend fun GlobalEventDispatcher.notify(type: EventType, event: Event = emptyEv
                 try {
                     listener.handler.invoke(event)
                 } catch (t: Throwable) {
-                    val eventName = listener.handler.parentClass.simpleName
+                    val eventName = type.name + "@" + listener.handler.parentClass.simpleName
                     val handlerClass = child.caller?.simpleName ?: "unknown"
                     logger.error(t) { "Unexpected behaviour in custom handler '$handlerClass' for event '$eventName'" }
                 }
