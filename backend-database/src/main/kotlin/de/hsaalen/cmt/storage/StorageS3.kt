@@ -66,6 +66,7 @@ internal object StorageS3 {
      * Create and upload a file with content.
      */
     fun uploadFile(uuid: UUID, contentStream: InputStream, contentLength: Long) {
+        logger.info("Uploading file content for $uuid")
         client.putObject({
             it.bucket(S3_BUCKET)
             it.key(uuid.value)
@@ -76,6 +77,7 @@ internal object StorageS3 {
      * Download the file content from a specific reference by [UUID].
      */
     fun downloadFile(uuid: UUID): InputStream {
+        logger.info("Downloading file content for $uuid")
         return client.getObject {
             it.bucket(S3_BUCKET)
             it.key(uuid.value)
@@ -87,6 +89,7 @@ internal object StorageS3 {
      */
     fun deleteFile(uuid: UUID) {
         try {
+            logger.info("Deleting file content from $uuid")
             client.deleteObject {
                 it.bucket(S3_BUCKET)
                 it.key(uuid.value)

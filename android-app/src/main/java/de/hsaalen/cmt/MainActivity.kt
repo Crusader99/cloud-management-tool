@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewAssetLoader.AssetsPathHandler
 import androidx.webkit.WebViewClientCompat
-import de.crusader.extensions.toFullString
 
 /**
  * Main activity that provides a web view for providing the web content.
@@ -74,7 +73,7 @@ class MainActivity : AppCompatActivity() {
             webView.settings.javaScriptEnabled = true
             webView.loadUrl(endpointWebAsserts)
         } catch (ex: Throwable) {
-            Log.e("APP-DEBUG", ex.toFullString())
+            Log.e("APP-DEBUG", ex.stackTraceToString())
         }
     }
 
