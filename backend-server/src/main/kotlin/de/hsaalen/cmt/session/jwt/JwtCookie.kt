@@ -108,7 +108,7 @@ fun ServerUserInfoDto.generateJwtToken(): String {
 
 
 /**
- * Extension method to update a HTTP cookie with new valid JWT token.
+ * Extension method to update an HTTP cookie with new valid JWT token.
  */
 fun ApplicationResponse.updateJwtCookie(jwtToken: String) = cookies.append(
     name = JwtCookie.cookieName, // The key name of the cookie

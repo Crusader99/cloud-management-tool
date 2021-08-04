@@ -16,7 +16,8 @@ fun Application.registerRoutes() = routing {
 
     routeAuthentication()
     routeReferences()
+    routeFiles()
     routeLabels()
     routeMetrics()
-    routeWebSockets()
+    routeRSocket()
 }

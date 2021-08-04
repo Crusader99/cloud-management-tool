@@ -8,7 +8,7 @@ import de.hsaalen.cmt.network.dto.objects.LineChangeMode
 import de.hsaalen.cmt.network.dto.rsocket.DocumentChangeDto
 import de.hsaalen.cmt.network.dto.rsocket.LabelUpdateDto
 import de.hsaalen.cmt.network.dto.rsocket.LiveDto
-import de.hsaalen.cmt.network.dto.rsocket.RequestDocumentDto
+import de.hsaalen.cmt.network.dto.rsocket.RequestReferenceDto
 import de.hsaalen.cmt.repository.DocumentRepository
 import de.hsaalen.cmt.repository.LabelRepository
 import de.hsaalen.cmt.session.jwt.JwtPayload
@@ -84,11 +84,20 @@ class Connection(socket: RSocket, private val payload: JwtPayload, val jwtToken:
         requestChannel { init, input ->
             logger.info("got requestChannel")
             withWebSocketSession(userEmail, socketId) {
-                val request: RequestDocumentDto = init.decodeProtobufData()
+                val request: RequestReferenceDto = init.decodeProtobufData()
                 val documentUUID = request.reference
                 val docRepo: DocumentRepository by route.inject()
                 val events = GlobalEventDispatcher.createBundle(this)
 
+                // Get existing file content and check for access permissions
+                val documentFlow = docRepo.downloadDocument(documentUUID)
+                    .lineSequence()
+                    .mapIndexed { index, line ->
+                        val mode = if (index == 0) LineChangeMode.MODIFY else LineChangeMode.ADD
+                        DocumentChangeDto(documentUUID, index, line, mode)
+                    }.asFlow()
+
+                // Listen for incoming modification events
                 events.launch {
                     withWebSocketSession(userEmail, socketId) {
                         input.collect {
@@ -102,17 +111,13 @@ class Connection(socket: RSocket, private val payload: JwtPayload, val jwtToken:
                     }
                 }
 
-                val documentFlow = docRepo.downloadContent(documentUUID)
-                    .lineSequence()
-                    .mapIndexed { index, line ->
-                        val mode = if (index == 0) LineChangeMode.MODIFY else LineChangeMode.ADD
-                        DocumentChangeDto(documentUUID, index, line, mode)
-                    }.asFlow()
+                // Get modifications from other clients as stream
                 val eventFlow = events.receiveEventsAsFlow<UserDocumentChangeEvent>()
                     .filter { it.senderSocketId != socketId }
                     .map { it.modification }
                     .filter { it.uuid == documentUUID }
 
+                // Provide live flow synchronisation
                 channelFlow {
                     documentFlow.collect { send(it) }
                     eventFlow.collect { send(it) }
@@ -122,6 +127,7 @@ class Connection(socket: RSocket, private val payload: JwtPayload, val jwtToken:
                 }.map { it.buildPayload() }
             }
         }
+
         job.invokeOnCompletion {
             WebSocketManager.connections -= this@Connection
             logger.info("Websocket disconnected")

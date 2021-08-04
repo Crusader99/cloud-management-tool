@@ -19,7 +19,7 @@ import io.ktor.util.*
 import org.koin.ktor.ext.inject
 
 /**
- * Register and handle REST API routes from clients related to references and their content.
+ * Register and handle REST API routes from clients that are related to any reference.
  */
 fun Routing.routeReferences() = route("/" + RestPaths.base) {
     val repo: ReferenceRepository by inject()
@@ -42,17 +42,5 @@ fun Routing.routeReferences() = route("/" + RestPaths.base) {
     postWithSession(apiPathRenameReference) {
         val request: ReferenceUpdateRenameDto = call.receive()
         call.respond(repo.rename(request.uuid, request.newName))
-    }
-    getWithSession("/upload") {
-        call.respondText("Upload")
-    }
-    getWithSession("$apiPathDownload/{uuid}") {
-        val uuid: String by call.parameters
-        val docRepo: DocumentRepository by call.inject()
-        val stream = docRepo.downloadContent(UUID(uuid)).byteInputStream()
-        call.response.header(HttpHeaders.ContentDisposition, "attachment")
-        call.respondOutputStream {
-            stream.copyTo(this)
-        }
     }
 }
