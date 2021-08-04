@@ -29,7 +29,11 @@ const val apiPathListLabels = "/listLabels"
 
 const val apiPathImport = "/import"
 
-const val apiPathDownload = "/download"
+const val apiPathUploadFile = "/file/upload"
+
+const val apiPathDownloadFile = "/file/download"
+
+const val apiPathDownloadDocument = "/document/download"
 
 const val apiPathAuthRestore = "/restore"
 

@@ -42,7 +42,7 @@ fun encrypt(decrypted: ByteArray, key: ByteArray, secureRandomizedPadding: Boole
 }
 
 /**
- * Decrypt a encrypted [ByteArray] by given key using AES.
+ * Decrypt an encrypted [ByteArray] by given key using AES.
  *
  * @param secureRandomizedPadding - Generates different output for same input, which is more secure. Enabled by default.
  */

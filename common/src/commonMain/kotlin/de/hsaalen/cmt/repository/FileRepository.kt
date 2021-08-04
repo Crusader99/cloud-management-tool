@@ -1,8 +1,6 @@
 package de.hsaalen.cmt.repository
 
 import de.hsaalen.cmt.network.dto.objects.UUID
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.SendChannel
 
 /**
  * Repository port for providing specific file infrastructure. This can be implemented by the server using AWS S3 db
@@ -14,11 +12,11 @@ interface FileRepository {
     /**
      * Download the reference content by a specific [UUID].
      */
-    suspend fun download(uuid: UUID, contentStream: SendChannel<ByteArray>)
+    suspend fun download(uuid: UUID): ByteArray
 
     /**
      * Upload or overwrite the reference content by a specific [UUID].
      */
-    suspend fun upload(uuid: UUID, contentStream: ReceiveChannel<ByteArray>, contentLength: Long)
+    suspend fun upload(uuid: UUID, content: ByteArray)
 
 }

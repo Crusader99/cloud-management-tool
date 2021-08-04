@@ -26,12 +26,12 @@ interface AuthenticationRepository {
     suspend fun login(email: String, passwordPlain: String): ServerUserInfoDto
 
     /**
-     * Sends logout request to server to receive a HTTP header to get cookies deleted.
+     * Sends logout request to server to receive an HTTP header to get cookies deleted.
      */
     suspend fun logout()
 
     /**
-     * Send request to the server for restoring user session. Session can only restored when JWT
+     * Send request to the server for restoring user session. Session is only restored when JWT
      * cookie is still valid.
      *
      * Email parameter may be empty when email is currently not known and is determined from server by cookie.
