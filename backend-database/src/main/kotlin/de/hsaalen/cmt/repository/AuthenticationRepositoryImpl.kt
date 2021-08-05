@@ -4,6 +4,7 @@ import de.hsaalen.cmt.crypto.hashSHA256
 import de.hsaalen.cmt.environment.DEFAULT_CREDENTIAL_VALUE
 import de.hsaalen.cmt.environment.PASSWORD_SALT
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
+import de.hsaalen.cmt.session.currentSession
 import de.hsaalen.cmt.sql.schema.UserDao
 import de.hsaalen.cmt.sql.schema.UserTable
 import de.hsaalen.cmt.utils.validateEmailAndThrow
@@ -86,14 +87,14 @@ internal object AuthenticationRepositoryImpl : AuthenticationRepository {
     }
 
     /**
-     * Request server to restore client session. Session can only restored when JWT cookie is still valid.
+     * Request server to restore client session. Session can only be restored when JWT cookie is still valid.
      *
      * @return Session instance when email of session still registered.
      * @throws SecurityException user email seem not to be registered anymore.
      */
-    override suspend fun restore(email: String) = getUserByMail(email)
+    override suspend fun restore() = getUserByMail(currentSession.userMail)
         ?.toServerUserInfoDto()
-        ?: throw SecurityException("User with email '$email' is not registered")
+        ?: throw SecurityException("User with email '${currentSession.userMail}' is not registered")
 
     /**
      * Search in SQL database for a specific user and return it when found.

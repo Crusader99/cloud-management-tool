@@ -33,9 +33,7 @@ interface AuthenticationRepository {
     /**
      * Send request to the server for restoring user session. Session is only restored when JWT
      * cookie is still valid.
-     *
-     * Email parameter may be empty when email is currently not known and is determined from server by cookie.
      */
-    suspend fun restore(email: String = ""): ServerUserInfoDto
+    suspend fun restore(): ServerUserInfoDto
 
 }

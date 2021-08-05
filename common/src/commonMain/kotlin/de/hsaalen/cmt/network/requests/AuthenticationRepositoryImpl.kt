@@ -72,15 +72,13 @@ internal object AuthenticationRepositoryImpl : ClientSupport, AuthenticationRepo
     /**
      * Send request to the server for restoring user session. Session is only restored when JWT
      * cookie is still valid.
-     *
-     * Note: Email parameter may be empty in this implementation because it is determined from server by cookie.
      */
-    override suspend fun restore(email: String): ServerUserInfoDto {
+    override suspend fun restore(): ServerUserInfoDto {
         val url = Url("$apiEndpoint$apiPathAuthRestore")
         val info: ServerUserInfoDto = Client.request(url) {
             method = HttpMethod.Get
         }
-        PersonalKeyManagement.load(email) ?: error("No key available")
+        PersonalKeyManagement.load(info.email) ?: error("No key available")
         return info
     }
 

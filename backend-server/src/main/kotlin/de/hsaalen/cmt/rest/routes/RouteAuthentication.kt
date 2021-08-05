@@ -64,8 +64,7 @@ fun Routing.routeAuthentication() = route("/" + RestPaths.base) {
 
     // Check authorization cookie is valid and refresh JWT token when logged in
     getWithSession(apiPathAuthRestore) {
-        val payload = call.request.readJwtCookie()
-        val user = repo.restore(payload.email)
+        val user = repo.restore()
         call.response.updateJwtCookie(user.generateJwtToken())
         call.respond(user)
     }
