@@ -5,6 +5,7 @@ import de.hsaalen.cmt.events.GlobalEventDispatcher
 import de.hsaalen.cmt.events.server.UserDocumentChangeEvent
 import de.hsaalen.cmt.mongo.MongoDB
 import de.hsaalen.cmt.mongo.TextDocument
+import de.hsaalen.cmt.network.dto.objects.ContentType
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode.*
 import de.hsaalen.cmt.network.dto.objects.UUID
 import de.hsaalen.cmt.network.dto.rsocket.DocumentChangeDto
@@ -51,7 +52,7 @@ internal object DocumentRepositoryImpl : DocumentRepository {
     /**
      * Download the content of a specific reference by uuid.
      */
-    override suspend fun downloadContent(uuid: UUID): String {
+    override suspend fun downloadDocument(uuid: UUID): String {
         // Ensure user has permissions to access this document
         checkAccess(currentSession.userMail, uuid)
 
@@ -67,6 +68,7 @@ internal object DocumentRepositoryImpl : DocumentRepository {
         newSuspendedTransaction {
             val ref = ReferenceDao.findById(reference.id) ?: error("Reference not found: $reference")
             check(ref.owner.email == userMail) { "No permissions to access document" }
+            check(ref.contentType == ContentType.TEXT) { "Type " + ref.contentType.name + " is no document" }
         }
     }
 

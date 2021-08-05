@@ -27,14 +27,7 @@ dependencies {
     implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.2.8")
 
     // Import Amazon AWS S3 driver for accessing Minio file storage
-    implementation("software.amazon.awssdk:s3:2.17.4")
-
-    // Statistics & logging frameworks
-    // See https://github.com/MicroUtils/kotlin-logging
-    implementation("io.github.microutils:kotlin-logging-jvm:2.0.10")
-    implementation("ch.qos.logback:logback-classic:1.2.3") {
-        because("Ktor depends on this library and has issues when missing")
-    }
+    implementation("software.amazon.awssdk:s3:2.17.7")
 
     // JUnit test framework
     testImplementation(kotlin("test"))

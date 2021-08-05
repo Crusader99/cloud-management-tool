@@ -19,6 +19,8 @@ object RestPaths {
 
 const val apiPathDeleteReference = "/deleteReference"
 
+const val apiPathRenameReference = "/renameReference"
+
 const val apiPathCreateReference = "/createReference"
 
 const val apiPathListReferences = "/listReferences"
@@ -27,7 +29,11 @@ const val apiPathListLabels = "/listLabels"
 
 const val apiPathImport = "/import"
 
-const val apiPathDownload = "/download"
+const val apiPathUploadFile = "/file/upload"
+
+const val apiPathDownloadFile = "/file/download"
+
+const val apiPathDownloadDocument = "/document/download"
 
 const val apiPathAuthRestore = "/restore"
 

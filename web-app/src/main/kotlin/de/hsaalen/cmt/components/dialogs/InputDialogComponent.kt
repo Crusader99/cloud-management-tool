@@ -33,6 +33,7 @@ suspend fun InputDialogComponent.show(
     title: String,
     message: String? = null,
     placeholder: String = "",
+    defaultValue: String = "",
     button: String = "OK"
 ): String? {
     val newName: String? = suspendCoroutine { continuation ->
@@ -42,6 +43,7 @@ suspend fun InputDialogComponent.show(
             this.title = title
             this.message = message
             this.placeholder = placeholder
+            this.defaultValue = defaultValue
             this.button = button
             this.isOpen = true
         }
@@ -60,6 +62,7 @@ external interface InputDialogComponentState : RState {
     var title: String
     var message: String?
     var placeholder: String
+    var defaultValue: String
     var button: String
 
     var isOpen: Boolean
@@ -93,7 +96,7 @@ class InputDialogComponent : RComponent<RProps, InputDialogComponentState>() {
      */
     override fun InputDialogComponentState.init() {
         isOpen = false
-        userInput = ""
+        userInput = defaultValue
     }
 
     /**
@@ -110,7 +113,13 @@ class InputDialogComponent : RComponent<RProps, InputDialogComponentState>() {
                     }
                     br {}
                 }
-                mTextField(state.placeholder, autoFocus = true, margin = MFormControlMargin.none, fullWidth = true) {
+                mTextField(
+                    label = state.placeholder,
+                    defaultValue = state.defaultValue,
+                    autoFocus = true,
+                    margin = MFormControlMargin.none,
+                    fullWidth = true
+                ) {
                     attrs {
                         onTextChange(::onTextChangeHandler)
                         onEnterKey { onCreateHandler?.invoke() }

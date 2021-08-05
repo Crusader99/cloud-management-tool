@@ -18,6 +18,6 @@ interface DocumentRepository {
     /**
      * Download the content of a specific reference by uuid.
      */
-    suspend fun downloadContent(uuid: UUID): String
+    suspend fun downloadDocument(uuid: UUID): String
 
 }

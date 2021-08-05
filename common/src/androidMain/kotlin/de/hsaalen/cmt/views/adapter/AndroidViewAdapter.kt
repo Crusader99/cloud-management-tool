@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
-import de.crusader.extensions.toFullString
 import de.crusader.objects.Point
 import de.crusader.objects.color.Color
 import de.crusader.painter.impl.AndroidCanvasPainter
@@ -21,7 +20,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-fun Throwable.report() = debug(toFullString())
+fun Throwable.report() = debug(stackTraceToString())
 
 fun debug(msg: String) = Log.d("DEBUG", msg)
 

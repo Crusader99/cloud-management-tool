@@ -1,25 +1,19 @@
 package de.hsaalen.cmt.network.session
 
-import com.soywiz.krypto.encoding.fromBase64
 import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.apiPathRSocket
 import de.hsaalen.cmt.network.dto.objects.UUID
 import de.hsaalen.cmt.network.dto.rsocket.DocumentChangeDto
 import de.hsaalen.cmt.network.dto.rsocket.LiveDto
-import de.hsaalen.cmt.network.dto.rsocket.RequestDocumentDto
+import de.hsaalen.cmt.network.dto.rsocket.RequestReferenceDto
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.network.exceptions.ConnectException
-import de.hsaalen.cmt.network.requests.AuthenticationRepositoryImpl
-import de.hsaalen.cmt.network.requests.DocumentRepositoryImpl
-import de.hsaalen.cmt.network.requests.LabelRepositoryImpl
-import de.hsaalen.cmt.network.requests.ReferenceRepositoryImpl
+import de.hsaalen.cmt.network.requests.*
 import de.hsaalen.cmt.repository.AuthenticationRepository
 import de.hsaalen.cmt.utils.buildPayload
 import de.hsaalen.cmt.utils.decodeProtobufData
-import de.hsaalen.cmt.utils.protobufData
 import io.ktor.client.*
 import io.rsocket.kotlin.RSocket
-import io.rsocket.kotlin.payload.buildPayload
 import io.rsocket.kotlin.transport.ktor.client.rSocket
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
@@ -45,9 +39,8 @@ class Session(
      *
      * @see {https://rsocket.io}
      */
-    private val rSocket: RSocket,
-
-    ) : ReferenceRepositoryImpl, LabelRepositoryImpl, DocumentRepositoryImpl {
+    val rSocket: RSocket,
+) : ReferenceRepositoryImpl, LabelRepositoryImpl, DocumentRepositoryImpl, FileRepositoryImpl {
 
     /**
      * True while the websocket is connected to the server.
@@ -68,18 +61,16 @@ class Session(
      * Send [LiveDto] over rSocket connection.
      */
     suspend fun sendLiveDTO(dto: LiveDto) {
-        val payload = buildPayload {
-            // Encrypt content before sending to server
-            protobufData(dto.encrypt())
-        }
+        // Encrypt content before sending to server
+        val payload = dto.encrypt().buildPayload()
         rSocket.fireAndForget(payload)
     }
 
     /**
-     * Open a modification channel for editing a document. Also changes from other clients will received.
+     * Open a modification channel for editing a document. Also changes from other clients will be received.
      */
     fun modifyDocument(reference: UUID, sendChannel: Channel<DocumentChangeDto>): Flow<DocumentChangeDto> {
-        val init = RequestDocumentDto(reference).encrypt().buildPayload()
+        val init = RequestReferenceDto(reference).encrypt().buildPayload()
         val sendEvents = sendChannel.receiveAsFlow().map { it.encrypt().buildPayload() }
         return rSocket.requestChannel(init, sendEvents).map { it.decodeProtobufData<DocumentChangeDto>().decrypt() }
     }
@@ -122,9 +113,8 @@ class Session(
         /**
          * Personal master crypto key that can be used for encrypting and decrypting all non reference related data.
          */
-        // TODO: decrypt key before using. a key for decryption the key is required. store in cookie?
         val personalKey: ByteArray
-            get() = instance?.userInfo?.personalKeyBase64?.fromBase64() ?: error("No key available")
+            get() = PersonalKeyManagement.currentKey ?: error("No key available")
 
         /**
          * Factory for [AuthenticationRepository] implementation.

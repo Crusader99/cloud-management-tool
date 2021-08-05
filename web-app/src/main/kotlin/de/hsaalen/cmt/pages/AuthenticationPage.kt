@@ -2,12 +2,11 @@ package de.hsaalen.cmt.pages
 
 import com.ccfraser.muirwik.components.MLinkUnderline
 import com.ccfraser.muirwik.components.mLink
-import de.hsaalen.cmt.components.dialogs.InputDialogComponent
-import de.hsaalen.cmt.components.dialogs.renderInputDialog
 import de.hsaalen.cmt.components.login.Credentials
 import de.hsaalen.cmt.components.login.loginComponent
 import de.hsaalen.cmt.components.login.registerComponent
-import de.hsaalen.cmt.extensions.handleSwitchBackendDialog
+import de.hsaalen.cmt.events.EventType
+import de.hsaalen.cmt.events.launchNotification
 import kotlinx.css.*
 import react.*
 import react.dom.attrs
@@ -39,11 +38,6 @@ external interface AuthenticationPageState : RState {
 @JsExport
 class AuthenticationPage(props: AuthenticationPageProps) :
     RComponent<AuthenticationPageProps, AuthenticationPageState>(props) {
-
-    /**
-     * Reference to create dialog for switching backend a specific url.
-     */
-    private val refSwitchBackendDialog = createRef<InputDialogComponent>()
 
     /**
      * Initialize state of the [AuthenticationPage].
@@ -86,7 +80,6 @@ class AuthenticationPage(props: AuthenticationPageProps) :
             }
         }
         renderLink()
-        renderInputDialog(ref = refSwitchBackendDialog)
     }
 
     /**
@@ -105,7 +98,7 @@ class AuthenticationPage(props: AuthenticationPageProps) :
                         cursor = Cursor.pointer
                         float = Float.left
                     }
-                    onClick = { refSwitchBackendDialog.current?.handleSwitchBackendDialog() }
+                    onClick = { launchNotification(EventType.PRE_SWITCH_BACKEND) }
                 }
             }
 

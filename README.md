@@ -91,6 +91,8 @@ Make sure the android sdk is installed and path is correct.
 sdk.dir=/opt/android
 ```
 
+Note when opening the full project with Android Studio, the `local.properties` file will be generated automatically.
+
 ### With gradle & docker-compose:
 
 Build all modules, including android:

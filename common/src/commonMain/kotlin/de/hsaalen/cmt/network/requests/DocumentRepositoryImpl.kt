@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.network.requests
 
 import de.hsaalen.cmt.crypto.decrypt
+import de.hsaalen.cmt.network.apiPathDownloadDocument
 import de.hsaalen.cmt.network.dto.objects.UUID
 import de.hsaalen.cmt.network.dto.rsocket.DocumentChangeDto
 import de.hsaalen.cmt.network.session.Client
@@ -26,8 +27,8 @@ internal interface DocumentRepositoryImpl : ClientSupport, DocumentRepository {
     /**
      * Download the content of a specific reference by uuid.
      */
-    override suspend fun downloadContent(uuid: UUID): String {
-        val url = Url("$apiEndpoint/download/$uuid")
+    override suspend fun downloadDocument(uuid: UUID): String {
+        val url = Url("$apiEndpoint/$apiPathDownloadDocument/$uuid")
         val encryptedText: String = Client.request(url) {
             method = HttpMethod.Get
         }

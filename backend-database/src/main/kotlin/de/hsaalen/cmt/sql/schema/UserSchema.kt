@@ -1,6 +1,6 @@
 package de.hsaalen.cmt.sql.schema
 
-import de.crusader.extensions.toHexStr
+import de.hsaalen.cmt.crypto.toBase64
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
@@ -46,6 +46,6 @@ class UserDao(id: EntityID<UUID>) : UUIDEntity(id) {
     /**
      * Convert to data transfer object.
      */
-    fun toServerUserInfoDto() = ServerUserInfoDto(fullName, email, personalEncryptedKey.toHexStr())
+    fun toServerUserInfoDto() = ServerUserInfoDto(fullName, email, personalEncryptedKey.toBase64())
 
 }

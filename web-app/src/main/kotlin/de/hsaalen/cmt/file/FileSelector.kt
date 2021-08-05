@@ -28,6 +28,25 @@ suspend fun File.readText(): String {
 }
 
 /**
+ * Functionality for reading bytes of a given file.
+ */
+suspend fun File.readBytes(): ByteArray {
+    val reader = FileReader()
+    val result: dynamic = suspendCoroutine { continuation ->
+        reader.onload = {
+            continuation.resume(reader.result)
+        }
+        reader.readAsArrayBuffer(this)
+    }
+    return Int8Array(result) as ByteArray
+}
+
+/**
+ * External defined Int8Array that is included in W3C standard.
+ */
+external class Int8Array(arrayBuffer: dynamic)
+
+/**
  * Provides functionality for opening a file input dialog.
  */
 object FileSelector {

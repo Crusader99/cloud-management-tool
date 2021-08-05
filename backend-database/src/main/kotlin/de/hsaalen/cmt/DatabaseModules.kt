@@ -36,7 +36,7 @@ object DatabaseModules {
         single<ReferenceRepository> { ReferenceRepositoryImpl }
         single<LabelRepository> { LabelRepositoryImpl }
         single<DocumentRepository> { DocumentRepositoryImpl }
+        single<FileRepository> { FileRepositoryImpl }
     }
-
 
 }

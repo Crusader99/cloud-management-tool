@@ -23,15 +23,15 @@ dependencies {
     implementation(project(":common"))
 
     // Network framework
-    implementation("io.ktor:ktor-server-core:1.6.1")
-    implementation("io.ktor:ktor-server-cio:1.6.1") {
+    implementation("io.ktor:ktor-server-core:1.6.2")
+    implementation("io.ktor:ktor-server-cio:1.6.2") {
         because("Known issues with netty & jetty")
     }
-    implementation("io.ktor:ktor-serialization:1.6.1")
-    implementation("io.ktor:ktor-websockets:1.6.1")
-    implementation("io.ktor:ktor-metrics-micrometer:1.6.1")
-    implementation("io.ktor:ktor-auth:1.6.1")
-    implementation("io.ktor:ktor-auth-jwt:1.6.1")
+    implementation("io.ktor:ktor-serialization:1.6.2")
+    implementation("io.ktor:ktor-websockets:1.6.2")
+    implementation("io.ktor:ktor-metrics-micrometer:1.6.2")
+    implementation("io.ktor:ktor-auth:1.6.2")
+    implementation("io.ktor:ktor-auth-jwt:1.6.2")
 
     // Use RSocket as better alternative to plain websockets (https://rsocket.io/)
     implementation("io.rsocket.kotlin:rsocket-transport-ktor-server:0.13.1")
@@ -50,11 +50,11 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation("io.insert-koin:koin-test:3.1.2")
     testImplementation("io.mockk:mockk:1.12.0")
-    testImplementation("io.ktor:ktor-server-test-host:1.6.1")
+    testImplementation("io.ktor:ktor-server-test-host:1.6.2")
     testImplementation("de.crusader:webscraper-selenium:3.1.0")
     testImplementation("de.crusader:webscraper-htmlunit:3.1.0")
-    testImplementation("io.ktor:ktor-client-core:1.6.1")
-    testImplementation("io.ktor:ktor-client-cio:1.6.1")
+    testImplementation("io.ktor:ktor-client-core:1.6.2")
+    testImplementation("io.ktor:ktor-client-cio:1.6.2")
     testImplementation("io.rsocket.kotlin:rsocket-transport-ktor-client:0.13.1")
 
 }
@@ -71,7 +71,7 @@ tasks.test {
 
 // Configure detekt code analyze tool to generate HTML report
 detekt {
-    ignoreFailures = true // Currently only print warning
+    ignoreFailures = true // Currently, only print warning
     reports {
         html.enabled = true
     }

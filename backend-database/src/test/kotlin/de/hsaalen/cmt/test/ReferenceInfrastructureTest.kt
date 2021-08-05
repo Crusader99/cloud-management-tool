@@ -44,7 +44,7 @@ class ReferenceInfrastructureTest {
 
             suspend fun validate() {
                 assertEquals(info.displayName, ref.displayName)
-                assertEquals("", docRepo.downloadContent(ref.uuid))
+                assertEquals("", docRepo.downloadDocument(ref.uuid))
                 assertEquals(info.labels, labelNames)
             }
 
@@ -66,22 +66,22 @@ class ReferenceInfrastructureTest {
             ref = refRepo.listReferences().references.single { it.uuid == ref.uuid }
 
             docRepo.modifyDocument(DocumentChangeDto(ref.uuid, 0, "line-1", MODIFY))
-            assertEquals("line-1", docRepo.downloadContent(ref.uuid))
+            assertEquals("line-1", docRepo.downloadDocument(ref.uuid))
 
             docRepo.modifyDocument(DocumentChangeDto(ref.uuid, 1, "line-2", ADD))
-            assertEquals("line-1\nline-2", docRepo.downloadContent(ref.uuid))
+            assertEquals("line-1\nline-2", docRepo.downloadDocument(ref.uuid))
 
             docRepo.modifyDocument(DocumentChangeDto(ref.uuid, 0, "line-0", ADD))
-            assertEquals("line-0\nline-1\nline-2", docRepo.downloadContent(ref.uuid))
+            assertEquals("line-0\nline-1\nline-2", docRepo.downloadDocument(ref.uuid))
 
             docRepo.modifyDocument(DocumentChangeDto(ref.uuid, 1, "x", ADD))
-            assertEquals("line-0\nx\nline-1\nline-2", docRepo.downloadContent(ref.uuid))
+            assertEquals("line-0\nx\nline-1\nline-2", docRepo.downloadDocument(ref.uuid))
 
             docRepo.modifyDocument(DocumentChangeDto(ref.uuid, 1, "y", MODIFY))
-            assertEquals("line-0\ny\nline-1\nline-2", docRepo.downloadContent(ref.uuid))
+            assertEquals("line-0\ny\nline-1\nline-2", docRepo.downloadDocument(ref.uuid))
 
             docRepo.modifyDocument(DocumentChangeDto(ref.uuid, 1, "", DELETE))
-            assertEquals("line-0\nline-1\nline-2", docRepo.downloadContent(ref.uuid))
+            assertEquals("line-0\nline-1\nline-2", docRepo.downloadDocument(ref.uuid))
         }
     }
 

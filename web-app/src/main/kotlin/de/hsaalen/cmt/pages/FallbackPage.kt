@@ -5,11 +5,13 @@ import com.ccfraser.muirwik.components.button.MButtonVariant
 import com.ccfraser.muirwik.components.button.mButton
 import com.ccfraser.muirwik.components.dialog.mDialog
 import com.ccfraser.muirwik.components.dialog.mDialogTitle
-import de.hsaalen.cmt.components.dialogs.InputDialogComponent
-import de.hsaalen.cmt.components.dialogs.renderInputDialog
-import de.hsaalen.cmt.extensions.handleSwitchBackendDialog
+import de.hsaalen.cmt.events.EventType
+import de.hsaalen.cmt.events.launchNotification
 import kotlinx.css.*
-import react.*
+import react.RBuilder
+import react.RComponent
+import react.RProps
+import react.RState
 import styled.css
 
 /**
@@ -24,11 +26,6 @@ external interface FallbackPageProps : RProps {
  */
 @JsExport
 class FallbackPage : RComponent<FallbackPageProps, RState>() {
-
-    /**
-     * Reference to create dialog for switching backend a specific url.
-     */
-    private val refSwitchBackendDialog = createRef<InputDialogComponent>()
 
     /**
      * Called when page is rendered.
@@ -56,10 +53,9 @@ class FallbackPage : RComponent<FallbackPageProps, RState>() {
                     position = Position.absolute
                     zIndex = Int.MAX_VALUE
                 }
-                onClick = { refSwitchBackendDialog.current?.handleSwitchBackendDialog() }
+                onClick = { launchNotification(EventType.PRE_SWITCH_BACKEND) }
             }
         }
-        renderInputDialog(ref = refSwitchBackendDialog)
     }
 
 }

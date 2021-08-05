@@ -3,14 +3,17 @@ package de.hsaalen.cmt.network.requests
 import de.hsaalen.cmt.network.apiPathCreateReference
 import de.hsaalen.cmt.network.apiPathDeleteReference
 import de.hsaalen.cmt.network.apiPathListReferences
+import de.hsaalen.cmt.network.apiPathRenameReference
 import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientDeleteReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.Reference
+import de.hsaalen.cmt.network.dto.objects.UUID
+import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateRenameDto
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.network.session.Client
-import de.hsaalen.cmt.utils.ClientSupport
 import de.hsaalen.cmt.repository.ReferenceRepository
+import de.hsaalen.cmt.utils.ClientSupport
 import io.ktor.http.*
 
 /**
@@ -51,6 +54,17 @@ internal interface ReferenceRepositoryImpl : ClientSupport, ReferenceRepository 
         return Client.request(url) {
             method = HttpMethod.Post
             body = request
+        }
+    }
+
+    /**
+     * Give a new title name to a reference.
+     */
+    override suspend fun rename(uuid: UUID, newTitle: String) {
+        val url = Url("$apiEndpoint$apiPathRenameReference")
+        return Client.request(url) {
+            method = HttpMethod.Post
+            body = ReferenceUpdateRenameDto(uuid, newTitle)
         }
     }
 

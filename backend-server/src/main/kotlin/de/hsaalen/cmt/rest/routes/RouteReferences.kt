@@ -5,13 +5,13 @@ import de.hsaalen.cmt.network.dto.client.ClientCreateReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientDeleteReferenceDto
 import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.UUID
+import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateRenameDto
 import de.hsaalen.cmt.repository.DocumentRepository
 import de.hsaalen.cmt.repository.ReferenceRepository
 import de.hsaalen.cmt.session.getWithSession
 import de.hsaalen.cmt.session.postWithSession
 import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -19,7 +19,7 @@ import io.ktor.util.*
 import org.koin.ktor.ext.inject
 
 /**
- * Register and handle REST API routes from clients related to references and their content.
+ * Register and handle REST API routes from clients that are related to any reference.
  */
 fun Routing.routeReferences() = route("/" + RestPaths.base) {
     val repo: ReferenceRepository by inject()
@@ -39,16 +39,8 @@ fun Routing.routeReferences() = route("/" + RestPaths.base) {
         val request: ClientDeleteReferenceDto = call.receive()
         call.respond(repo.deleteReference(request))
     }
-    getWithSession("/upload") {
-        call.respondText("Upload")
-    }
-    getWithSession("$apiPathDownload/{uuid}") {
-        val uuid: String by call.parameters
-        val docRepo: DocumentRepository by call.inject()
-        val stream = docRepo.downloadContent(UUID(uuid)).byteInputStream()
-        call.response.header(HttpHeaders.ContentDisposition, "attachment")
-        call.respondOutputStream {
-            stream.copyTo(this)
-        }
+    postWithSession(apiPathRenameReference) {
+        val request: ReferenceUpdateRenameDto = call.receive()
+        call.respond(repo.rename(request.uuid, request.newName))
     }
 }

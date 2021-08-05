@@ -7,6 +7,8 @@ import com.ccfraser.muirwik.components.list.mListItem
 import com.ccfraser.muirwik.components.list.mListItemText
 import de.hsaalen.cmt.SoftwareInfo
 import de.hsaalen.cmt.components.dialogs.aboutSoftwareDialog
+import de.hsaalen.cmt.events.EventType
+import de.hsaalen.cmt.events.launchNotification
 import de.hsaalen.cmt.network.session.Session
 import kotlinx.browser.window
 import kotlinx.css.FlexBasis
@@ -21,12 +23,10 @@ import styled.styledDiv
  * Wrapper function to simplify creation of this [ViewAppBar] react component.
  */
 fun RBuilder.appBar(
-    onLogout: () -> Unit,
     isLoggedIn: Boolean,
     drawerMenu: Map<String, (Event) -> Unit>,
 ) = child(ViewAppBar::class) {
     attrs {
-        this.onLogout = onLogout
         this.isLoggedIn = isLoggedIn
         this.drawerMenu = drawerMenu
     }
@@ -36,7 +36,6 @@ fun RBuilder.appBar(
  * React props of the [ViewAppBar] component.
  */
 external interface ViewAppBarProps : RProps {
-    var onLogout: () -> Unit
     var isLoggedIn: Boolean
     var drawerMenu: Map<String, (Event) -> Unit>
 }
@@ -95,7 +94,8 @@ class ViewAppBar : RComponent<ViewAppBarProps, ViewAppBarState>() {
                         mIconButton(
                             iconName = "logout_icon",
                             color = MColor.inherit,
-                            onClick = { props.onLogout() })
+                            onClick = { launchNotification(EventType.PRE_LOGOUT) }
+                        )
                     }
                 }
             }

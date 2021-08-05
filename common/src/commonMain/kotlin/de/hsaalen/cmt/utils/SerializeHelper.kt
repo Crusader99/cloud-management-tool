@@ -36,20 +36,30 @@ object SerializeHelper {
      */
     inline fun <reified DTO> decodeJson(json: String): DTO = configured.decodeFromString(json)
 
+    /**
+     * Encode given data transfer object to ProtoBuf.
+     */
+    inline fun <reified DTO> encodeProtoBuf(dto: DTO): ByteArray = ProtoBuf.encodeToByteArray(dto)
+
+    /**
+     * Decode the ProtoBuf to a data transfer object.
+     */
+    inline fun <reified DTO> decodeProtoBuf(data: ByteArray): DTO = ProtoBuf.decodeFromByteArray(data)
+
 }
 
 /**
  * Add [LiveDto] data to rSocket payload.
  */
 inline fun <reified DTO : LiveDto> PayloadBuilder.protobufData(dto: DTO) {
-    data(ProtoBuf.encodeToByteArray(dto as LiveDto))
+    data(SerializeHelper.encodeProtoBuf(dto as LiveDto))
 }
 
 /**
  * Read [LiveDto] data from rSocket payload.
  */
 inline fun <reified DTO : LiveDto> Payload.decodeProtobufData(): DTO {
-    val dto: LiveDto = ProtoBuf.decodeFromByteArray(data.readBytes())
+    val dto: LiveDto = SerializeHelper.decodeProtoBuf(data.readBytes())
     return dto as DTO
 }
 

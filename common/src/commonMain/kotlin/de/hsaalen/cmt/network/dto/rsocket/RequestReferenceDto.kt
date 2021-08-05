@@ -4,10 +4,10 @@ import de.hsaalen.cmt.network.dto.objects.UUID
 import kotlinx.serialization.Serializable
 
 /**
- * Request server to provide content to a specific document.
+ * Request server to provide content to a specific reference.
  */
 @Serializable
-data class RequestDocumentDto(
+data class RequestReferenceDto(
     val reference: UUID,
 ) : ReferenceUpdateDto() {
 
