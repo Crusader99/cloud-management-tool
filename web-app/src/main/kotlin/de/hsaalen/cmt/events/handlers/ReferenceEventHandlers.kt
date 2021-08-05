@@ -35,7 +35,7 @@ object ReferenceEventHandlers {
     }
 
     /**
-     * Import data from simplenote json format.
+     * Import data from simple-note json format.
      */
     private suspend fun onImportDocuments() {
         suspend fun importFile(name: String, content: String) {
@@ -57,6 +57,7 @@ object ReferenceEventHandlers {
                     logger.info { file.name + " successfully imported" }
                 }
             }
+            GuiOperations.showSnackBar("Successfully imported", MAlertSeverity.success)
         } catch (ex: Exception) {
             logger.warn(ex) { "Document import failed" }
             GuiOperations.showSnackBar(ex.message ?: return, MAlertSeverity.warning)

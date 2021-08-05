@@ -11,8 +11,9 @@ import de.hsaalen.cmt.network.dto.client.ClientLoginDto
 import de.hsaalen.cmt.network.dto.client.ClientRegisterDto
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.network.session.Client
-import de.hsaalen.cmt.utils.ClientSupport
+import de.hsaalen.cmt.network.session.PersonalKeyManagement
 import de.hsaalen.cmt.repository.AuthenticationRepository
+import de.hsaalen.cmt.utils.ClientSupport
 import io.ktor.http.*
 
 /**
@@ -33,10 +34,13 @@ internal object AuthenticationRepositoryImpl : ClientSupport, AuthenticationRepo
         val encryptedPersonalKey = encrypt(personalKey, passwordPlain.encodeToByteArray()).toBase64()
         val passwordHashed = hashPassword(passwordPlain)
         val url = Url("$apiEndpoint$apiPathAuthRegister")
-        return Client.request(url) {
+        val encryptedInfo: ServerUserInfoDto = Client.request(url) {
             method = HttpMethod.Post
             body = ClientRegisterDto(fullName, email, passwordHashed, encryptedPersonalKey)
         }
+        val decryptedInfo: ServerUserInfoDto = encryptedInfo.decrypt(passwordPlain)
+        PersonalKeyManagement.store(decryptedInfo)
+        return decryptedInfo
     }
 
     /**
@@ -45,36 +49,45 @@ internal object AuthenticationRepositoryImpl : ClientSupport, AuthenticationRepo
     override suspend fun login(email: String, passwordPlain: String): ServerUserInfoDto {
         val passwordHashed = hashPassword(passwordPlain)
         val url = Url("$apiEndpoint$apiPathAuthLogin")
-        return Client.request(url) {
+        val encryptedInfo: ServerUserInfoDto = Client.request(url) {
             method = HttpMethod.Post
             body = ClientLoginDto(email, passwordHashed)
         }
+        val decryptedInfo: ServerUserInfoDto = encryptedInfo.decrypt(passwordPlain)
+        PersonalKeyManagement.store(decryptedInfo)
+        return decryptedInfo
     }
 
     /**
-     * Sends logout request to server to receive a HTTP header to get cookies deleted.
+     * Sends logout request to server to receive an HTTP header to get cookies deleted.
      */
-    override suspend fun logout(): Unit = Client.request(Url("$apiEndpoint$apiPathAuthLogout")) {
-        method = HttpMethod.Post
+    override suspend fun logout(): Unit = try { // Define type explicit to ignore result
+        Client.request(Url("$apiEndpoint$apiPathAuthLogout")) {
+            method = HttpMethod.Post
+        }
+    } finally {
+        PersonalKeyManagement.delete()
     }
 
     /**
-     * Send request to the server for restoring user session. Session can only restored when JWT
+     * Send request to the server for restoring user session. Session is only restored when JWT
      * cookie is still valid.
      *
      * Note: Email parameter may be empty in this implementation because it is determined from server by cookie.
      */
     override suspend fun restore(email: String): ServerUserInfoDto {
         val url = Url("$apiEndpoint$apiPathAuthRestore")
-        return Client.request(url) {
+        val info: ServerUserInfoDto = Client.request(url) {
             method = HttpMethod.Get
         }
+        PersonalKeyManagement.load(email) ?: error("No key available")
+        return info
     }
 
     /**
      * Hash the given password parameter WITHOUT salting.
      *
-     * Note: Salting only happens on server side and a specific salt is defined by setting a environment variable.
+     * Note: Salting only happens on server side and a specific salt is defined by setting an environment variable.
      */
     private fun hashPassword(password: String): String {
         // Hash password without salting on clientside and convert to hex string
