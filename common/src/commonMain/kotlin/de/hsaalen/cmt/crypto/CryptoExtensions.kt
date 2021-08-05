@@ -27,7 +27,15 @@ fun Sequence<String>.decrypt(secureRandomizedPadding: Boolean = true): Sequence<
  * @param secureRandomizedPadding - Generates different output for same input, which is more secure. Enabled by default.
  */
 fun decrypt(encrypted: String, secureRandomizedPadding: Boolean = true): String =
-    decrypt(encrypted.fromBase64(), Session.personalKey, secureRandomizedPadding).decodeToString()
+    decrypt(encrypted.fromBase64(), secureRandomizedPadding).decodeToString()
+
+/**
+ * Decrypt [ByteArray]'s using users personal session key.
+ *
+ * @param secureRandomizedPadding - Generates different output for same input, which is more secure. Enabled by default.
+ */
+fun decrypt(encryptedData: ByteArray, secureRandomizedPadding: Boolean = true): ByteArray =
+    decrypt(encryptedData, Session.personalKey, secureRandomizedPadding)
 
 /**
  * Encrypt [List] of [String]'s using users personal session key.
@@ -51,4 +59,12 @@ fun Sequence<String>.encrypt(secureRandomizedPadding: Boolean = true): Sequence<
  * @param secureRandomizedPadding - Generates different output for same input, which is more secure. Enabled by default.
  */
 fun encrypt(plainText: String, secureRandomizedPadding: Boolean = true): String =
-    encrypt(plainText.encodeToByteArray(), Session.personalKey, secureRandomizedPadding).toBase64()
+    encrypt(plainText.encodeToByteArray(), secureRandomizedPadding).toBase64()
+
+/**
+ * Encrypt [ByteArray]'s using users personal session key.
+ *
+ * @param secureRandomizedPadding - Generates different output for same input, which is more secure. Enabled by default.
+ */
+fun encrypt(plainData: ByteArray, secureRandomizedPadding: Boolean = true): ByteArray =
+    encrypt(plainData, Session.personalKey, secureRandomizedPadding)
