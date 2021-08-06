@@ -59,7 +59,7 @@ class Connection(socket: RSocket, private val payload: JwtPayload, val jwtToken:
      * Process all incoming packets using suspend function to prevent blocking.
      */
     suspend fun handler(route: Route) = RSocketRequestHandler {
-        WebSocketManager.connections += this@Connection
+        LocalConnectionManager.connections += this@Connection
         logger.info("Connected websocket with " + payload.email + " " + payload.fullName)
         fireAndForget { payload ->
             logger.info("got fireAndForget")
@@ -129,7 +129,7 @@ class Connection(socket: RSocket, private val payload: JwtPayload, val jwtToken:
         }
 
         job.invokeOnCompletion {
-            WebSocketManager.connections -= this@Connection
+            LocalConnectionManager.connections -= this@Connection
             logger.info("Websocket disconnected")
         }
     }
@@ -146,7 +146,7 @@ class Connection(socket: RSocket, private val payload: JwtPayload, val jwtToken:
         } catch (t: Throwable) {
             logger.error("Unable to perform RSocket disconnect", t)
         } finally {
-            WebSocketManager.connections -= this
+            LocalConnectionManager.connections -= this
         }
     }
 

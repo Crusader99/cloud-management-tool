@@ -70,13 +70,21 @@ val dockerMinio by tasks.registering(DockerRunTask::class) {
     command("server /data")
 }
 
+val dockerRedis by tasks.registering(DockerRunTask::class) {
+    addPort(freeHostSystemPort, 6379)
+    args("-itd")
+    image("redis")
+}
+
 val dockerStop by tasks.registering(DockerStopTask::class) {
     stopContainerFromTask(dockerPostgres)
     stopContainerFromTask(dockerMongoDB)
+    stopContainerFromTask(dockerMinio)
+    stopContainerFromTask(dockerRedis)
 }
 
 tasks.test {
-    dependsOn(dockerPostgres, dockerMongoDB, dockerMinio)
+    dependsOn(dockerPostgres, dockerMongoDB, dockerMinio, dockerRedis)
     finalizedBy(dockerStop)
 
     environment["PASSWORD_SALT"] = "salt"
@@ -91,6 +99,7 @@ tasks.test {
     environment["MONGO_PORT"] = dockerMongoDB.firstPublishedPort
 
     environment["S3_ENDPOINT"] = "http://localhost:" + dockerMinio.firstPublishedPort
+    environment["REDIS_PORT"] = dockerRedis.firstPublishedPort
 
     useJUnitPlatform()
     timeout.set(Duration.ofSeconds(60L))

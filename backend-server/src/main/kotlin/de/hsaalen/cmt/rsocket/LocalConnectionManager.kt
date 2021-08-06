@@ -6,22 +6,25 @@ import de.hsaalen.cmt.utils.buildPayload
 import mu.KotlinLogging
 
 /**
- * Singleton object for holding active web socket connections.
+ * A singleton object for holding active web socket connections of the current backend server. More clients may be connected
+ * to other backend server instances.
  */
-object WebSocketManager {
+object LocalConnectionManager {
 
     /**
-     * List of all currently active web-socket connections.
+     * List of all currently active web-socket connections to the current server instance. More clients may be connected
+     * to other backend server instances.
      */
     val connections = mutableListOf<Connection>()
 
     /**
-     * Local logger instance for this [WebSocketManager].
+     * Local logger instance for this [LocalConnectionManager].
      */
     private val logger = KotlinLogging.logger { }
 
     /**
-     * Broadcast a DTO to all web-socket clients.
+     * Broadcast a DTO to all web-socket clients of the current backend server. More clients may be connected
+     * to other backend server instances.
      */
     suspend fun broadcast(dto: LiveDto, filter: Iterable<Connection>.() -> Iterable<Connection> = { this }) {
         logger.debug("broadcast: " + dto::class.simpleName)
@@ -34,7 +37,8 @@ object WebSocketManager {
     }
 
     /**
-     * Disconnect all clients with related JWT token.
+     * Disconnect all clients with related JWT token of the current backend server. More clients may be connected
+     * to other backend server instances.
      */
     suspend fun disconnect(withJwtToken: String) {
         for (others in connections.filter { it.jwtToken == withJwtToken }) {

@@ -23,25 +23,28 @@ private val logger = KotlinLogging.logger {}
  */
 val eventModule = SerializersModule {
     polymorphic(Event::class) {
-        fun <T : Any> PolymorphicModuleBuilder<T>.register(cls: KClass<T>) {
-            logger.debug("subclass(" + cls.simpleName + "::class)")
-            if (cls.isSealed) {
-                logger.debug("Skip " + cls.simpleName)
-                return
-            }
-            try {
-                val serializer = serializer(cls.starProjectedType) as KSerializer<T>
-                subclass(cls, serializer)
-            } catch (ex: Exception) {
-                throw IllegalStateException("Unable to register event for serialization: " + cls.qualifiedName, ex)
-            }
-        }
-
         // Scan for subclasses of the Event class at runtime including subpackages
         val reflections = Reflections("de.hsaalen.cmt", SubTypesScanner(false))
         val subTypes: Set<Class<out Event>> = reflections.getSubTypesOf(Event::class.java)
         for (cls in subTypes) {
             register(cls.kotlin)
         }
+    }
+}
+
+/**
+ * Helper extension function to register a class as polymorphic subtype of a base class in the current function context.
+ */
+private fun <T : Any> PolymorphicModuleBuilder<T>.register(cls: KClass<T>) {
+    logger.debug("subclass(" + cls.simpleName + "::class)")
+    if (cls.isSealed) {
+        logger.debug("Skip " + cls.simpleName)
+        return
+    }
+    try {
+        val serializer = serializer(cls.starProjectedType) as KSerializer<T>
+        subclass(cls, serializer)
+    } catch (ex: Exception) {
+        throw IllegalStateException("Unable to register event for serialization: " + cls.qualifiedName, ex)
     }
 }
