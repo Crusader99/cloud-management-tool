@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.pages
 
+import com.ccfraser.muirwik.components.lab.alert.MAlertSeverity
 import com.ccfraser.muirwik.components.mTypography
 import de.hsaalen.cmt.components.referenceList
 import de.hsaalen.cmt.events.*
@@ -157,7 +158,12 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
             button = "Add"
         ) ?: return
         logger.info { "Add label name: $labelName" }
-        Session.instance?.addLabel(event.reference, labelName)
+        try {
+            Session.instance?.addLabel(event.reference, labelName)
+        } catch (ex: Exception) {
+            val message = ex.message ?: "Unable to add label"
+            GuiOperations.showSnackBar(message, MAlertSeverity.warning)
+        }
     }
 
     /**

@@ -6,6 +6,7 @@ import de.hsaalen.cmt.WebApp
 import de.hsaalen.cmt.components.dialogs.show
 import de.hsaalen.cmt.components.features.show
 import de.hsaalen.cmt.file.FileSelector
+import mu.KotlinLogging
 import react.setState
 
 object GuiOperations {
@@ -14,6 +15,11 @@ object GuiOperations {
      * Reference to the main web app instance.
      */
     lateinit var webApp: WebApp
+
+    /**
+     * Logging instance for this class.
+     */
+    private val logger = KotlinLogging.logger("BackendLocator")
 
     /**
      * Show a loading screen until the action code block is completed.
@@ -53,6 +59,7 @@ object GuiOperations {
      * Opens a new snack bar and replaces the previous one when the previous one is still open.
      */
     suspend fun showSnackBar(message: String, severity: MAlertSeverity, timeoutMs: Long = 4_000) {
+        logger.info { "Show snackbar ($timeoutMs ms): $message" }
         webApp.refSnackBar.current?.show(message, severity, timeoutMs)
     }
 

@@ -1,7 +1,8 @@
-package de.hsaalen.cmt
+package de.hsaalen.cmt.theme
 
 import com.ccfraser.muirwik.components.styles.ThemeOptions
 import com.ccfraser.muirwik.components.styles.createMuiTheme
+import de.hsaalen.cmt.Theme
 import kotlinext.js.jsObject
 import kotlinx.css.Color
 

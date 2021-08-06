@@ -1,10 +1,7 @@
 package de.hsaalen.cmt.events
 
 import de.hsaalen.cmt.components.login.Credentials
-import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.network.dto.objects.Reference
-import io.ktor.utils.io.core.*
-import kotlinx.coroutines.launch
 
 /**
  * Registry for all possible custom events.
