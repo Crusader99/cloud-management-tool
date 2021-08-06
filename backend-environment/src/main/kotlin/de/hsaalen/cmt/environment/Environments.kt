@@ -13,7 +13,7 @@ private val logger = KotlinLogging.logger { }.apply {
 }
 
 /**
- * The default value for user name and password when not configured over system environment variables
+ * The default value for username and password when not configured over system environment variables
  */
 const val DEFAULT_CREDENTIAL_VALUE = "admin123"
 
@@ -53,7 +53,7 @@ val POSTGRESQL_HOST = envOrDefault("POSTGRESQL_HOST", "localhost")
 val POSTGRESQL_PORT = envOrDefault("POSTGRESQL_PORT", 5432).toInt()
 
 /**
- * User name for postgres SQL authorization.
+ * Username for postgres SQL authorization.
  */
 val POSTGRESQL_USER = envOrDefault("POSTGRESQL_USER", DEFAULT_CREDENTIAL_VALUE)
 
@@ -68,7 +68,7 @@ val POSTGRESQL_PASSWORD = envOrDefault("POSTGRESQL_PASSWORD", DEFAULT_CREDENTIAL
 val POSTGRESQL_DB = envOrDefault("POSTGRESQL_DB", "postgres")
 
 /**
- * Host address to the mongo database.
+ * Address of the host for connecting to the mongo database.
  */
 val MONGO_HOST = envOrDefault("MONGO_HOST", "localhost")
 
@@ -78,12 +78,12 @@ val MONGO_HOST = envOrDefault("MONGO_HOST", "localhost")
 val MONGO_PORT = envOrDefault("MONGO_PORT", 27017).toInt()
 
 /**
- * User name for mongo database authorization.
+ * Username for mongo database authorization.
  */
 val MONGO_USER = envOrDefault("MONGO_USER", DEFAULT_CREDENTIAL_VALUE)
 
 /**
- * User name for mongo database authentication.
+ * Password for mongo database authentication.
  */
 val MONGO_PASSWORD = envOrDefault("MONGO_PASSWORD", DEFAULT_CREDENTIAL_VALUE)
 
@@ -93,7 +93,7 @@ val MONGO_PASSWORD = envOrDefault("MONGO_PASSWORD", DEFAULT_CREDENTIAL_VALUE)
 val S3_ENDPOINT = envOrDefault("S3_ENDPOINT", "http://localhost:9000")
 
 /**
- * The user name or access key of the S3 file storage.
+ * The username or access key of the S3 file storage.
  */
 val S3_USER = envOrDefault("S3_USER", DEFAULT_CREDENTIAL_VALUE)
 
@@ -107,12 +107,20 @@ val S3_PASSWORD = envOrDefault("S3_PASSWORD", DEFAULT_CREDENTIAL_VALUE)
  */
 val S3_BUCKET = envOrDefault("S3_BUCKET", "file")
 
+/**
+ * The host that is used to connect to Redis.
+ */
+val REDIS_HOST = envOrDefault("REDIS_HOST", "localhost")
 
 /**
- * Reads a system environment variable or throws an exception when not available.
+ * The port that is used to connect to Redis.
  */
-private fun env(environmentName: String) = envOrNull(environmentName)
-    ?: error("Environment variable '$environmentName' has to be provided")
+val REDIS_PORT = envOrNull("REDIS_PORT")?.toIntOrNull() ?: 6379
+
+/**
+ * The topic that is used by Redis to publish events and register listeners.
+ */
+val REDIS_TOPIC = envOrDefault("REDIS_TOPIC", "se-project")
 
 /**
  * Reads a system environment variable or returns null when not available.

@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.network.dto.rsocket
 
+import de.hsaalen.cmt.events.Event
 import de.hsaalen.cmt.network.dto.objects.Reference
 import kotlinx.serialization.Serializable
 
@@ -9,7 +10,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ReferenceUpdateAddDto(
     val reference: Reference,
-) : ReferenceUpdateDto() {
+) : ReferenceUpdateDto(), Event {
 
     /**
      * Encrypt sensible information using personal session key and return new encrypted instance.

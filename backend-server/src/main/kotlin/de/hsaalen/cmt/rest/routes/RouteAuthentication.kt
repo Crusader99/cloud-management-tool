@@ -11,7 +11,6 @@ import de.hsaalen.cmt.session.currentSession
 import de.hsaalen.cmt.session.getWithSession
 import de.hsaalen.cmt.session.jwt.JwtCookie
 import de.hsaalen.cmt.session.jwt.generateJwtToken
-import de.hsaalen.cmt.session.jwt.readJwtCookie
 import de.hsaalen.cmt.session.jwt.updateJwtCookie
 import de.hsaalen.cmt.session.postWithSession
 import io.ktor.application.*

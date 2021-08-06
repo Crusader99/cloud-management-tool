@@ -1,10 +1,12 @@
 package de.hsaalen.cmt.events
 
+import de.hsaalen.cmt.events.notifications.DirectNotificator
+import de.hsaalen.cmt.events.notifications.Notificator
 import mu.KotlinLogging
 import kotlin.reflect.KClass
 
 /**
- * System wide event dispatcher that allows dispatching events and registering event handlers through [ListenerBundle]s.
+ * System-wide event dispatcher that allows dispatching events and registering event handlers through [ListenerBundle]s.
  */
 object GlobalEventDispatcher {
 
@@ -17,6 +19,12 @@ object GlobalEventDispatcher {
      * List of all currently registered child [ListenerBundle]'s.
      */
     val children = mutableListOf<ListenerBundle>()
+
+    /**
+     * A [Notificator] notifies the registered event handlers when an event was called. Custom [Notificator]'s for
+     * example would allow synchronizing events over redis.
+     */
+    var notificator: Notificator = DirectNotificator()
 
     /**
      * Create new child bundle in which new listeners can be registered. When the listeners
@@ -40,16 +48,6 @@ object GlobalEventDispatcher {
      * Notify registered listeners about new event data.
      */
     suspend fun notify(event: Event) {
-        for (child in children) {
-            for (listener in child.listeners) {
-                try {
-                    listener.invoke(event)
-                } catch (t: Throwable) {
-                    val eventName = listener.parentClass.simpleName
-                    val handlerClass = child.caller?.simpleName ?: "unknown"
-                    logger.error(t) { "Unexpected behaviour in handler '$handlerClass' for event '$eventName'" }
-                }
-            }
-        }
+        notificator.notify(event)
     }
 }

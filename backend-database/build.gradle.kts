@@ -29,6 +29,10 @@ dependencies {
     // Import Amazon AWS S3 driver for accessing Minio file storage
     implementation("software.amazon.awssdk:s3:2.17.7")
 
+    // Redis for synchronisation between server multiple instances
+    implementation("org.redisson:redisson:3.16.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.2.2")
+
     // JUnit test framework
     testImplementation(kotlin("test"))
     testImplementation("io.mockk:mockk:1.12.0")

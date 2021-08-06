@@ -7,7 +7,7 @@ services:
     depends_on:
       - postgres
     ports:
-      - 8686:8686
+      - '8686:8686'
     environment:
       REST_PORT: 8080
       PASSWORD_SALT: ${PASSWORD_SALT}
@@ -22,6 +22,9 @@ services:
       S3_ENDPOINT: http://file-storage:9000
       S3_USER: ${S3_USER}
       S3_PASSWORD: ${S3_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_TOPIC: se-project
       JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8686
   postgres:
     image: postgres:13.3-alpine
@@ -60,7 +63,7 @@ services:
     expose:
       - 9000
     volumes:
-        - s3:/data
+      - s3:/data
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
       interval: 30s
@@ -81,8 +84,6 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-    ports:
-      - 9090:9090
     depends_on:
       - backend-server
   grafana:
@@ -104,8 +105,8 @@ services:
       - backend-server
       - web-app
     ports:
-      - 80:80
-      - 8092:8080 # Dashboard: http://localhost:8082
+      - '80:80'
+      - '8092:8080' # Dashboard: http://localhost:8082
 volumes:
   postgres:
   mongodb:

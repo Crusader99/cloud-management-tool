@@ -1,15 +1,11 @@
 package de.hsaalen.cmt.network.dto.rsocket
 
-import de.hsaalen.cmt.events.Event
-import kotlinx.serialization.Serializable
-
 /**
  * Data transfer object when any reference added/removed.
  */
-@Serializable
-sealed class ReferenceUpdateDto : Event, LiveDto()
+sealed class ReferenceUpdateDto : LiveDto()
 
 /**
- * After a reference got updated by an user.
+ * After a reference got updated by user.
  */
 typealias ReferenceUpdateEvent = ReferenceUpdateDto
