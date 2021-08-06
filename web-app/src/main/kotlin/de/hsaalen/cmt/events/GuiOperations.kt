@@ -19,7 +19,7 @@ object GuiOperations {
     /**
      * Logging instance for this class.
      */
-    private val logger = KotlinLogging.logger("BackendLocator")
+    private val logger = KotlinLogging.logger("GuiOperations")
 
     /**
      * Show a loading screen until the action code block is completed.
