@@ -76,14 +76,14 @@ class ViewAppBar : RComponent<ViewAppBarProps, ViewAppBarState>() {
                         }
                     })
                 }
-                mTypography(text = "Cloud Management Tool", variant = MTypographyVariant.h6)
+                mTypography(text = SoftwareInfo.name, variant = MTypographyVariant.h6)
                 if (props.isLoggedIn) {
                     styledDiv {
                         css {
                             flex(1.0, 1.0, FlexBasis.auto)
                         }
                     }
-                    if (window.innerWidth > 500) {  // Only print user name when on large page
+                    if (window.innerWidth > 500) {  // Only print username when on large page
                         Session.instance?.userInfo?.let { userInfo ->
                             mTooltip("Logged in as " + userInfo.email) {
                                 p { +userInfo.fullName }
@@ -150,7 +150,7 @@ class ViewAppBar : RComponent<ViewAppBarProps, ViewAppBarState>() {
     }
 
     /**
-     * Called when the about dialog is closed by the user.
+     * Called when the about-dialog is closed by the user.
      */
     private fun onCloseAboutDialog() {
         setState {

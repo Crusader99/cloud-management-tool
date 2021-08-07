@@ -1,8 +1,10 @@
 package de.hsaalen.cmt.pages
 
+import de.hsaalen.cmt.components.ViewAppBar
+import de.hsaalen.cmt.components.documenteditor.AceEngine
 import de.hsaalen.cmt.components.documenteditor.DiffCalculator
 import de.hsaalen.cmt.components.documenteditor.Engine
-import de.hsaalen.cmt.components.documenteditor.TextareaEngine
+import de.hsaalen.cmt.components.documenteditor.aceEditor
 import de.hsaalen.cmt.events.GlobalEventDispatcher
 import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.extensions.launch
@@ -11,18 +13,16 @@ import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.rsocket.DocumentChangeDto
 import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateRemoveDto
 import de.hsaalen.cmt.network.session.Session
+import kotlinext.js.jsObject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.css.*
 import kotlinx.css.properties.BoxShadows
-import kotlinx.html.js.onInputFunction
 import mu.KotlinLogging
-import org.w3c.dom.HTMLTextAreaElement
 import react.*
-import react.dom.attrs
 import styled.css
-import styled.styledTextarea
+import styled.injectGlobal
 
 /**
  * React properties of the [DocumentEditPage] component.
@@ -37,7 +37,8 @@ external interface DocumentEditPageProps : RProps {
  * React state of the [DocumentEditPage] component.
  */
 external interface DocumentEditPageState : RState {
-    var defaultText: String?
+    var isReadOnly: Boolean
+    var value: String
 }
 
 /**
@@ -56,19 +57,18 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
     private var diffCalculator = DiffCalculator(::onDocumentChangedLocal)
 
     /**
-     * Reference to the text area element.
-     */
-    private val textarea = createRef<HTMLTextAreaElement>()
-
-    /**
      * The engine for handling text changes.
      */
-    private val engine: Engine = TextareaEngine(textarea)
+    private val engine: Engine = AceEngine {
+        editor
+    }
 
     /**
      * Output channel for changed that will be sent to server.
      */
     private var channelSend = Channel<DocumentChangeDto>()
+
+    private var editor: dynamic = null
 
     /**
      * Register events for this component.
@@ -76,16 +76,18 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
     private val events = GlobalEventDispatcher.createBundle(this) {
         register(::onRemovedReference)
         launch {
-            val text = ""
-            diffCalculator.setText(text)
-            engine.text = text
-            setState {
-                defaultText = text
-            }
+            diffCalculator.setText("")
             Session.instance?.modifyDocument(props.reference.uuid, channelSend)?.collect { event ->
                 onDocumentChangedRemote(event)
             }
         }
+    }
+
+    /**
+     * Initialize state of the [ViewAppBar].
+     */
+    override fun DocumentEditPageState.init() {
+        isReadOnly = false
     }
 
     /**
@@ -100,10 +102,46 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
      * Called when page is rendered.
      */
     override fun RBuilder.render() {
-        styledTextarea {
+        val editorWidth = 100.pct
+        val editorHeight = 90.pct
+
+        val marker: dynamic = jsObject {
+            startRo = 0
+            startCol = 2
+            endRow = 1
+            endCol = 20
+            className = "error-marker"
+            type = "background"
+        }
+
+        val annotation: dynamic = jsObject {
+            row = 0
+            column = 2
+            type = "error"
+            text = "A error"
+        }
+
+
+        val styles = CSSBuilder(allowClasses = false).apply {
+            ".error" {
+                position = Position.absolute
+                backgroundColor = Color.green
+
+                hover {
+                    backgroundColor = Color.red
+                }
+            }
+        }
+
+        injectGlobal(styles.toString())
+//        styledDiv {
+//            css {
+//                +MarkerStyle.
+//            }
+        aceEditor {
             css {
-                width = 100.pct
-                height = 90.pct
+                width = editorWidth
+                height = editorHeight
                 top = 64.px
                 left = 0.px
                 right = 0.px
@@ -115,19 +153,66 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
                 border = "0"
             }
             attrs {
-                ref = textarea
-                onInputFunction = { onTextChanged(engine.text) }
-                autoFocus = true
+                value = state.value
+                width = editorWidth.toString()
+                height = editorHeight.toString()
+                wrapEnabled = true
+                showPrintMargin = false
+                annotations = arrayOf(annotation)
+                markers = arrayOf(marker)
+                readOnly = state.isReadOnly
+                onLoad = {
+                    logger.info { "Injected editor instance" }
+                    editor = it
+                }
+                onInput = ::onTextChanged
+                onChange = { newText, event ->
+                    logger.info { "Editor: onChange" }
+                    setState {
+                        value = newText
+                    }
+                }
             }
         }
+
+//        styledTextarea {
+//            css {
+//                width = 100.pct
+//                height = 90.pct
+//                top = 64.px
+//                left = 0.px
+//                right = 0.px
+//                bottom = 0.px
+//                position = Position.fixed
+//                resize = Resize.none
+//                outline = Outline.none
+//                boxShadow = BoxShadows.none
+//                border = "0"
+//            }
+//            attrs {
+//                ref = textarea
+//                onInputFunction = { onTextChanged(engine.text) }
+//                autoFocus = true
+//            }
+//        }
     }
 
     /**
      * Called after every key the user pressed.
      */
-    private fun onTextChanged(newText: String) {
+    private fun onTextChanged() {
+        logger.info { "Editor: onInput" }
         coroutines.launch {
-            diffCalculator.findChangedLines(newText)
+            try {
+                setState {
+                    isReadOnly = true
+                }
+                diffCalculator.findChangedLines(state.value)
+            } finally {
+                setState {
+                    isReadOnly = false
+                }
+            }
         }
     }
 
@@ -135,13 +220,7 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
      * Called when any line change detected that has to be transmitted to server.
      */
     private suspend fun onDocumentChangedLocal(lineNumber: Int, lineContent: String, changeMode: LineChangeMode) {
-        val dto = DocumentChangeDto(props.reference.uuid, lineNumber, lineContent, changeMode)
-        try {
-            textarea.current?.readOnly = true
-            channelSend.send(dto)
-        } finally {
-            textarea.current?.readOnly = false
-        }
+        channelSend.send(DocumentChangeDto(props.reference.uuid, lineNumber, lineContent, changeMode))
     }
 
     /**
@@ -152,14 +231,18 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
         if (dto.uuid != props.reference.uuid) {
             return
         }
-        logger.debug { "Received text change: $dto" }
+        logger.info { "Received text change: $dto" }
         val lineContentDecrypted = dto.lineContent
         when (dto.lineChangeMode) {
             LineChangeMode.MODIFY -> engine.modifyLine(dto.lineNumber, lineContentDecrypted)
             LineChangeMode.ADD -> engine.addLine(dto.lineNumber, lineContentDecrypted)
             LineChangeMode.DELETE -> engine.deleteLine(dto.lineNumber)
         }
-        diffCalculator.setText(engine.text)
+        val newText = engine.text
+        diffCalculator.setText(newText)
+        setState {
+            value = newText
+        }
     }
 
     /**
@@ -174,3 +257,15 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
     }
 
 }
+
+//object MarkerStyle : StyleSheet("ComponentStyles") {
+//    // Example of an ".element:hover" selector
+//    val error by css {
+//        position = Position.absolute
+//        backgroundColor = Color.green
+//
+//        hover {
+//            backgroundColor = Color.red
+//        }
+//    }
+//}

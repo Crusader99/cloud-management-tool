@@ -62,6 +62,8 @@ services:
       MINIO_ROOT_PASSWORD: ${S3_PASSWORD}
     expose:
       - 9000
+    ports:
+      - '9000:9000'
     volumes:
       - s3:/data
     healthcheck:

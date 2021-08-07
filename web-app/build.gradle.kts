@@ -21,6 +21,9 @@ dependencies {
     // See https://material-ui.com and https://github.com/cfnz/muirwik
     implementation("com.ccfraser.muirwik:muirwik-components:0.8.2")
 
+    implementation(npm("ace-builds", "1.4.12"))
+    implementation(npm("react-ace", "9.4.3"))
+
     // Test framework on javascript platform
     testImplementation(kotlin("test-js"))
 }
@@ -30,6 +33,7 @@ kotlin {
         binaries.executable()
         browser {
             // For continuous integration: gradle browserDevelopmentRun --continuous
+            useCommonJs()
             distribution {
                 directory = File("$buildDir/artifact-js/")
             }

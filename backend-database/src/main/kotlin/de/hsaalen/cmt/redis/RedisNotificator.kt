@@ -39,6 +39,12 @@ object RedisNotificator : DirectNotificator() {
     }
 
     /**
+     * Unique backend server instance identifier.
+     */
+    var serverInstance: Int = 0
+        private set
+
+    /**
      * The registered topic to listed on for new event notifications from other server instances.
      */
     private var topic: RTopic? = null

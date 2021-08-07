@@ -3,6 +3,11 @@ package de.hsaalen.cmt
 object SoftwareInfo {
 
     /**
+     * The name of the software to be displayed in frontend.
+     */
+    val name = "Cloud Management Tool"
+
+    /**
      * Info description for the hole software project including sub-projects.
      */
     val description = """
