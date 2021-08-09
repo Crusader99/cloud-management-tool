@@ -1,7 +1,7 @@
 import de.hsaalen.cmt.crypto.generateCryptoKey
 import de.hsaalen.cmt.crypto.toBase64
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
-import de.hsaalen.cmt.network.session.PersonalKeyManagement
+import de.hsaalen.cmt.network.keys.PersonalKeyManagement
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertNull

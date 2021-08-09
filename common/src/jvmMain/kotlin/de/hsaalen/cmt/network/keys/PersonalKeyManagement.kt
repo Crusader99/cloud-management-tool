@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.network.session
+package de.hsaalen.cmt.network.keys
 
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 

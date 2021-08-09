@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.network.session
+package de.hsaalen.cmt.network.keys
 
 import kotlinx.serialization.Serializable
 

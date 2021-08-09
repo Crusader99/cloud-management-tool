@@ -11,7 +11,7 @@ import de.hsaalen.cmt.network.dto.client.ClientLoginDto
 import de.hsaalen.cmt.network.dto.client.ClientRegisterDto
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.network.session.Client
-import de.hsaalen.cmt.network.session.PersonalKeyManagement
+import de.hsaalen.cmt.network.keys.PersonalKeyManagement
 import de.hsaalen.cmt.repository.AuthenticationRepository
 import de.hsaalen.cmt.utils.ClientSupport
 import io.ktor.http.*
