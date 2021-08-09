@@ -7,12 +7,12 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertNull
 
 /**
- * Tests to ensure the personal crypto key is stored correctly in session storage.
+ * Tests to ensure the personal crypto key is stored correctly in local storage.
  */
 class TestCryptoKey {
 
     /**
-     * Ensure key can be stored, loaded and deleted from session storage.
+     * Ensure key can be stored, loaded and deleted from local storage.
      */
     @Test
     fun testKeyManagement() {
