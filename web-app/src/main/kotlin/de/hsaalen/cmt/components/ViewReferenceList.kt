@@ -21,7 +21,7 @@ import styled.styledDiv
  * Wrapper function to simplify creation of this react component.
  */
 fun RBuilder.referenceList(
-    dto: ServerReferenceListDto?,
+    dto: ServerReferenceListDto,
 ) = child(ViewReferenceList::class) {
     attrs {
         this.dto = dto
@@ -32,7 +32,7 @@ fun RBuilder.referenceList(
  * React properties of the [ViewReferenceList] component.
  */
 external interface ViewReferenceListProps : RProps {
-    var dto: ServerReferenceListDto?
+    var dto: ServerReferenceListDto
 }
 
 /**
@@ -79,31 +79,20 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
      * Called when the complete body of the table should be rendered.
      */
     private fun RBuilder.renderTableBody() = mTableBody {
-        val dto = props.dto
-        if (dto == null) {
-            renderTableBodyRow(null) // Currently no references loaded
-        } else {
-            for (ref in dto.references) {
-                renderTableBodyRow(ref)
-            }
+        for (ref in props.dto.references) {
+            renderTableBodyRow(ref)
         }
     }
 
     /**
      * Called when the only a single row of the table body should be rendered.
      */
-    private fun RBuilder.renderTableBodyRow(ref: Reference?) = mTableRow(hover = true) {
+    private fun RBuilder.renderTableBodyRow(ref: Reference) = mTableRow(hover = true) {
         css {
             cursor = Cursor.pointer
         }
         attrs {
-            if (ref != null) {
-                onClick = { dispatch(it, EventType.PRE_USER_OPEN_REFERENCE, ReferenceEvent(ref)) }
-            }
-        }
-        if (ref == null) {
-            mTableCell { +"Loading..." }
-            return@mTableRow
+            onClick = { dispatch(it, EventType.PRE_USER_OPEN_REFERENCE, ReferenceEvent(ref)) }
         }
 
         mTableCell { +ref.displayName }

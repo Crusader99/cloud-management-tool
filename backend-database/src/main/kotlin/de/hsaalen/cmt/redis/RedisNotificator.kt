@@ -8,6 +8,7 @@ import de.hsaalen.cmt.events.GlobalEventDispatcher
 import de.hsaalen.cmt.events.eventModule
 import de.hsaalen.cmt.events.notifications.DirectNotificator
 import de.hsaalen.cmt.events.notifications.Notificator
+import de.hsaalen.cmt.network.dto.objects.UUID
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
@@ -37,6 +38,12 @@ object RedisNotificator : DirectNotificator() {
     val serializer = ProtoBuf {
         serializersModule = eventModule
     }
+
+    /**
+     * Unique backend server instance identifier.
+     */
+    var serverInstance: UUID = UUID(java.util.UUID.randomUUID().toString())
+        private set
 
     /**
      * The registered topic to listed on for new event notifications from other server instances.

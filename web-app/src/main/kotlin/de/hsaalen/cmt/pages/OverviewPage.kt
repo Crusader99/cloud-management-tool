@@ -143,8 +143,13 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
         val oldTitle = event.reference.displayName
         val message = "New title for reference '$oldTitle':"
         val newTitle = GuiOperations.showInputDialog("Rename", message, defaultValue = oldTitle)
-        if (oldTitle != newTitle) {
-            Session.instance?.rename(event.reference.uuid, newTitle ?: return)
+        try {
+            if (oldTitle != newTitle) {
+                Session.instance?.rename(event.reference.uuid, newTitle ?: return)
+            }
+        } catch (ex: Exception) {
+            val error = ex.message ?: "Unable to rename reference"
+            GuiOperations.showSnackBar(error, MAlertSeverity.warning)
         }
     }
 
@@ -161,8 +166,8 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
         try {
             Session.instance?.addLabel(event.reference, labelName)
         } catch (ex: Exception) {
-            val message = ex.message ?: "Unable to add label"
-            GuiOperations.showSnackBar(message, MAlertSeverity.warning)
+            val error = ex.message ?: "Unable to add label"
+            GuiOperations.showSnackBar(error, MAlertSeverity.warning)
         }
     }
 
