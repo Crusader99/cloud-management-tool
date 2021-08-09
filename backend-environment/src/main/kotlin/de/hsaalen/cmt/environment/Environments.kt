@@ -28,7 +28,7 @@ val REST_PORT = envOrDefault("REST_PORT", 80).toInt()
 val JWT_ISSUER = envOrDefault("JWT_ISSUER", "CloudTool")
 
 /**
- * Name of JWT token issuer.
+ * Password for the JWT token.
  */
 val JWT_HMAC512_SECRET_KEY = envOrDefault("JWT_HMAC512_SECRET_KEY", DEFAULT_CREDENTIAL_VALUE)
 

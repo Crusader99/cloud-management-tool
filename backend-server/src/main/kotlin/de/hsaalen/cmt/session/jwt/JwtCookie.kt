@@ -13,6 +13,7 @@ import io.ktor.auth.*
 import io.ktor.auth.jwt.*
 import io.ktor.request.*
 import io.ktor.response.*
+import io.ktor.util.date.*
 import mu.KotlinLogging
 import java.util.*
 
@@ -110,13 +111,15 @@ fun ServerUserInfoDto.generateJwtToken(): String {
 /**
  * Extension method to update an HTTP cookie with new valid JWT token.
  */
-fun ApplicationResponse.updateJwtCookie(jwtToken: String) = cookies.append(
+fun ApplicationResponse.updateJwtCookie(jwtToken: String = "", expired: Boolean = false) = cookies.append(
     name = JwtCookie.cookieName, // The key name of the cookie
     value = jwtToken, // JWT token
-    maxAge = JWT_MAX_AGE_MS / 1000L, // Age in seconds
+    maxAge = if (expired) 0 else JWT_MAX_AGE_MS / 1000L, // Age in seconds
     domain = "",
     path = "/",
+    expires = if (expired) GMTDate.START else null,
 //    secure = true, // Requires https protocol
     httpOnly = true, // Access only from HTTP headers
 //    extensions = mapOf("SameSite" to "None") // Not required in same site
+    extensions = mapOf("SameSite" to "strict") // Prevent XSRF attacks
 )

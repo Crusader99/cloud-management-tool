@@ -45,7 +45,7 @@ fun Routing.routeAuthentication() = route("/" + RestPaths.base) {
         logger.info("Register new account with e-mail= " + request.email)
         val personalKey = request.personalEncryptedKey.fromBase64()
         val user = repo.register(request.fullName, request.email, request.passwordHashed, personalKey)
-        call.response.updateJwtCookie(user.generateJwtToken())
+        call.response.updateJwtCookie(jwtToken = user.generateJwtToken())
         call.respond(user)
     }
 
@@ -57,7 +57,7 @@ fun Routing.routeAuthentication() = route("/" + RestPaths.base) {
         }
 
         // Reset cookie using http header
-        call.response.cookies.appendExpired(name = JwtCookie.cookieName, path = "/", domain = "")
+        call.response.updateJwtCookie(expired = true)
         call.respond(Unit)
     }
 

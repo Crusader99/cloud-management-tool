@@ -31,7 +31,7 @@ import kotlin.test.assertEquals
  * Based on examples from {https://github.com/rsocket/rsocket-kotlin}.
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class TestRSocket {
+class RSocketTest {
 
     /**
      * Detect free port on host system.
