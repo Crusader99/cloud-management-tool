@@ -8,6 +8,7 @@ import de.hsaalen.cmt.network.dto.rsocket.LiveDto
 import de.hsaalen.cmt.network.dto.rsocket.RequestReferenceDto
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
 import de.hsaalen.cmt.network.exceptions.ConnectException
+import de.hsaalen.cmt.network.keys.PersonalKeyManagement
 import de.hsaalen.cmt.network.requests.*
 import de.hsaalen.cmt.repository.AuthenticationRepository
 import de.hsaalen.cmt.utils.buildPayload
@@ -143,7 +144,7 @@ class Session(
         }
 
         /**
-         * Request server to restore user session. Session can only restored when JWT cookie is still valid.
+         * Request server to restore user session. Session can only be restored when JWT cookie is still valid.
          *
          * @return True when session has been restored or false when it can't be restored.
          * @throws ConnectException when no connection to backend services was possible.

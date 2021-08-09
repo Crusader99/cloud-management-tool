@@ -6,8 +6,8 @@ import de.hsaalen.cmt.network.dto.objects.UUID
 import de.hsaalen.cmt.network.dto.rsocket.DocumentChangeDto
 import de.hsaalen.cmt.network.session.Client
 import de.hsaalen.cmt.network.session.Session
-import de.hsaalen.cmt.utils.ClientSupport
 import de.hsaalen.cmt.repository.DocumentRepository
+import de.hsaalen.cmt.utils.ClientSupport
 import io.ktor.http.*
 
 /**

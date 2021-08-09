@@ -75,10 +75,9 @@ for testing proposes.
 * [x] Allow offline access in Android app
 * [x] Implement file upload / download
 * [x] Encrypt files and documents
-* [ ] ...
 * [x] Configure Grafana & Prometheus
 * [x] Provide statistics with Ktor: /metrics
-* [ ] ...
+* [x] Multi instance Redis support
 * [ ] Select all repository link references for documentation
 * [ ] Submit latex documentation until 15.08.2021
 

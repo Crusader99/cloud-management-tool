@@ -3,7 +3,7 @@ package de.hsaalen.cmt.events
 import de.hsaalen.cmt.events.server.LabelChangeEvent
 import de.hsaalen.cmt.events.server.SessionCloseEvent
 import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateEvent
-import de.hsaalen.cmt.rsocket.WebSocketManager
+import de.hsaalen.cmt.rsocket.LocalConnectionManager
 import mu.KotlinLogging
 
 /**
@@ -31,14 +31,14 @@ object EventHandlers {
      * Invoked when reference was added/removed.
      */
     private suspend fun handleReferenceUpdate(event: ReferenceUpdateEvent) {
-        WebSocketManager.broadcast(event)
+        LocalConnectionManager.broadcast(event)
     }
 
     /**
      * Invoked when user adds/removed labels.
      */
     private suspend fun handleLabelChange(event: LabelChangeEvent) {
-        WebSocketManager.broadcast(event.modification)
+        LocalConnectionManager.broadcast(event.modification)
     }
 
     /**
@@ -46,7 +46,7 @@ object EventHandlers {
      */
     private suspend fun handleSessionClose(event: SessionCloseEvent) {
         try {
-            WebSocketManager.disconnect(event.jwtToken)
+            LocalConnectionManager.disconnect(event.jwtToken)
         } catch (ex: Exception) {
             logger.warn("Unable to disconnect websockets related to session", ex)
         }

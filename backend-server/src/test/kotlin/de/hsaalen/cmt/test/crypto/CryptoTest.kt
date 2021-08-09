@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 /**
  * Test cryptographical functions for correct encryption/decryption.
  */
-class TestCrypto {
+class CryptoTest {
 
     /**
      * Encrypt and decrypt text.

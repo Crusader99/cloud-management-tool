@@ -25,7 +25,7 @@ internal object LabelRepositoryImpl : LabelRepository {
         get() = currentSession.userMail
 
     /**
-     * Add label to an existing reference by it's [UUID].
+     * Add label to an existing reference by its [UUID].
      */
     override suspend fun addLabel(reference: UUID, labelName: String) {
         try {
@@ -51,7 +51,7 @@ internal object LabelRepositoryImpl : LabelRepository {
     }
 
     /**
-     * Remove label from an existing reference by it's [UUID].
+     * Remove label from an existing reference by its [UUID].
      */
     override suspend fun removeLabel(reference: UUID, labelName: String) {
         try {

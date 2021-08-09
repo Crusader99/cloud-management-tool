@@ -1,5 +1,6 @@
 package de.hsaalen.cmt.pages
 
+import com.ccfraser.muirwik.components.lab.alert.MAlertSeverity
 import com.ccfraser.muirwik.components.mTypography
 import de.hsaalen.cmt.components.referenceList
 import de.hsaalen.cmt.events.*
@@ -142,8 +143,13 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
         val oldTitle = event.reference.displayName
         val message = "New title for reference '$oldTitle':"
         val newTitle = GuiOperations.showInputDialog("Rename", message, defaultValue = oldTitle)
-        if (oldTitle != newTitle) {
-            Session.instance?.rename(event.reference.uuid, newTitle ?: return)
+        try {
+            if (oldTitle != newTitle) {
+                Session.instance?.rename(event.reference.uuid, newTitle ?: return)
+            }
+        } catch (ex: Exception) {
+            val error = ex.message ?: "Unable to rename reference"
+            GuiOperations.showSnackBar(error, MAlertSeverity.warning)
         }
     }
 
@@ -157,7 +163,12 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
             button = "Add"
         ) ?: return
         logger.info { "Add label name: $labelName" }
-        Session.instance?.addLabel(event.reference, labelName)
+        try {
+            Session.instance?.addLabel(event.reference, labelName)
+        } catch (ex: Exception) {
+            val error = ex.message ?: "Unable to add label"
+            GuiOperations.showSnackBar(error, MAlertSeverity.warning)
+        }
     }
 
     /**

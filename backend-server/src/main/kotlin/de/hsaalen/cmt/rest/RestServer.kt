@@ -2,7 +2,9 @@ package de.hsaalen.cmt.rest
 
 import de.crusader.extensions.initialCause
 import de.hsaalen.cmt.DatabaseModules
+import de.hsaalen.cmt.SoftwareInfo
 import de.hsaalen.cmt.network.dto.server.ServerErrorDto
+import de.hsaalen.cmt.redis.RedisNotificator
 import de.hsaalen.cmt.session.jwt.JwtCookie
 import de.hsaalen.cmt.session.jwt.toPayload
 import de.hsaalen.cmt.utils.SerializeHelper
@@ -109,6 +111,9 @@ fun Application.module() {
                 parseAuthorizationHeader("Bearer $token")
             }
         }
+    }
+    install(DefaultHeaders) {
+        header(HttpHeaders.Server, SoftwareInfo.name + " @ Instance " + RedisNotificator.serverInstance)
     }
     registerRoutes() // Handle the REST API calls
 }

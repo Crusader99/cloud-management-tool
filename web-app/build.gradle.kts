@@ -30,6 +30,7 @@ kotlin {
         binaries.executable()
         browser {
             // For continuous integration: gradle browserDevelopmentRun --continuous
+            useCommonJs()
             distribution {
                 directory = File("$buildDir/artifact-js/")
             }

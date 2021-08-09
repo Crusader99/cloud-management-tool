@@ -2,14 +2,21 @@ version: "3.9"
 services:
   web-app: # Internal port is 8081
     build: web-app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.web-app.rule=PathPrefix(`/`)"
+      - "traefik.http.services.web-app.loadbalancer.server.port=8081"
   backend-server:
     build: backend-server
     depends_on:
       - postgres
-    ports:
-      - 8686:8686
+#    ports:
+#      - '8686:8686'
     environment:
       REST_PORT: 8080
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_HMAC512_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_MAX_AGE_MS: ${JWT_MAX_AGE_MS}
       PASSWORD_SALT: ${PASSWORD_SALT}
       POSTGRESQL_HOST: postgres
       POSTGRESQL_PORT: 5432
@@ -22,7 +29,16 @@ services:
       S3_ENDPOINT: http://file-storage:9000
       S3_USER: ${S3_USER}
       S3_PASSWORD: ${S3_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_TOPIC: se-project
       JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8686
+    deploy:
+      replicas: 2
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-server.rule=PathPrefix(`/api/v1.0`)"
+      - "traefik.http.services.backend-server.loadbalancer.server.port=8080"
   postgres:
     image: postgres:13.3-alpine
     restart: always
@@ -60,7 +76,7 @@ services:
     expose:
       - 9000
     volumes:
-        - s3:/data
+      - s3:/data
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
       interval: 30s
@@ -81,8 +97,6 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-    ports:
-      - 9090:9090
     depends_on:
       - backend-server
   grafana:
@@ -99,13 +113,19 @@ services:
   traefik: # https://hub.docker.com/_/traefik/
     image: traefik:v2.4.8
     volumes:
-      - ./docker-compose/traefik:/etc/traefik:z
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web-app.address=:80"
+    privileged: true
     depends_on:
       - backend-server
       - web-app
     ports:
-      - 80:80
-      - 8092:8080 # Dashboard: http://localhost:8082
+      - '80:80'
+      - '8092:8080' # Dashboard: http://localhost:8082
 volumes:
   postgres:
   mongodb:

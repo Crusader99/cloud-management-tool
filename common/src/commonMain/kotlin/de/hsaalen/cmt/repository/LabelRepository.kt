@@ -12,24 +12,34 @@ import de.hsaalen.cmt.network.dto.objects.UUID
 interface LabelRepository {
 
     /**
-     * Add label to an existing reference by it's [UUID].
+     * Add label to an existing reference by its [UUID].
      */
     suspend fun addLabel(reference: UUID, labelName: String)
 
     /**
-     * Add label to an existing reference by it's [Reference] instance.
+     * Add label to an existing reference by its [Reference] instance.
      */
-    suspend fun addLabel(reference: Reference, labelName: String) = addLabel(reference.uuid, labelName)
+    suspend fun addLabel(reference: Reference, labelName: String) {
+        if (labelName in reference.labels) {
+            error("Label already added")
+        }
+        addLabel(reference.uuid, labelName)
+    }
 
     /**
-     * Remove label from an existing reference by it's [UUID].
+     * Remove label from an existing reference by its [UUID].
      */
     suspend fun removeLabel(reference: UUID, labelName: String)
 
     /**
-     * Remove label from an existing reference by it's [Reference] instance.
+     * Remove label from an existing reference by its [Reference] instance.
      */
-    suspend fun removeLabel(reference: Reference, labelName: String) = removeLabel(reference.uuid, labelName)
+    suspend fun removeLabel(reference: Reference, labelName: String) {
+        if (labelName in reference.labels) {
+            // Only remove label when label existing
+            removeLabel(reference.uuid, labelName)
+        }
+    }
 
     /**
      * List all labels from a user that are applied to any reference.

@@ -25,6 +25,10 @@ val SessionContext.senderSocketId: String
 suspend inline fun <R> withWebSocketSession(userMail: String, socketId: String, crossinline block: suspend () -> R): R {
     val context = WebSocketContextImpl(userMail, socketId)
     return withContext(coroutineContext + SessionContext.threadLocal.asContextElement(context)) {
-        block()
+        try {
+            block()
+        } catch (ex: Exception) {
+            throw IllegalStateException("Unable to handle RSocket session for '$userMail'", ex)
+        }
     }
 }

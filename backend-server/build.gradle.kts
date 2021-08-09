@@ -56,7 +56,6 @@ dependencies {
     testImplementation("io.ktor:ktor-client-core:1.6.2")
     testImplementation("io.ktor:ktor-client-cio:1.6.2")
     testImplementation("io.rsocket.kotlin:rsocket-transport-ktor-client:0.13.1")
-
 }
 
 // Exclude conflicting junit5 test dependency from ktor

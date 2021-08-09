@@ -18,18 +18,18 @@ import io.ktor.http.*
 internal interface LabelRepositoryImpl : ClientSupport, LabelRepository {
 
     /**
-     * Add label to an existing reference by it's [UUID].
+     * Add label to an existing reference by its [UUID].
      */
     override suspend fun addLabel(reference: UUID, labelName: String) {
         if (!labelName.isValidLabelString()) {
-            error("Label name does not match expected format")
+            error("Label does not match expected format")
         }
         val dto = LabelUpdateDto(reference, labelName, LabelChangeMode.ADD)
         Session.instance?.sendLiveDTO(dto)
     }
 
     /**
-     * Remove label from an existing reference by it's [UUID].
+     * Remove label from an existing reference by its [UUID].
      */
     override suspend fun removeLabel(reference: UUID, labelName: String) {
         val dto = LabelUpdateDto(reference, labelName, LabelChangeMode.REMOVE)

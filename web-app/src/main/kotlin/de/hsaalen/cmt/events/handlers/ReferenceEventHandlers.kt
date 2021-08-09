@@ -16,6 +16,7 @@ import react.setState
  * Global event handlers for the GUI application.
  */
 object ReferenceEventHandlers {
+
     /**
      * Logging instance for this class.
      */

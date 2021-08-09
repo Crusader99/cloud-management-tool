@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.css.*
 import kotlinx.css.properties.BoxShadows
 import kotlinx.html.js.onInputFunction
+import mu.KotlinLogging
 import org.w3c.dom.HTMLTextAreaElement
 import react.*
 import react.dom.attrs
@@ -44,6 +45,11 @@ external interface DocumentEditPageState : RState {
  */
 @JsExport
 class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState>() {
+    /**
+     * Local logger instance for this [DocumentEditPage].
+     */
+    private val logger = KotlinLogging.logger("DocumentEditPage")
+
     /**
      * Algorithm that detects changes in document
      */
@@ -146,7 +152,7 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
         if (dto.uuid != props.reference.uuid) {
             return
         }
-        println("Received text change: $dto")
+        logger.debug { "Received text change: $dto" }
         val lineContentDecrypted = dto.lineContent
         when (dto.lineChangeMode) {
             LineChangeMode.MODIFY -> engine.modifyLine(dto.lineNumber, lineContentDecrypted)
@@ -163,7 +169,7 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
         if (ref.uuid != props.reference.uuid) {
             return
         }
-        // Currently open document reference was removed
+        // The active open document reference was removed so close editor view
         props.onExit()
     }
 

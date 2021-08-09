@@ -61,6 +61,9 @@ internal interface ReferenceRepositoryImpl : ClientSupport, ReferenceRepository 
      * Give a new title name to a reference.
      */
     override suspend fun rename(uuid: UUID, newTitle: String) {
+        if (newTitle.isBlank()) {
+            error("Empty title is not allowed")
+        }
         val url = Url("$apiEndpoint$apiPathRenameReference")
         return Client.request(url) {
             method = HttpMethod.Post

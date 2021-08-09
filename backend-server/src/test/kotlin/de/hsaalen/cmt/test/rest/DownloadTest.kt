@@ -21,7 +21,7 @@ import kotlin.test.assertEquals
 /**
  * Tests that use the ktor REST API directly to ensure communication is working.
  */
-class TestDownload : KoinTest {
+class DownloadTest : KoinTest {
 
     /**
      * Test download of document contents.

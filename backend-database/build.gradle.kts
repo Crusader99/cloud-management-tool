@@ -29,6 +29,10 @@ dependencies {
     // Import Amazon AWS S3 driver for accessing Minio file storage
     implementation("software.amazon.awssdk:s3:2.17.7")
 
+    // Redis for synchronisation between server multiple instances
+    implementation("org.redisson:redisson:3.16.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.2.2")
+
     // JUnit test framework
     testImplementation(kotlin("test"))
     testImplementation("io.mockk:mockk:1.12.0")
@@ -66,13 +70,21 @@ val dockerMinio by tasks.registering(DockerRunTask::class) {
     command("server /data")
 }
 
+val dockerRedis by tasks.registering(DockerRunTask::class) {
+    addPort(freeHostSystemPort, 6379)
+    args("-itd")
+    image("redis")
+}
+
 val dockerStop by tasks.registering(DockerStopTask::class) {
     stopContainerFromTask(dockerPostgres)
     stopContainerFromTask(dockerMongoDB)
+    stopContainerFromTask(dockerMinio)
+    stopContainerFromTask(dockerRedis)
 }
 
 tasks.test {
-    dependsOn(dockerPostgres, dockerMongoDB, dockerMinio)
+    dependsOn(dockerPostgres, dockerMongoDB, dockerMinio, dockerRedis)
     finalizedBy(dockerStop)
 
     environment["PASSWORD_SALT"] = "salt"
@@ -87,6 +99,7 @@ tasks.test {
     environment["MONGO_PORT"] = dockerMongoDB.firstPublishedPort
 
     environment["S3_ENDPOINT"] = "http://localhost:" + dockerMinio.firstPublishedPort
+    environment["REDIS_PORT"] = dockerRedis.firstPublishedPort
 
     useJUnitPlatform()
     timeout.set(Duration.ofSeconds(60L))

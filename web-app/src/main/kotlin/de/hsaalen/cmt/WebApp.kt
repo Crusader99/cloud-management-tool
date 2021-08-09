@@ -1,5 +1,6 @@
 package de.hsaalen.cmt
 
+import com.ccfraser.muirwik.components.styles.mStylesProvider
 import de.hsaalen.cmt.components.appBar
 import de.hsaalen.cmt.components.dialogs.InputDialogComponent
 import de.hsaalen.cmt.components.dialogs.renderInputDialog
@@ -16,6 +17,8 @@ import de.hsaalen.cmt.pages.AuthenticationPage
 import de.hsaalen.cmt.pages.DocumentEditPage
 import de.hsaalen.cmt.pages.FallbackPage
 import de.hsaalen.cmt.pages.OverviewPage
+import de.hsaalen.cmt.theme.ThemeProvider
+import de.hsaalen.cmt.theme.toMuiTheme
 import org.w3c.dom.events.Event
 import react.*
 import react.dom.header
@@ -61,57 +64,67 @@ class WebApp : RComponent<RProps, WebAppState>() {
      * Called whenever an update is required.
      */
     override fun RBuilder.render() {
-        //mThemeProvider(Theme.LIGHT.toMuiTheme()) { // TODO: re enable when fixed
-        renderHeader()
-        renderInputDialog(refInputDialog)
-        renderSnackbar(refSnackBar)
-        loadingOverlay(state.loadingTasks > 0)
+        mStylesProvider {
+            child(ThemeProvider::class) {
+                attrs.theme = Theme.LIGHT.toMuiTheme()
+                renderHeader()
+                renderInputDialog(refInputDialog)
+                renderSnackbar(refSnackBar)
+                loadingOverlay(state.loadingTasks > 0)
 
-        when (state.page) {
-            EnumPageType.CONNECTING -> {
-                // Keep empty to print empty page
-            }
-            EnumPageType.UNAVAILABLE -> {
-                child(FallbackPage::class) {
-                    attrs {
-                        onRetry = { launchNotification(EventType.PRE_RECONNECT) }
+                when (state.page) {
+                    EnumPageType.CONNECTING -> {
+                        // Keep empty to print empty page
                     }
-                }
-            }
-            EnumPageType.AUTHENTICATION -> {
-                // Allow user to login
-                child(AuthenticationPage::class) {
-                    attrs {
-                        onLogin = { credentials ->
-                            launchNotification(EventType.PRE_LOGIN, LoginEvent(credentials, isRegistration = false))
+                    EnumPageType.UNAVAILABLE -> {
+                        child(FallbackPage::class) {
+                            attrs {
+                                onRetry = { launchNotification(EventType.PRE_RECONNECT) }
+                            }
                         }
-                        onRegister = { credentials ->
-                            launchNotification(EventType.PRE_LOGIN, LoginEvent(credentials, isRegistration = true))
+                    }
+                    EnumPageType.AUTHENTICATION -> {
+                        // Allow user to login
+                        child(AuthenticationPage::class) {
+                            attrs {
+                                onLogin = { credentials ->
+                                    launchNotification(
+                                        EventType.PRE_LOGIN,
+                                        LoginEvent(credentials, isRegistration = false)
+                                    )
+                                }
+                                onRegister = { credentials ->
+                                    launchNotification(
+                                        EventType.PRE_LOGIN,
+                                        LoginEvent(credentials, isRegistration = true)
+                                    )
+                                }
+                                lastEmail = ""
+                                isEnabled = state.loadingTasks <= 0
+                            }
                         }
-                        lastEmail = ""
-                        isEnabled = state.loadingTasks <= 0
                     }
-                }
-            }
-            EnumPageType.OVERVIEW -> {
-                val localSession = Session.instance!! // TODO: exception handling
-                // When already logged in
-                child(OverviewPage::class) {
-                    attrs {
-                        session = localSession
+                    EnumPageType.OVERVIEW -> {
+                        val localSession = Session.instance!! // TODO: exception handling
+                        // When already logged in
+                        child(OverviewPage::class) {
+                            attrs {
+                                session = localSession
+                            }
+                        }
                     }
-                }
-            }
-            EnumPageType.EDIT_DOCUMENT -> {
-                val localSession = Session.instance!! // TODO: exception handling
-                val ref = state.reference!!
-                child(DocumentEditPage::class) {
-                    attrs {
-                        session = localSession
-                        reference = ref
-                        onExit = {
-                            setState {
-                                page = EnumPageType.OVERVIEW
+                    EnumPageType.EDIT_DOCUMENT -> {
+                        val localSession = Session.instance!! // TODO: exception handling
+                        val ref = state.reference!!
+                        child(DocumentEditPage::class) {
+                            attrs {
+                                session = localSession
+                                reference = ref
+                                onExit = {
+                                    setState {
+                                        page = EnumPageType.OVERVIEW
+                                    }
+                                }
                             }
                         }
                     }

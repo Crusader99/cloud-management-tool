@@ -1,9 +1,9 @@
-package de.hsaalen.cmt.network.session
+package de.hsaalen.cmt.network.keys
 
 import kotlinx.serialization.Serializable
 
 /**
- * A personal key data element that can be stored in browsers session storage.
+ * A personal key data element that can be stored in browsers local storage.
  */
 @Serializable
 internal class PersonalKeyData(

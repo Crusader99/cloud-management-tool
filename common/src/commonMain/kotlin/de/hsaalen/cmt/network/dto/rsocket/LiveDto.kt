@@ -8,4 +8,4 @@ import kotlinx.serialization.Serializable
  * DTO that is sent over websocket. ("live synchronization")
  */
 @Serializable
-sealed class LiveDto : Event, Encryptable<LiveDto>
+sealed class LiveDto : Encryptable<LiveDto>, Event
