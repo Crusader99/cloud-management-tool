@@ -1,6 +1,7 @@
 package de.hsaalen.cmt
 
 import de.hsaalen.cmt.events.handlers.AuthenticationEventHandlers
+import de.hsaalen.cmt.events.handlers.DisconnectEventHandlers
 import de.hsaalen.cmt.events.handlers.ReferenceEventHandlers
 import de.hsaalen.cmt.extensions.BackendLocator
 import de.hsaalen.cmt.extensions.ExceptionHandler
@@ -19,6 +20,7 @@ fun main() {
 
     // Initialize global event handlers for frontend
     AuthenticationEventHandlers.init()
+    DisconnectEventHandlers.init()
     ReferenceEventHandlers.init()
 
     // Render web app

@@ -18,6 +18,7 @@ import kotlin.coroutines.coroutineContext
  * Global event handlers for the GUI application.
  */
 object AuthenticationEventHandlers {
+
     /**
      * Logging instance for this class.
      */

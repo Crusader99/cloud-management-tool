@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.rsocket
 
 import de.hsaalen.cmt.network.dto.rsocket.LiveDto
+import de.hsaalen.cmt.network.dto.rsocket.LocalSessionClosedDto
 import de.hsaalen.cmt.utils.SerializeHelper
 import de.hsaalen.cmt.utils.buildPayload
 import mu.KotlinLogging
@@ -41,8 +42,15 @@ object LocalConnectionManager {
      * to other backend server instances.
      */
     suspend fun disconnect(withJwtToken: String) {
+        val payload = LocalSessionClosedDto.buildPayload()
         for (others in connections.filter { it.jwtToken == withJwtToken }) {
-            others.disconnect()
+            try {
+                // It informs the client that the session is closed by a logout,
+                // performed in another browser tab of the same session
+                others.fireAndForget(payload.copy())
+            } finally {
+                others.disconnect()
+            }
         }
     }
 
