@@ -14,24 +14,24 @@ import styled.css
  */
 fun RBuilder.loadingOverlay(
     isLoading: Boolean = true,
-) = child(LoadingOverlay::class) {
+) = child(ViewLoadingOverlay::class) {
     attrs {
         this.isLoading = isLoading
     }
 }
 
 /**
- * React properties of the [LoadingOverlay] component.
+ * React properties of the [ViewLoadingOverlay] component.
  */
-external interface LoadingOverlayProps : RProps {
+external interface ViewLoadingOverlayProps : RProps {
     var isLoading: Boolean
 }
 
 /**
- * A overlay component for a loading animation.
+ * An overlay component for a loading animation.
  */
 @JsExport
-class LoadingOverlay : RComponent<LoadingOverlayProps, RState>() {
+class ViewLoadingOverlay : RComponent<ViewLoadingOverlayProps, RState>() {
 
     /**
      * Called when this overlay component is rendered.

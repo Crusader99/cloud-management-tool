@@ -130,7 +130,7 @@ object AuthenticationEventHandlers {
             launchNotification(EventType.START_KEEP_ALIVE_JOB)
         } catch (ex: Throwable) {
             val failMessage = "Login failed: " + ex.message
-            logger.warn { failMessage }
+            logger.warn(ex) { failMessage }
             coroutines.launch {
                 GuiOperations.showSnackBar(failMessage, MAlertSeverity.error)
             }

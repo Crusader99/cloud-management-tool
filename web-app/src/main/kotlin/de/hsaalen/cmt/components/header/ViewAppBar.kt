@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.components
+package de.hsaalen.cmt.components.header
 
 import com.ccfraser.muirwik.components.*
 import com.ccfraser.muirwik.components.button.mIconButton

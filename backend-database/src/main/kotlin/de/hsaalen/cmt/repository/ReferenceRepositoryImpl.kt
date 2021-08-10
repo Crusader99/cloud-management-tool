@@ -102,6 +102,8 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
             ReferenceDao.find(ReferenceTable.owner eq creator.id)
                 .orderBy(ReferenceTable.dateLastModified to SortOrder.DESC)
                 .map { it.toReference() }
+                .filter { it.labels.containsAll(query.filterLabels) }
+                .filter { query.searchName.lowercase() in it.displayName.lowercase() }
         }
         return ServerReferenceListDto(refs)
     }

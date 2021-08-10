@@ -1,4 +1,4 @@
-package de.hsaalen.cmt.components
+package de.hsaalen.cmt.components.header
 
 import com.ccfraser.muirwik.components.form.MFormControlMargin
 import com.ccfraser.muirwik.components.form.MFormControlVariant
@@ -12,6 +12,8 @@ import de.hsaalen.cmt.events.launchNotification
 import de.hsaalen.cmt.extensions.launch
 import de.hsaalen.cmt.extensions.onEnterKey
 import de.hsaalen.cmt.extensions.onTextChange
+import de.hsaalen.cmt.network.dto.objects.LabelChangeMode
+import de.hsaalen.cmt.network.dto.rsocket.LabelUpdateDto
 import de.hsaalen.cmt.network.session.Session
 import kotlinx.css.*
 import react.*
@@ -22,7 +24,7 @@ import styled.styledDiv
  * React state of the [LabelSearch] component.
  */
 external interface LabelSearchState : RState {
-    var allLabels: Array<String>
+    var allLabels: Set<String> // Use a set to prevent duplicates
     var filterLabels: Array<String>
     var searchText: String
     var isLoading: Boolean
@@ -38,10 +40,11 @@ class LabelSearch : RComponent<RProps, LabelSearchState>() {
      * Register events for this component.
      */
     private val events = GlobalEventDispatcher.createBundle(this) {
+        register(::onServerLabelUpdate) // Event called by server
         launch {
             val labels = Session.instance!!.listLabels()
             setState {
-                allLabels = labels.toTypedArray()
+                allLabels = labels
                 isLoading = false
             }
         }
@@ -53,7 +56,7 @@ class LabelSearch : RComponent<RProps, LabelSearchState>() {
     override fun LabelSearchState.init() {
         isLoading = true
         searchText = ""
-        allLabels = emptyArray()
+        allLabels = emptySet()
         filterLabels = emptyArray()
     }
 
@@ -75,7 +78,7 @@ class LabelSearch : RComponent<RProps, LabelSearchState>() {
             }
 
             mAutoCompleteMultiValue(
-                options = state.allLabels,
+                options = state.allLabels.toTypedArray().sortedArray(),
                 { args -> renderField(args) },
                 value = state.filterLabels
             ) {
@@ -87,7 +90,8 @@ class LabelSearch : RComponent<RProps, LabelSearchState>() {
                     setState {
                         filterLabels = value
                     }
-                    launchNotification(EventType.PRE_CHANGE_SEARCH, SearchEvent(state.searchText, state.filterLabels))
+                    val event = SearchEvent(state.searchText, value.toSet())
+                    launchNotification(EventType.PRE_USER_MODIFY_SEARCH, event)
                 }
                 css {
                     paddingLeft = 10.px
@@ -114,7 +118,20 @@ class LabelSearch : RComponent<RProps, LabelSearchState>() {
                 }
             }
             onEnterKey {
-                launchNotification(EventType.PRE_CHANGE_SEARCH, SearchEvent(state.searchText, state.filterLabels))
+                val event = SearchEvent(state.searchText, state.filterLabels.toSet())
+                launchNotification(EventType.PRE_USER_MODIFY_SEARCH, event)
+            }
+        }
+    }
+
+    /**
+     * Event called by server after a label was added / removed.
+     */
+    private fun onServerLabelUpdate(event: LabelUpdateDto) {
+        if (event.mode == LabelChangeMode.ADD) {
+            // Ensure label is also registered in the suggestions
+            setState {
+                allLabels = allLabels + event.labelName
             }
         }
     }

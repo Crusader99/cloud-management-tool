@@ -7,5 +7,6 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class ClientReferenceQueryDto(
-    val searchName: String? = null
+    val searchName: String = "",
+    val filterLabels: Set<String> = emptySet()
 ) : ClientDto

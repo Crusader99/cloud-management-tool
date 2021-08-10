@@ -1,6 +1,7 @@
 package de.hsaalen.cmt.events
 
 import de.hsaalen.cmt.components.login.Credentials
+import de.hsaalen.cmt.network.dto.client.ClientReferenceQueryDto
 import de.hsaalen.cmt.network.dto.objects.Reference
 
 /**
@@ -21,7 +22,7 @@ enum class EventType {
     PRE_USER_DOWNLOAD_REFERENCE,
     PRE_USER_DELETE_REFERENCE,
     PRE_USER_RENAME_REFERENCE,
-    PRE_CHANGE_SEARCH,
+    PRE_USER_MODIFY_SEARCH,
 }
 
 /**
@@ -39,11 +40,13 @@ data class LabelEditEvent(val reference: Reference, val labelName: String) : Eve
 /**
  * Specific event type for the login event to allow passing parameters.
  */
-class LoginEvent(val credentials: Credentials, val isRegistration: Boolean) : Event
+data class LoginEvent(val credentials: Credentials, val isRegistration: Boolean) : Event
 
 
 /**
  * Specific event type for the search event to allow searching for specific references.
  */
-class SearchEvent(val searchText: String, val labels: Array<String>) : Event
+data class SearchEvent(val query: ClientReferenceQueryDto) : Event {
+    constructor(searchName: String, filterLabels: Set<String>) : this(ClientReferenceQueryDto(searchName, filterLabels))
+}
 
