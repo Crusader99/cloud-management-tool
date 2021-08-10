@@ -11,13 +11,9 @@ import de.hsaalen.cmt.events.EventType
 import de.hsaalen.cmt.events.launchNotification
 import de.hsaalen.cmt.network.session.Session
 import kotlinx.browser.window
-import kotlinx.css.FlexBasis
-import kotlinx.css.flex
 import org.w3c.dom.events.Event
 import react.*
 import react.dom.*
-import styled.css
-import styled.styledDiv
 
 /**
  * Wrapper function to simplify creation of this [ViewAppBar] react component.
@@ -76,13 +72,8 @@ class ViewAppBar : RComponent<ViewAppBarProps, ViewAppBarState>() {
                         }
                     })
                 }
-                mTypography(text = SoftwareInfo.name, variant = MTypographyVariant.h6)
                 if (props.isLoggedIn) {
-                    styledDiv {
-                        css {
-                            flex(1.0, 1.0, FlexBasis.auto)
-                        }
-                    }
+                    child(LabelSearch::class) {}
                     if (window.innerWidth > 500) {  // Only print username when on large page
                         Session.instance?.userInfo?.let { userInfo ->
                             mTooltip("Logged in as " + userInfo.email) {
@@ -97,6 +88,8 @@ class ViewAppBar : RComponent<ViewAppBarProps, ViewAppBarState>() {
                             onClick = { launchNotification(EventType.PRE_LOGOUT) }
                         )
                     }
+                } else {
+                    mTypography(text = SoftwareInfo.name, variant = MTypographyVariant.h6)
                 }
             }
             mDrawer(open = state.isDrawerVisible, anchor = MDrawerAnchor.left, onClose = {
