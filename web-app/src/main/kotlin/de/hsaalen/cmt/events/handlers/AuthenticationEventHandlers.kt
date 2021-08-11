@@ -41,18 +41,17 @@ object AuthenticationEventHandlers {
      * Configures the React state to open the connecting page.
      */
     private suspend fun onReconnect() {
-        GuiOperations.setPage(EnumPageType.CONNECTING)
+        GuiOperations.page = EnumPageType.CONNECTING
         GuiOperations.loading {
             try {
                 logger.info { "Try restoring session...." }
                 val restoredSession = Session.restore()
                 // Only print overview page when session restore was successful
-                val nextPage = if (restoredSession) EnumPageType.OVERVIEW else EnumPageType.AUTHENTICATION
-                GuiOperations.setPage(nextPage)
+                GuiOperations.page = if (restoredSession) EnumPageType.OVERVIEW else EnumPageType.AUTHENTICATION
                 launchNotification(EventType.START_KEEP_ALIVE_JOB)
             } catch (ex: ConnectException) {
                 delay(2000)
-                GuiOperations.setPage(EnumPageType.UNAVAILABLE)
+                GuiOperations.page = EnumPageType.UNAVAILABLE
             } catch (ex: Exception) {
                 // Ignore other errors
                 logger.error(ex) { "Unable to restore session" }
@@ -93,14 +92,14 @@ object AuthenticationEventHandlers {
         try {
             GuiOperations.loading {
                 Session.instance?.logout()
-                GuiOperations.setPage(EnumPageType.AUTHENTICATION)
+                GuiOperations.page = EnumPageType.AUTHENTICATION
                 coroutines.launch {
                     GuiOperations.showSnackBar("Logged out", MAlertSeverity.success)
                 }
                 delay(400)
             }
         } finally {
-            GuiOperations.setPage(EnumPageType.AUTHENTICATION)
+            GuiOperations.page = EnumPageType.AUTHENTICATION
         }
     }
 
@@ -122,7 +121,7 @@ object AuthenticationEventHandlers {
                         Session.login(event.credentials.email, event.credentials.password)
                     }
                 }
-                GuiOperations.setPage(EnumPageType.OVERVIEW)
+                GuiOperations.page = EnumPageType.OVERVIEW
             }
             coroutines.launch {
                 GuiOperations.showSnackBar("Successfully logged in!", MAlertSeverity.success)

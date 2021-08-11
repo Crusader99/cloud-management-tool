@@ -4,12 +4,12 @@ import com.ccfraser.muirwik.components.*
 import com.ccfraser.muirwik.components.button.mIconButton
 import com.ccfraser.muirwik.components.table.*
 import de.crusader.extensions.toDate
-import de.crusader.objects.color.Color
+import de.crusader.extensions.toTimeSpanStr
 import de.hsaalen.cmt.events.*
 import de.hsaalen.cmt.network.dto.objects.Reference
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
-import de.hsaalen.cmt.theme.toCssColor
 import kotlinx.css.*
+import kotlinx.html.currentTimeMillis
 import react.RBuilder
 import react.RComponent
 import react.RProps
@@ -18,7 +18,7 @@ import styled.css
 import styled.styledDiv
 
 /**
- * Wrapper function to simplify creation of this react component.
+ * Wrapper function to simplify creation of this React component.
  */
 fun RBuilder.referenceList(
     dto: ServerReferenceListDto,
@@ -66,9 +66,6 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
         mTableRow {
             for (column in columns) {
                 mTableCell {
-                    css {
-                        backgroundColor = Color.DARK_GRAY.toCssColor()
-                    }
                     +column
                 }
             }
@@ -103,7 +100,9 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
                 }
                 for (label in ref.labels) {
                     mChip(label, onDelete = {
-                        dispatch(it, EventType.PRE_USER_REMOVE_LABEL, LabelEditEvent(ref, label))
+                        dispatch(it, EventType.PRE_USER_REMOVE_LABEL, LabelEvent(ref, label))
+                    }, onClick = {
+                        dispatch(it, EventType.PRE_USER_CLICK_ON_LABEL, LabelEvent(ref, label))
                     }) {
                         attrs {
                             asDynamic().clickable = true
@@ -128,7 +127,11 @@ class ViewReferenceList : RComponent<ViewReferenceListProps, RState>() {
                 }
             }
         }
-        mTableCell { +ref.dateLastAccess.toDate().toDateString() }
+        mTooltip((currentTimeMillis() - ref.dateLastAccess).toTimeSpanStr() + " ago") {
+            mTableCell {
+                +ref.dateLastAccess.toDate().toDateString()
+            }
+        }
         mTableCell(align = MTableCellAlign.right) {
             mTooltip("Download") {
                 mIconButton("download", onClick = {

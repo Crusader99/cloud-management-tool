@@ -32,6 +32,7 @@ object ReferenceEventHandlers {
             register(EventType.PRE_CREATE_NEW_DOCUMENT, ReferenceEventHandlers::onCreateReference)
             register(EventType.PRE_FILE_UPLOAD, ReferenceEventHandlers::onUploadFile)
             register(EventType.PRE_USER_OPEN_REFERENCE, ReferenceEventHandlers::onReferenceOpen)
+            register(EventType.PRE_USER_RENAME_REFERENCE, ::onClientReferenceRename)
         }
     }
 
@@ -122,6 +123,23 @@ object ReferenceEventHandlers {
             val message = "Type $type does not support live edit"
             GuiOperations.showSnackBar(message, MAlertSeverity.warning)
             logger.warn { message }
+        }
+    }
+
+    /**
+     * Request server to rename a reference.
+     */
+    private suspend fun onClientReferenceRename(event: ReferenceEvent) {
+        val oldTitle = event.reference.displayName
+        val message = "New title for reference '$oldTitle':"
+        val newTitle = GuiOperations.showInputDialog("Rename", message, defaultValue = oldTitle)
+        try {
+            if (oldTitle != newTitle) {
+                Session.instance?.rename(event.reference.uuid, newTitle ?: return)
+            }
+        } catch (ex: Exception) {
+            val error = ex.message ?: "Unable to rename reference"
+            GuiOperations.showSnackBar(error, MAlertSeverity.warning)
         }
     }
 

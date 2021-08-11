@@ -18,6 +18,7 @@ enum class EventType {
     START_KEEP_ALIVE_JOB,
     PRE_USER_ADD_LABEL,
     PRE_USER_REMOVE_LABEL,
+    PRE_USER_CLICK_ON_LABEL,
     PRE_USER_OPEN_REFERENCE,
     PRE_USER_DOWNLOAD_REFERENCE,
     PRE_USER_DELETE_REFERENCE,
@@ -30,18 +31,15 @@ enum class EventType {
  */
 data class ReferenceEvent(val reference: Reference) : Event
 
-
 /**
  * [Event] class for an event handler related to a label modification.
  */
-data class LabelEditEvent(val reference: Reference, val labelName: String) : Event
-
+data class LabelEvent(val reference: Reference, val labelName: String) : Event
 
 /**
  * Specific event type for the login event to allow passing parameters.
  */
 data class LoginEvent(val credentials: Credentials, val isRegistration: Boolean) : Event
-
 
 /**
  * Specific event type for the search event to allow searching for specific references.

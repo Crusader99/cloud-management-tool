@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.css.*
 import kotlinx.css.properties.BoxShadows
+import kotlinx.css.properties.LineHeight
 import kotlinx.html.js.onInputFunction
 import mu.KotlinLogging
 import org.w3c.dom.HTMLTextAreaElement
@@ -113,6 +114,7 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
                 outline = Outline.none
                 boxShadow = BoxShadows.none
                 border = "0"
+                lineHeight = LineHeight("1.3")
             }
             attrs {
                 ref = textarea
