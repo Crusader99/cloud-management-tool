@@ -141,6 +141,7 @@ internal object Client {
         } catch (t: Throwable) {
             val message = t.message.takeIf { it?.length in 3..100 } ?: "Server-Error ($statusCode)"
             when (response.status) {
+                HttpStatusCode.BadGateway -> throw ConnectException(message, t)
                 HttpStatusCode.GatewayTimeout -> throw ConnectException(message, t)
                 HttpStatusCode.Unauthorized -> throw UnauthorizedException(message, t)
                 else -> throw ServerException(statusCode, message, t)

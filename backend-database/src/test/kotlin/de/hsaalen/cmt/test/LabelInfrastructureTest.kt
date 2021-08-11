@@ -43,7 +43,7 @@ class LabelInfrastructureTest {
             logger.info("Added label to reference")
         }
 
-        lateinit var previousLabels: List<String>
+        lateinit var previousLabels: Set<String>
 
         // Check labels of reference
         runBlockingWithSession {

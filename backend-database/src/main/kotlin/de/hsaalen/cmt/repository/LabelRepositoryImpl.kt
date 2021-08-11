@@ -82,11 +82,11 @@ internal object LabelRepositoryImpl : LabelRepository {
     /**
      * List all labels from a user that are applied to any reference.
      */
-    override suspend fun listLabels(): List<String> {
+    override suspend fun listLabels(): Set<String> {
         try {
             return newSuspendedTransaction {
                 val user = UserDao.findUserByEmail(userEmail)
-                LabelDao.find(LabelTable.owner eq user.id).map { it.labelName }
+                LabelDao.find(LabelTable.owner eq user.id).map { it.labelName }.toSet()
             }
         } catch (ex: Exception) {
             throw IllegalStateException("Can not list all labels for user", ex)

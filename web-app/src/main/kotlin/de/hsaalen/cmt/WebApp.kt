@@ -1,12 +1,12 @@
 package de.hsaalen.cmt
 
 import com.ccfraser.muirwik.components.styles.mStylesProvider
-import de.hsaalen.cmt.components.appBar
 import de.hsaalen.cmt.components.dialogs.InputDialogComponent
 import de.hsaalen.cmt.components.dialogs.renderInputDialog
 import de.hsaalen.cmt.components.features.ViewSnackbar
 import de.hsaalen.cmt.components.features.loadingOverlay
 import de.hsaalen.cmt.components.features.renderSnackbar
+import de.hsaalen.cmt.components.header.appBar
 import de.hsaalen.cmt.events.EventType
 import de.hsaalen.cmt.events.GuiOperations
 import de.hsaalen.cmt.events.LoginEvent

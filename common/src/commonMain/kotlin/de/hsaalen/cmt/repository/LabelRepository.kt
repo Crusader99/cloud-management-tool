@@ -44,6 +44,6 @@ interface LabelRepository {
     /**
      * List all labels from a user that are applied to any reference.
      */
-    suspend fun listLabels(): List<String>
+    suspend fun listLabels(): Set<String>
 
 }

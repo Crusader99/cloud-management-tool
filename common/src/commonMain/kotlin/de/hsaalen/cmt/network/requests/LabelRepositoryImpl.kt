@@ -39,16 +39,16 @@ internal interface LabelRepositoryImpl : ClientSupport, LabelRepository {
     /**
      * List all labels from a user that are applied to any reference.
      */
-    override suspend fun listLabels(): List<String> {
+    override suspend fun listLabels(): Set<String> {
         val url = Url("$apiEndpoint$apiPathListLabels")
-        val encryptedLabels: List<String> = Client.request(url) {
+        val encryptedLabels: Set<String> = Client.request(url) {
             method = HttpMethod.Get
         }
 
         // Note that for labels the secureRandomizedPadding is disabled because encrypted
         // data has to be the same every time. This is required because of features like
         // the search by label function.
-        return encryptedLabels.decrypt(secureRandomizedPadding = false)
+        return encryptedLabels.decrypt(secureRandomizedPadding = false).toSet()
     }
 
 }

@@ -32,7 +32,6 @@ external interface OverviewPageProps : RProps {
  * React state of the [OverviewPage] component.
  */
 external interface OverviewPageState : RState {
-    var query: ClientReferenceQueryDto
     var dto: ServerReferenceListDto
     var isLoading: Boolean
 }
@@ -64,6 +63,7 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
         register(EventType.PRE_USER_RENAME_REFERENCE, ::onClientReferenceRename)
         register(EventType.PRE_USER_ADD_LABEL, ::onClientLabelAdd)
         register(EventType.PRE_USER_REMOVE_LABEL, ::onClientLabelRemove)
+        register(EventType.PRE_USER_MODIFY_SEARCH, ::onClientChangeSearch)
 
         // Initialize reference list
         launch(::updateReferences)
@@ -74,7 +74,6 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
      */
     override fun OverviewPageState.init() {
         isLoading = true
-        query = ClientReferenceQueryDto()
         dto = ServerReferenceListDto(emptyList())
     }
 
@@ -102,13 +101,18 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
     /**
      * Request a references update from server.
      */
-    private suspend fun updateReferences() {
+    private suspend fun updateReferences(query: ClientReferenceQueryDto = ClientReferenceQueryDto()) {
         GuiOperations.loading {
             try {
-                val received = props.session.listReferences(state.query)
+                val received = props.session.listReferences(query)
                 setState {
                     dto = received
                 }
+            } catch (ex: Exception) {
+                val message = "Can't update references"
+                logger.error(ex) { message }
+                val error = ex.message ?: message
+                GuiOperations.showSnackBar(error, MAlertSeverity.error)
             } finally {
                 setState {
                     isLoading = false
@@ -176,6 +180,14 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
      */
     private suspend fun onClientLabelRemove(event: LabelEditEvent) {
         Session.instance?.removeLabel(event.reference, event.labelName)
+    }
+
+    /**
+     * Called when user modifies the search parameters.
+     */
+    private suspend fun onClientChangeSearch(event: SearchEvent) {
+        logger.info { "onClientChangeSearch $event" }
+        updateReferences(event.query)
     }
 
     /**

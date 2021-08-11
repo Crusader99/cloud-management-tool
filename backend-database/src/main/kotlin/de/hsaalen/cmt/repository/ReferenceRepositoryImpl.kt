@@ -21,8 +21,9 @@ import de.hsaalen.cmt.storage.StorageS3
 import de.hsaalen.cmt.utils.id
 import de.hsaalen.cmt.utils.toUUID
 import org.jetbrains.exposed.sql.SortOrder
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.jetbrains.exposed.sql.upperCase
 import org.joda.time.DateTime
 
 /**
@@ -99,9 +100,11 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
     override suspend fun listReferences(query: ClientReferenceQueryDto): ServerReferenceListDto {
         val refs = newSuspendedTransaction {
             val creator = UserDao.findUserByEmail(userEmail)
-            ReferenceDao.find(ReferenceTable.owner eq creator.id)
+            val searchText = "%" + query.searchName.uppercase() + "%"
+            ReferenceDao.find { (ReferenceTable.owner eq creator.id) and (ReferenceTable.displayName.upperCase() like searchText) }
                 .orderBy(ReferenceTable.dateLastModified to SortOrder.DESC)
                 .map { it.toReference() }
+                .filter { it.labels.containsAll(query.filterLabels) }
         }
         return ServerReferenceListDto(refs)
     }

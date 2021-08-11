@@ -29,7 +29,7 @@ internal interface ReferenceRepositoryImpl : ClientSupport, ReferenceRepository 
         val url = Url("$apiEndpoint$apiPathListReferences")
         val dto: ServerReferenceListDto = Client.request(url) {
             method = HttpMethod.Post
-            body = query
+            body = query.encrypt()
         }
         return dto.decrypt()
     }
