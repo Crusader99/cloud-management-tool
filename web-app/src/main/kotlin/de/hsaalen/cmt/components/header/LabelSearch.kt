@@ -89,8 +89,9 @@ class LabelSearch : RComponent<RProps, LabelSearchState>() {
                 attrs.onChange = { _, value, _ ->
                     setState {
                         filterLabels = value
+                        searchText = "" // Text added as label
                     }
-                    val event = SearchEvent(state.searchText, value.toSet())
+                    val event = SearchEvent("", value.toSet())
                     launchNotification(EventType.PRE_USER_MODIFY_SEARCH, event)
                 }
                 css {
