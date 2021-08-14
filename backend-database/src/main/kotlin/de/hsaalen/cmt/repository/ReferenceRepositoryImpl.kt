@@ -13,15 +13,14 @@ import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateRemoveDto
 import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateRenameDto
 import de.hsaalen.cmt.network.dto.server.ServerReferenceListDto
 import de.hsaalen.cmt.session.currentSession
-import de.hsaalen.cmt.sql.schema.ReferenceDao
-import de.hsaalen.cmt.sql.schema.ReferenceTable
-import de.hsaalen.cmt.sql.schema.RevisionDao
-import de.hsaalen.cmt.sql.schema.UserDao
+import de.hsaalen.cmt.sql.schema.*
 import de.hsaalen.cmt.storage.StorageS3
 import de.hsaalen.cmt.utils.id
 import de.hsaalen.cmt.utils.toUUID
 import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.upperCase
 import org.joda.time.DateTime
@@ -124,6 +123,16 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
             }
 
             contentType = ref.contentType
+
+            // Cleanup labels when used nowhere
+            for (label in ref.labels) {
+                if (LabelRefMappingDao.find(LabelRefMappingTable.label eq label.id).count() <= 1) {
+                    // Delete label when this is the only reference, which will be deleted now
+                    LabelTable.deleteWhere { LabelTable.id eq label.id }
+                }
+            }
+
+            // Remove actual reference element
             ref.delete()
         }
 

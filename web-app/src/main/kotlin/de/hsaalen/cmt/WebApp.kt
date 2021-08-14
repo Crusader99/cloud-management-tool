@@ -105,7 +105,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                         }
                     }
                     EnumPageType.OVERVIEW -> {
-                        val localSession = Session.instance!! // TODO: exception handling
+                        val localSession = Session.instance ?: return@child launchNotification(EventType.PRE_LOGOUT)
                         // When already logged in
                         child(OverviewPage::class) {
                             attrs {
@@ -114,8 +114,8 @@ class WebApp : RComponent<RProps, WebAppState>() {
                         }
                     }
                     EnumPageType.EDIT_DOCUMENT -> {
-                        val localSession = Session.instance!! // TODO: exception handling
-                        val ref = state.reference!!
+                        val localSession = Session.instance ?: return@child launchNotification(EventType.PRE_LOGOUT)
+                        val ref = state.reference ?: return@child launchNotification(EventType.PRE_LOGOUT)
                         child(DocumentEditPage::class) {
                             attrs {
                                 session = localSession

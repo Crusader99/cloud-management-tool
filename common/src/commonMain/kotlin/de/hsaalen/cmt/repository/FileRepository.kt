@@ -12,11 +12,11 @@ interface FileRepository {
     /**
      * Download the reference content by a specific [UUID].
      */
-    suspend fun download(uuid: UUID): ByteArray
+    suspend fun download(reference: UUID): ByteArray
 
     /**
      * Upload or overwrite the reference content by a specific [UUID].
      */
-    suspend fun upload(uuid: UUID, content: ByteArray)
+    suspend fun upload(reference: UUID, content: ByteArray)
 
 }
