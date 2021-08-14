@@ -51,15 +51,21 @@ object ReferenceEventHandlers {
         }
 
         try {
+            var importCount = 0
             GuiOperations.loading {
                 for (file in GuiOperations.showFileSelector()) {
                     logger.info { "Importing " + file.name + "..." }
                     val text = file.readText()
                     importFile(file.name, text)
                     logger.info { file.name + " successfully imported" }
+                    importCount++
                 }
             }
-            GuiOperations.showSnackBar("Successfully imported", MAlertSeverity.success)
+            if (importCount > 0) {
+                GuiOperations.showSnackBar("Successfully imported $importCount documents", MAlertSeverity.success)
+            } else {
+                GuiOperations.showSnackBar("Import cancelled", MAlertSeverity.warning)
+            }
         } catch (ex: Exception) {
             logger.warn(ex) { "Document import failed" }
             GuiOperations.showSnackBar(ex.message ?: return, MAlertSeverity.warning)
