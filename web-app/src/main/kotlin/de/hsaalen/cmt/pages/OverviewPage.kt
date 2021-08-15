@@ -32,7 +32,6 @@ external interface OverviewPageProps : RProps {
  * React state of the [OverviewPage] component.
  */
 external interface OverviewPageState : RState {
-    var query: ClientReferenceQueryDto
     var dto: ServerReferenceListDto
     var isLoading: Boolean
 }
@@ -61,9 +60,9 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
         // Clientside events
         register(EventType.PRE_USER_DELETE_REFERENCE, ::onClientReferenceDelete)
         register(EventType.PRE_USER_DOWNLOAD_REFERENCE, ::onClientReferenceDownload)
-        register(EventType.PRE_USER_RENAME_REFERENCE, ::onClientReferenceRename)
         register(EventType.PRE_USER_ADD_LABEL, ::onClientLabelAdd)
         register(EventType.PRE_USER_REMOVE_LABEL, ::onClientLabelRemove)
+        register(EventType.PRE_USER_MODIFY_SEARCH, ::onClientChangeSearch)
 
         // Initialize reference list
         launch(::updateReferences)
@@ -74,7 +73,6 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
      */
     override fun OverviewPageState.init() {
         isLoading = true
-        query = ClientReferenceQueryDto()
         dto = ServerReferenceListDto(emptyList())
     }
 
@@ -102,13 +100,18 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
     /**
      * Request a references update from server.
      */
-    private suspend fun updateReferences() {
+    private suspend fun updateReferences(query: ClientReferenceQueryDto = ClientReferenceQueryDto()) {
         GuiOperations.loading {
             try {
-                val received = props.session.listReferences(state.query)
+                val received = props.session.listReferences(query)
                 setState {
                     dto = received
                 }
+            } catch (ex: Exception) {
+                val message = "Can't update references"
+                logger.error(ex) { message }
+                val error = ex.message ?: message
+                GuiOperations.showSnackBar(error, MAlertSeverity.error)
             } finally {
                 setState {
                     isLoading = false
@@ -137,23 +140,6 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
     }
 
     /**
-     * Request server to rename a reference.
-     */
-    private suspend fun onClientReferenceRename(event: ReferenceEvent) {
-        val oldTitle = event.reference.displayName
-        val message = "New title for reference '$oldTitle':"
-        val newTitle = GuiOperations.showInputDialog("Rename", message, defaultValue = oldTitle)
-        try {
-            if (oldTitle != newTitle) {
-                Session.instance?.rename(event.reference.uuid, newTitle ?: return)
-            }
-        } catch (ex: Exception) {
-            val error = ex.message ?: "Unable to rename reference"
-            GuiOperations.showSnackBar(error, MAlertSeverity.warning)
-        }
-    }
-
-    /**
      * Called when user adds a label to a reference.
      */
     private suspend fun onClientLabelAdd(event: ReferenceEvent) {
@@ -174,8 +160,16 @@ class OverviewPage : RComponent<OverviewPageProps, OverviewPageState>() {
     /**
      * Called when user removes a label from a reference.
      */
-    private suspend fun onClientLabelRemove(event: LabelEditEvent) {
+    private suspend fun onClientLabelRemove(event: LabelEvent) {
         Session.instance?.removeLabel(event.reference, event.labelName)
+    }
+
+    /**
+     * Called when user modifies the search parameters.
+     */
+    private suspend fun onClientChangeSearch(event: SearchEvent) {
+        logger.info { "onClientChangeSearch $event" }
+        updateReferences(event.query)
     }
 
     /**

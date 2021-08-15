@@ -28,9 +28,9 @@ dependencies {
 kotlin {
     js(IR) {
         binaries.executable()
+        useCommonJs()
         browser {
             // For continuous integration: gradle browserDevelopmentRun --continuous
-            useCommonJs()
             distribution {
                 directory = File("$buildDir/artifact-js/")
             }
@@ -56,7 +56,7 @@ kotlin {
 
 // Configure detekt code analyze tool to generate HTML report
 detekt {
-    ignoreFailures = true // Currently only print warning
+    ignoreFailures = true // Only print warning
     reports {
         html.enabled = true
     }

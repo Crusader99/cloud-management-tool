@@ -3,7 +3,6 @@ package de.hsaalen.cmt.network.session
 import de.hsaalen.cmt.network.RestPaths
 import de.hsaalen.cmt.network.apiPathRSocket
 import de.hsaalen.cmt.network.dto.objects.UUID
-import de.hsaalen.cmt.network.dto.rsocket.DocumentChangeDto
 import de.hsaalen.cmt.network.dto.rsocket.LiveDto
 import de.hsaalen.cmt.network.dto.rsocket.RequestReferenceDto
 import de.hsaalen.cmt.network.dto.server.ServerUserInfoDto
@@ -70,10 +69,10 @@ class Session(
     /**
      * Open a modification channel for editing a document. Also changes from other clients will be received.
      */
-    fun modifyDocument(reference: UUID, sendChannel: Channel<DocumentChangeDto>): Flow<DocumentChangeDto> {
+    fun modifyDocument(reference: UUID, sendChannel: Channel<LiveDto>): Flow<LiveDto> {
         val init = RequestReferenceDto(reference).encrypt().buildPayload()
         val sendEvents = sendChannel.receiveAsFlow().map { it.encrypt().buildPayload() }
-        return rSocket.requestChannel(init, sendEvents).map { it.decodeProtobufData<DocumentChangeDto>().decrypt() }
+        return rSocket.requestChannel(init, sendEvents).map { it.decodeProtobufData<LiveDto>().decrypt() }
     }
 
     /**

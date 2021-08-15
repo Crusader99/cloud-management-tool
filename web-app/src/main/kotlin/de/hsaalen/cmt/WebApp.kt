@@ -1,12 +1,12 @@
 package de.hsaalen.cmt
 
 import com.ccfraser.muirwik.components.styles.mStylesProvider
-import de.hsaalen.cmt.components.appBar
 import de.hsaalen.cmt.components.dialogs.InputDialogComponent
 import de.hsaalen.cmt.components.dialogs.renderInputDialog
 import de.hsaalen.cmt.components.features.ViewSnackbar
 import de.hsaalen.cmt.components.features.loadingOverlay
 import de.hsaalen.cmt.components.features.renderSnackbar
+import de.hsaalen.cmt.components.header.appBar
 import de.hsaalen.cmt.events.EventType
 import de.hsaalen.cmt.events.GuiOperations
 import de.hsaalen.cmt.events.LoginEvent
@@ -105,7 +105,7 @@ class WebApp : RComponent<RProps, WebAppState>() {
                         }
                     }
                     EnumPageType.OVERVIEW -> {
-                        val localSession = Session.instance!! // TODO: exception handling
+                        val localSession = Session.instance ?: return@child launchNotification(EventType.PRE_LOGOUT)
                         // When already logged in
                         child(OverviewPage::class) {
                             attrs {
@@ -114,8 +114,8 @@ class WebApp : RComponent<RProps, WebAppState>() {
                         }
                     }
                     EnumPageType.EDIT_DOCUMENT -> {
-                        val localSession = Session.instance!! // TODO: exception handling
-                        val ref = state.reference!!
+                        val localSession = Session.instance ?: return@child launchNotification(EventType.PRE_LOGOUT)
+                        val ref = state.reference ?: return@child launchNotification(EventType.PRE_LOGOUT)
                         child(DocumentEditPage::class) {
                             attrs {
                                 session = localSession

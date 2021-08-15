@@ -1,23 +1,21 @@
-package de.hsaalen.cmt.components
+package de.hsaalen.cmt.components.header
 
 import com.ccfraser.muirwik.components.*
 import com.ccfraser.muirwik.components.button.mIconButton
 import com.ccfraser.muirwik.components.list.mList
 import com.ccfraser.muirwik.components.list.mListItem
 import com.ccfraser.muirwik.components.list.mListItemText
+import de.hsaalen.cmt.EnumPageType
 import de.hsaalen.cmt.SoftwareInfo
 import de.hsaalen.cmt.components.dialogs.aboutSoftwareDialog
 import de.hsaalen.cmt.events.EventType
+import de.hsaalen.cmt.events.GuiOperations
 import de.hsaalen.cmt.events.launchNotification
 import de.hsaalen.cmt.network.session.Session
 import kotlinx.browser.window
-import kotlinx.css.FlexBasis
-import kotlinx.css.flex
 import org.w3c.dom.events.Event
 import react.*
 import react.dom.*
-import styled.css
-import styled.styledDiv
 
 /**
  * Wrapper function to simplify creation of this [ViewAppBar] react component.
@@ -76,12 +74,11 @@ class ViewAppBar : RComponent<ViewAppBarProps, ViewAppBarState>() {
                         }
                     })
                 }
-                mTypography(text = SoftwareInfo.name, variant = MTypographyVariant.h6)
                 if (props.isLoggedIn) {
-                    styledDiv {
-                        css {
-                            flex(1.0, 1.0, FlexBasis.auto)
-                        }
+                    if (GuiOperations.page == EnumPageType.OVERVIEW) {
+                        child(LabelSearch::class) {}
+                    } else if (GuiOperations.page == EnumPageType.EDIT_DOCUMENT) {
+                        child(DocumentTitle::class) {}
                     }
                     if (window.innerWidth > 500) {  // Only print username when on large page
                         Session.instance?.userInfo?.let { userInfo ->
@@ -97,6 +94,8 @@ class ViewAppBar : RComponent<ViewAppBarProps, ViewAppBarState>() {
                             onClick = { launchNotification(EventType.PRE_LOGOUT) }
                         )
                     }
+                } else {
+                    mTypography(text = SoftwareInfo.name, variant = MTypographyVariant.h6)
                 }
             }
             mDrawer(open = state.isDrawerVisible, anchor = MDrawerAnchor.left, onClose = {

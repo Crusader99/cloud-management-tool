@@ -37,7 +37,7 @@ internal object Postgresql {
 
             // Creates the tables when not existing
             // Also used to test the connection to database
-            SchemaUtils.create(UserTable, ReferenceTable, RevisionTable, LabelTable, LabelRefMappingTable)
+            SchemaUtils.create(UserTable, ReferenceTable, LabelTable, LabelRefMappingTable)
         }
     }
 

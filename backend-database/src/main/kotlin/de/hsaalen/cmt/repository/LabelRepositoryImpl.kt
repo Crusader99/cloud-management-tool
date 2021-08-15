@@ -61,12 +61,12 @@ internal object LabelRepositoryImpl : LabelRepository {
                 val label = findLabel(creator, labelName) ?: error("Label not found")
 
                 // Remove label from reference
-                val removeQuery =
+                LabelRefMappingTable.deleteWhere {
                     (LabelRefMappingTable.label eq label.id) and (LabelRefMappingTable.reference eq ref.id)
-                LabelRefMappingTable.deleteWhere { removeQuery }
+                }
 
                 // Cleanup label when used nowhere
-                if (LabelRefMappingDao.find(LabelRefMappingTable.label eq label.id).count() == 0L) {
+                if (LabelRefMappingDao.find(LabelRefMappingTable.label eq label.id).none()) {
                     LabelTable.deleteWhere { LabelTable.id eq label.id }
                 }
             }
@@ -82,11 +82,11 @@ internal object LabelRepositoryImpl : LabelRepository {
     /**
      * List all labels from a user that are applied to any reference.
      */
-    override suspend fun listLabels(): List<String> {
+    override suspend fun listLabels(): Set<String> {
         try {
             return newSuspendedTransaction {
                 val user = UserDao.findUserByEmail(userEmail)
-                LabelDao.find(LabelTable.owner eq user.id).map { it.labelName }
+                LabelDao.find(LabelTable.owner eq user.id).map { it.labelName }.toSet()
             }
         } catch (ex: Exception) {
             throw IllegalStateException("Can not list all labels for user", ex)
