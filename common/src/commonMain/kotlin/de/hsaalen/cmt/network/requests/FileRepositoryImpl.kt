@@ -17,8 +17,8 @@ internal interface FileRepositoryImpl : ClientSupport, FileRepository {
     /**
      * Download the reference content by a specific [UUID].
      */
-    override suspend fun download(uuid: UUID): ByteArray {
-        val url = Url("$apiEndpoint$apiPathDownloadFile/$uuid")
+    override suspend fun download(reference: UUID): ByteArray {
+        val url = Url("$apiEndpoint$apiPathDownloadFile/$reference")
         val encryptedContent: ByteArray = Client.request(url) {
             method = HttpMethod.Get
         }
@@ -28,8 +28,8 @@ internal interface FileRepositoryImpl : ClientSupport, FileRepository {
     /**
      * Upload or overwrite the reference content by a specific [UUID].
      */
-    override suspend fun upload(uuid: UUID, content: ByteArray) {
-        val url = Url("$apiEndpoint$apiPathUploadFile/$uuid")
+    override suspend fun upload(reference: UUID, content: ByteArray) {
+        val url = Url("$apiEndpoint$apiPathUploadFile/$reference")
         val encryptedContent = encrypt(content)
         return Client.request(url) {
             method = HttpMethod.Post

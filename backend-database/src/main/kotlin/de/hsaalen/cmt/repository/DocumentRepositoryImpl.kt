@@ -2,7 +2,7 @@ package de.hsaalen.cmt.repository
 
 import com.mongodb.client.model.PushOptions
 import de.hsaalen.cmt.events.GlobalEventDispatcher
-import de.hsaalen.cmt.events.server.UserDocumentChangeEvent
+import de.hsaalen.cmt.events.server.UserDocumentActionEvent
 import de.hsaalen.cmt.mongo.MongoDB
 import de.hsaalen.cmt.mongo.TextDocument
 import de.hsaalen.cmt.network.dto.objects.ContentType
@@ -14,6 +14,7 @@ import de.hsaalen.cmt.session.senderSocketId
 import de.hsaalen.cmt.sql.schema.ReferenceDao
 import de.hsaalen.cmt.utils.id
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.joda.time.DateTime
 import org.litote.kmongo.*
 
 /**
@@ -45,19 +46,20 @@ internal object DocumentRepositoryImpl : DocumentRepository {
         }
 
         // Notify event listeners
-        val event = UserDocumentChangeEvent(request, currentSession.userMail, currentSession.senderSocketId)
-        GlobalEventDispatcher.notify(event)
+        UserDocumentActionEvent(request, request.uuid, currentSession.userMail, currentSession.senderSocketId).let {
+            GlobalEventDispatcher.notify(it)
+        }
     }
 
     /**
      * Download the content of a specific reference by uuid.
      */
-    override suspend fun downloadDocument(uuid: UUID): String {
+    override suspend fun downloadDocument(reference: UUID): String {
         // Ensure user has permissions to access this document
-        checkAccess(currentSession.userMail, uuid)
+        checkAccess(currentSession.userMail, reference)
 
         // Read document content from MongoDB
-        return MongoDB.getDocumentContent(uuid.value)
+        return MongoDB.getDocumentContent(reference.value)
     }
 
     /**
@@ -69,6 +71,7 @@ internal object DocumentRepositoryImpl : DocumentRepository {
             val ref = ReferenceDao.findById(reference.id) ?: error("Reference not found: $reference")
             check(ref.owner.email == userMail) { "No permissions to access document" }
             check(ref.contentType == ContentType.TEXT) { "Type " + ref.contentType.name + " is no document" }
+            ref.dateLastModified = DateTime.now()
         }
     }
 

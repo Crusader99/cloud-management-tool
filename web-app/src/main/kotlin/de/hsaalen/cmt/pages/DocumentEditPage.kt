@@ -8,15 +8,21 @@ import de.hsaalen.cmt.extensions.coroutines
 import de.hsaalen.cmt.extensions.launch
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode
 import de.hsaalen.cmt.network.dto.objects.Reference
+import de.hsaalen.cmt.network.dto.rsocket.CursorUpdateDto
 import de.hsaalen.cmt.network.dto.rsocket.DocumentChangeDto
+import de.hsaalen.cmt.network.dto.rsocket.LiveDto
 import de.hsaalen.cmt.network.dto.rsocket.ReferenceUpdateRemoveDto
 import de.hsaalen.cmt.network.session.Session
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.css.*
 import kotlinx.css.properties.BoxShadows
+import kotlinx.css.properties.LineHeight
 import kotlinx.html.js.onInputFunction
+import kotlinx.html.js.onMouseDownFunction
+import kotlinx.html.js.onMouseUpFunction
 import mu.KotlinLogging
 import org.w3c.dom.HTMLTextAreaElement
 import react.*
@@ -61,19 +67,28 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
     private val textarea = createRef<HTMLTextAreaElement>()
 
     /**
-     * The engine for handling text changes.
-     */
-    private val engine: Engine = TextareaEngine(textarea)
-
-    /**
      * Output channel for changed that will be sent to server.
      */
-    private var channelSend = Channel<DocumentChangeDto>()
+    private var channelSend = Channel<LiveDto>()
+
+    /**
+     * Count the amount of mouse downs to check if the user
+     * has currently his mouse down. This is used to fix a bug, where
+     * it is not possible to select text, because of constant
+     * text updates.
+     */
+    private val mouseDowns = atomic(0)
+
+    /**
+     * The engine for handling text changes.
+     */
+    private val engine: Engine = TextareaEngine(textarea, mouseDowns, channelSend)
 
     /**
      * Register events for this component.
      */
     private val events = GlobalEventDispatcher.createBundle(this) {
+        register(::onRemovedReference)
         register(::onRemovedReference)
         launch {
             val text = ""
@@ -83,7 +98,11 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
                 defaultText = text
             }
             Session.instance?.modifyDocument(props.reference.uuid, channelSend)?.collect { event ->
-                onDocumentChangedRemote(event)
+                when (event) {
+                    is DocumentChangeDto -> onDocumentChangedRemote(event)
+                    is CursorUpdateDto -> onCursorPositionChange(event)
+                    else -> logger.warn { "Unknown document modification received: " + event::class.simpleName }
+                }
             }
         }
     }
@@ -113,10 +132,21 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
                 outline = Outline.none
                 boxShadow = BoxShadows.none
                 border = "0"
+                lineHeight = LineHeight("1.3")
             }
             attrs {
                 ref = textarea
                 onInputFunction = { onTextChanged(engine.text) }
+                onMouseDownFunction = {
+                    mouseDowns.incrementAndGet()
+                    println("mouse down")
+                }
+                onMouseUpFunction = {
+                    if (mouseDowns.decrementAndGet() < 0) {
+                        mouseDowns.value = 0
+                    }
+                    println("mouse up")
+                }
                 autoFocus = true
             }
         }
@@ -126,6 +156,7 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
      * Called after every key the user pressed.
      */
     private fun onTextChanged(newText: String) {
+        engine.text = engine.text // Will update the cursor positions
         coroutines.launch {
             diffCalculator.findChangedLines(newText)
         }
@@ -171,6 +202,13 @@ class DocumentEditPage : RComponent<DocumentEditPageProps, DocumentEditPageState
         }
         // The active open document reference was removed so close editor view
         props.onExit()
+    }
+
+    /**
+     * Event called by server when cursors position changed.
+     */
+    private fun onCursorPositionChange(dto: CursorUpdateDto) {
+        engine.updateCursor(dto.cursorOwner, dto.cursorIndex)
     }
 
 }

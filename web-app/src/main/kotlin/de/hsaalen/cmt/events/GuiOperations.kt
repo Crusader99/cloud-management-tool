@@ -66,10 +66,12 @@ object GuiOperations {
     /**
      * Determinate which page should be printed on web app main screen.
      */
-    fun setPage(pageType: EnumPageType) {
-        webApp.setState {
-            page = pageType
+    var page: EnumPageType
+        get() = webApp.state.page
+        set(newPageType) {
+            webApp.setState {
+                page = newPageType
+            }
         }
-    }
 
 }

@@ -63,6 +63,8 @@ internal interface ReferenceRepositoryImpl : ClientSupport, ReferenceRepository 
     override suspend fun rename(uuid: UUID, newTitle: String) {
         if (newTitle.isBlank()) {
             error("Empty title is not allowed")
+        } else if (newTitle.length > 50) {
+            error("Title max length is 50 characters")
         }
         val url = Url("$apiEndpoint$apiPathRenameReference")
         return Client.request(url) {

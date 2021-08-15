@@ -23,7 +23,7 @@ configurations.all {
 
 // Configure detekt code analyze tool to generate HTML report
 detekt {
-    ignoreFailures = true // Currently only print warning
+    ignoreFailures = true // Only print warning
     reports {
         html.enabled = true
     }

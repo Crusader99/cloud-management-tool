@@ -15,4 +15,4 @@ docker-compose down &
 echo Execute gradle using user \'$(users)\'...
 su $(users) -c "./gradlew --stop" # Ensure other gradle sessions are closed
 chown $(users) . -R # Ensure Gradle has user permissions for building
-su $(users) -c "./gradlew build -x detekt -x test" && docker-compose up --build -d
+su $(users) -c "./gradlew build -x detekt -x test -x browserTest" && docker-compose up --build -d

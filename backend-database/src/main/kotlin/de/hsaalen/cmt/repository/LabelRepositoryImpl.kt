@@ -61,12 +61,12 @@ internal object LabelRepositoryImpl : LabelRepository {
                 val label = findLabel(creator, labelName) ?: error("Label not found")
 
                 // Remove label from reference
-                val removeQuery =
+                LabelRefMappingTable.deleteWhere {
                     (LabelRefMappingTable.label eq label.id) and (LabelRefMappingTable.reference eq ref.id)
-                LabelRefMappingTable.deleteWhere { removeQuery }
+                }
 
                 // Cleanup label when used nowhere
-                if (LabelRefMappingDao.find(LabelRefMappingTable.label eq label.id).count() == 0L) {
+                if (LabelRefMappingDao.find(LabelRefMappingTable.label eq label.id).none()) {
                     LabelTable.deleteWhere { LabelTable.id eq label.id }
                 }
             }

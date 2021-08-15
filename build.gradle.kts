@@ -43,3 +43,11 @@ tasks.dokkaHtmlMultiModule {
     outputDirectory.set(buildDir.resolve("api-doc"))
     includes.from("README.md") // Print on index page
 }
+
+// Execute this task to generate API documentation.
+val docs by tasks.registering {
+    dependsOn(tasks.dokkaHtmlMultiModule)
+}
+
+tasks.withType<org.jetbrains.dokka.gradle.DokkaTask>().configureEach { dependsOn("assemble") }
+tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach { dependsOn("assemble") }

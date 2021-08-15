@@ -5,10 +5,7 @@ import com.ccfraser.muirwik.components.form.MFormControlVariant
 import com.ccfraser.muirwik.components.lab.mAutoCompleteMultiValue
 import com.ccfraser.muirwik.components.mTextField
 import com.ccfraser.muirwik.components.spreadProps
-import de.hsaalen.cmt.events.EventType
-import de.hsaalen.cmt.events.GlobalEventDispatcher
-import de.hsaalen.cmt.events.SearchEvent
-import de.hsaalen.cmt.events.launchNotification
+import de.hsaalen.cmt.events.*
 import de.hsaalen.cmt.extensions.launch
 import de.hsaalen.cmt.extensions.onEnterKey
 import de.hsaalen.cmt.extensions.onTextChange
@@ -41,6 +38,7 @@ class LabelSearch : RComponent<RProps, LabelSearchState>() {
      */
     private val events = GlobalEventDispatcher.createBundle(this) {
         register(::onServerLabelUpdate) // Event called by server
+        register(EventType.PRE_USER_CLICK_ON_LABEL, ::onUserClickOnLabel) // Event called by user
         launch {
             val labels = Session.instance!!.listLabels()
             setState {
@@ -123,6 +121,9 @@ class LabelSearch : RComponent<RProps, LabelSearchState>() {
                 launchNotification(EventType.PRE_USER_MODIFY_SEARCH, event)
             }
         }
+        css {
+            backgroundColor = Color.white
+        }
     }
 
     /**
@@ -135,6 +136,21 @@ class LabelSearch : RComponent<RProps, LabelSearchState>() {
                 allLabels = allLabels + event.labelName
             }
         }
+    }
+
+    /**
+     * Event called by client after clicking on a label in reference list.
+     */
+    private fun onUserClickOnLabel(event: LabelEvent) {
+        if (event.labelName in state.filterLabels) {
+            return // Skip because already added as filter
+        }
+        val filters = state.filterLabels + event.labelName
+        setState {
+            filterLabels = filters
+        }
+        val newEvent = SearchEvent(state.searchText, filters.toSet())
+        launchNotification(EventType.PRE_USER_MODIFY_SEARCH, newEvent)
     }
 
 }
