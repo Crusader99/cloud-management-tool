@@ -94,17 +94,18 @@ services:
     volumes:
       - ./docker-compose/prometheus/:/etc/prometheus/:z # Config files
       - prometheus:/prometheus # Database volume
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    user: root
+    privileged: true # Required for usage in podman
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
     depends_on:
       - backend-server
-  grafana:
+  grafana: # Use http://prometheus:9090 as connect url for data source
     image: grafana/grafana:7.5.3
     ports:
       - '${GRAFANA_PORT}:3000'
-    volumes: # Use http://prometheus:9090 as connect url for data source
-      - ./docker-compose/grafana:/var/lib/grafana:Z # :z is required in SELinux using podman
     depends_on:
       - prometheus
     environment:
@@ -119,7 +120,7 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web-app.address=:80"
-    privileged: true
+    privileged: true # Required for usage in podman
     depends_on:
       - backend-server
       - web-app

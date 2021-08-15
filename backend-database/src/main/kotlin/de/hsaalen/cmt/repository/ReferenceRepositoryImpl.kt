@@ -43,29 +43,18 @@ internal object ReferenceRepositoryImpl : ReferenceRepository {
         val ref: Reference = newSuspendedTransaction {
             // Create document in SQL
             val creator = UserDao.findUserByEmail(userEmail)
-            val now = DateTime.now()
             val reference = ReferenceDao.new {
                 this.displayName = request.displayName
                 this.contentType = request.contentType
                 this.owner = creator
                 this.dateLastModified = DateTime.now()
             }
-            val revision = RevisionDao.new {
-                this.item = reference
-                this.index = 0
-
-                this.dateCreation = now
-                this.dateLastAccess = now
-                this.creator = creator
-                this.accessCount = 0
-            }
 
             Reference(
                 uuid = reference.id.toUUID(),
                 displayName = reference.displayName,
                 contentType = reference.contentType,
-                dateCreation = revision.dateCreation.millis,
-                dateLastAccess = revision.dateLastAccess.millis,
+                dateLastAccess = reference.dateLastModified.millis,
                 labels = request.labels.toMutableSet()
             )
         }

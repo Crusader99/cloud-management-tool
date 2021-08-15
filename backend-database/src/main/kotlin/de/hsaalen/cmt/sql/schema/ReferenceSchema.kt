@@ -37,8 +37,7 @@ class ReferenceDao(id: EntityID<UUID>) : UUIDEntity(id) {
      * Convert [ReferenceDao] to [Reference] instance to be transmitted oer network.
      */
     fun toReference(): Reference {
-        val now = System.currentTimeMillis()
         val labels = labels.map { it.labelName }.toMutableSet()
-        return Reference(id.toUUID(), displayName, contentType, now, now, labels)
+        return Reference(id.toUUID(), displayName, contentType, dateLastModified.millis, labels)
     }
 }

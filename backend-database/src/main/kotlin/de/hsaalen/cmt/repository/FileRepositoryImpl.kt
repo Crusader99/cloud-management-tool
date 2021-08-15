@@ -6,6 +6,7 @@ import de.hsaalen.cmt.sql.schema.ReferenceDao
 import de.hsaalen.cmt.storage.StorageS3
 import de.hsaalen.cmt.utils.id
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.joda.time.DateTime
 
 /**
  * Server implementation of the file repository to provide access to the AWS S3 file storage.
@@ -36,6 +37,7 @@ internal object FileRepositoryImpl : FileRepository {
         if (ref.owner.email != userMail) {
             throw SecurityException("Can not access references from different users!")
         }
+        ref.dateLastModified = DateTime.now()
     }
 
 }

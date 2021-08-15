@@ -27,8 +27,8 @@ internal interface DocumentRepositoryImpl : ClientSupport, DocumentRepository {
     /**
      * Download the content of a specific reference by uuid.
      */
-    override suspend fun downloadDocument(uuid: UUID): String {
-        val url = Url("$apiEndpoint/$apiPathDownloadDocument/$uuid")
+    override suspend fun downloadDocument(reference: UUID): String {
+        val url = Url("$apiEndpoint/$apiPathDownloadDocument/$reference")
         val encryptedText: String = Client.request(url) {
             method = HttpMethod.Get
         }

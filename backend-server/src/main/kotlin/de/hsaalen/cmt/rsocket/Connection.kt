@@ -1,14 +1,11 @@
 package de.hsaalen.cmt.rsocket
 
 import de.hsaalen.cmt.events.GlobalEventDispatcher
-import de.hsaalen.cmt.events.server.UserDocumentChangeEvent
+import de.hsaalen.cmt.events.server.UserDocumentActionEvent
 import de.hsaalen.cmt.extensions.launch
 import de.hsaalen.cmt.network.dto.objects.LabelChangeMode
 import de.hsaalen.cmt.network.dto.objects.LineChangeMode
-import de.hsaalen.cmt.network.dto.rsocket.DocumentChangeDto
-import de.hsaalen.cmt.network.dto.rsocket.LabelUpdateDto
-import de.hsaalen.cmt.network.dto.rsocket.LiveDto
-import de.hsaalen.cmt.network.dto.rsocket.RequestReferenceDto
+import de.hsaalen.cmt.network.dto.rsocket.*
 import de.hsaalen.cmt.repository.DocumentRepository
 import de.hsaalen.cmt.repository.LabelRepository
 import de.hsaalen.cmt.session.jwt.JwtPayload
@@ -102,8 +99,11 @@ class Connection(socket: RSocket, private val payload: JwtPayload, val jwtToken:
                     withWebSocketSession(userEmail, socketId) {
                         input.collect {
                             try {
-                                val dto: DocumentChangeDto = it.decodeProtobufData()
-                                docRepo.modifyDocument(dto)
+                                when (val dto: LiveDto = it.decodeProtobufData()) {
+                                    is DocumentChangeDto -> docRepo.modifyDocument(dto)
+                                    is CursorUpdateDto -> GlobalEventDispatcher.notify(UserDocumentActionEvent(dto.copy(cursorOwner = de.hsaalen.cmt.network.dto.objects.UUID(socketId)), documentUUID, userEmail, socketId)) // Notify other clients
+                                    else -> logger.warn { "Unknown document modification: " + dto::class.simpleName }
+                                }
                             } catch (ex: Exception) {
                                 logger.error("Unable to handle document change", ex)
                             }
@@ -112,18 +112,19 @@ class Connection(socket: RSocket, private val payload: JwtPayload, val jwtToken:
                 }
 
                 // Get modifications from other clients as stream
-                val eventFlow = events.receiveEventsAsFlow<UserDocumentChangeEvent>()
+                val eventFlow = events.receiveEventsAsFlow<UserDocumentActionEvent>()
                     .filter { it.senderSocketId != socketId }
+                    .filter { it.reference == documentUUID }
                     .map { it.modification }
-                    .filter { it.uuid == documentUUID }
 
                 // Provide live flow synchronisation
-                channelFlow {
+                channelFlow{
                     documentFlow.collect { send(it) }
                     eventFlow.collect { send(it) }
                 }.onCompletion {
                     logger.info("Cancel document editing")
                     events.unregisterAll()
+                    GlobalEventDispatcher.notify(UserDocumentActionEvent(CursorUpdateDto(de.hsaalen.cmt.network.dto.objects.UUID(socketId), null), documentUUID, userEmail, socketId))
                 }.map { it.buildPayload() }
             }
         }
