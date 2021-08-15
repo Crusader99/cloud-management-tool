@@ -1,7 +1,11 @@
 # se-project
 
-Online management tool for files and documents. The web-app is [hosted online](https://provider.ddnss.de/se-project/)
-for testing proposes.
+Online management tool for files and documents. The project is [hosted online as live demo](https://provider.ddnss.de/se-project/).
+
+Final release for grading can be found
+in [https://github.com/Crusader99/se-project/releases/tag/1.0-final](https://github.com/Crusader99/se-project/releases/tag/1.0-final)
+
+---
 
 ## Conventions:
 
@@ -78,8 +82,8 @@ for testing proposes.
 * [x] Configure Grafana & Prometheus
 * [x] Provide statistics with Ktor: /metrics
 * [x] Multi instance Redis support
-* [ ] Select all repository link references for documentation
-* [ ] Submit latex documentation until 15.08.2021
+* [x] Select all repository link references for documentation
+* [x] Submit latex documentation until 15.08.2021
 
 ## Build & execute project
 
@@ -106,10 +110,7 @@ Start backend using docker (opens reverse-proxy on port 80):
 Cleanup data and volumes:
 > sudo docker-compose down -v
 
-### Execute without docker-compose:
+### Run frontend without docker-compose:
 
 Debug web-app (opens dev-server on port 8081):
 > gradle :web-app:browserDevelopmentRun --continuous
-
-Run server-backend:
-> gradle :server-backend:run
