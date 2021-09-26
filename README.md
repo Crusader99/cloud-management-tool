@@ -1,9 +1,8 @@
-# se-project
+# Cloud Management Tool
 
-Online management tool for files and documents. The project is [hosted online as live demo](https://provider.ddnss.de/se-project/).
+Online management tool for files and documents. The project is [hosted online as live demo](https://provider.ddnss.de/cloud-management-tool/).
 
-Final release for grading can be found
-in [https://github.com/Crusader99/se-project/releases/tag/1.0-final](https://github.com/Crusader99/se-project/releases/tag/1.0-final)
+Releases for self-hosting can be found in [https://github.com/Crusader99/cloud-management-tool/releases/tag/1.0-final](https://github.com/Crusader99/cloud-management-tool/releases/tag/1.0-final)
 
 ---
 

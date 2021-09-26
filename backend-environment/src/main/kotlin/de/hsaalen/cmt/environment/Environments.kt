@@ -120,7 +120,7 @@ val REDIS_PORT = envOrNull("REDIS_PORT")?.toIntOrNull() ?: 6379
 /**
  * The topic that is used by Redis to publish events and register listeners.
  */
-val REDIS_TOPIC = envOrDefault("REDIS_TOPIC", "se-project")
+val REDIS_TOPIC = envOrDefault("REDIS_TOPIC", "cloud-management-tool")
 
 /**
  * Reads a system environment variable or returns null when not available.

@@ -46,7 +46,7 @@ object BackendLocator {
             return if (frontendURL.startsWith("file://") || frontendHost == "appassets.androidplatform.net") {
                 // This is the official default backend server
                 // It can be changed using the "switch backend"-button
-                "https://provider.ddnss.de/se-project/" + RestPaths.base
+                "https://provider.ddnss.de/cloud-management-tool/" + RestPaths.base
             } else {
                 frontendURL.removeSuffix("/") + "/" + RestPaths.base
             }

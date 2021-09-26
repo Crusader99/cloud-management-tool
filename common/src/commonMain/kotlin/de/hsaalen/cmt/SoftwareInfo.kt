@@ -22,7 +22,7 @@ Frontend components:
 - Material UI (https://material-ui.com)
 - Muirwik (https://github.com/cfnz/muirwik)
 
-Go to Github-Repository: https://github.com/Crusader99/se-project
+Go to Github-Repository: https://github.com/Crusader99/cloud-management-tool
     """.trimIndent()
 
 }

@@ -1,4 +1,4 @@
-rootProject.name = "se-project"
+rootProject.name = "cloud-management-tool"
 
 pluginManagement {
     repositories {

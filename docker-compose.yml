@@ -31,7 +31,7 @@ services:
       S3_PASSWORD: ${S3_PASSWORD}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      REDIS_TOPIC: se-project
+      REDIS_TOPIC: cloud-management-tool
       JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8686
     deploy:
       replicas: 2
