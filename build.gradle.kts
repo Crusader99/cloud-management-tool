@@ -13,7 +13,7 @@ allprojects {
 }
 
 plugins {
-    kotlin("multiplatform") version "1.5.21" apply false // Allows common projects
+    kotlin("multiplatform") version "1.5.31" apply false // Allows common projects
     kotlin("plugin.serialization") version "1.5.21" apply false // Support for json serialization
 
     // Gradle plugin for android development
@@ -28,10 +28,10 @@ plugins {
     id("com.github.gelangweilte-studenten.gradle-docker-tests") version "1.2.6" apply false
 
     // Code quality: Tool for static code analysis
-    id("io.gitlab.arturbosch.detekt") version "1.17.1" apply false
+    id("io.gitlab.arturbosch.detekt") version "1.18.1" apply false
 
     // Generate API documentation from source code
-    id("org.jetbrains.dokka") version "1.5.0"
+    id("org.jetbrains.dokka") version "1.5.30"
 
     // Register plugins for better IDE support
     eclipse

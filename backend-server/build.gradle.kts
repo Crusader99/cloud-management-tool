@@ -23,15 +23,15 @@ dependencies {
     implementation(project(":common"))
 
     // Network framework
-    implementation("io.ktor:ktor-server-core:1.6.2")
-    implementation("io.ktor:ktor-server-cio:1.6.2") {
+    implementation("io.ktor:ktor-server-core:1.6.3")
+    implementation("io.ktor:ktor-server-cio:1.6.3") {
         because("Known issues with netty & jetty")
     }
-    implementation("io.ktor:ktor-serialization:1.6.2")
-    implementation("io.ktor:ktor-websockets:1.6.2")
-    implementation("io.ktor:ktor-metrics-micrometer:1.6.2")
-    implementation("io.ktor:ktor-auth:1.6.2")
-    implementation("io.ktor:ktor-auth-jwt:1.6.2")
+    implementation("io.ktor:ktor-serialization:1.6.3")
+    implementation("io.ktor:ktor-websockets:1.6.3")
+    implementation("io.ktor:ktor-metrics-micrometer:1.6.3")
+    implementation("io.ktor:ktor-auth:1.6.3")
+    implementation("io.ktor:ktor-auth-jwt:1.6.3")
 
     // Use RSocket as better alternative to plain websockets (https://rsocket.io/)
     implementation("io.rsocket.kotlin:rsocket-transport-ktor-server:0.13.1")
@@ -40,7 +40,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.3") {
         because("Ktor depends on this library and has issues when missing")
     }
-    implementation("io.micrometer:micrometer-registry-prometheus:1.7.2")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.7.4")
     implementation("io.insert-koin:koin-logger-slf4j:3.1.2")
 
     // Use Koin as dependency injection framework

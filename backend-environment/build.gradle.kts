@@ -8,7 +8,7 @@ dependencies {
     implementation(project(":common"))
 
     // Required for EventModuleSerializer to registering event instances in serialization module
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.2.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.0")
 
     // Reflection libraries to allow scanning for event instances
     implementation("org.reflections:reflections:0.9.12")

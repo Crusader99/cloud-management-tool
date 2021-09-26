@@ -17,21 +17,21 @@ dependencies {
     implementation(project(":backend-environment"))
 
     // SQL database driver for postgres
-    implementation("org.jetbrains.exposed:exposed-core:0.32.1")
-    implementation("org.jetbrains.exposed:exposed-dao:0.32.1")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.32.1")
-    implementation("org.jetbrains.exposed:exposed-jodatime:0.32.1")
-    implementation("org.postgresql:postgresql:42.2.23")
+    implementation("org.jetbrains.exposed:exposed-core:0.35.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.35.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.35.1")
+    implementation("org.jetbrains.exposed:exposed-jodatime:0.35.1")
+    implementation("org.postgresql:postgresql:42.2.24")
 
     // Mongo DB driver to support live edit in text documents
-    implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.2.8")
+    implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.3.0")
 
     // Import Amazon AWS S3 driver for accessing Minio file storage
-    implementation("software.amazon.awssdk:s3:2.17.7")
+    implementation("software.amazon.awssdk:s3:2.17.46")
 
     // Redis for synchronisation between server multiple instances
-    implementation("org.redisson:redisson:3.16.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.2.2")
+    implementation("org.redisson:redisson:3.16.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.3.0")
 
     // JUnit test framework
     testImplementation(kotlin("test"))

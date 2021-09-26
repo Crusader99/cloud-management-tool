@@ -55,9 +55,9 @@ dependencies {
     // https://developer.android.com/jetpack/androidx/migrate/artifact-mappings
     implementation("androidx.webkit:webkit:1.4.0") // Used to provide android web-browser
     implementation("androidx.core:core-ktx:1.6.0")
-    implementation("androidx.appcompat:appcompat:1.3.0")
+    implementation("androidx.appcompat:appcompat:1.3.1")
     implementation("com.google.android.material:material:1.4.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.4")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.1")
     implementation("androidx.navigation:navigation-fragment-ktx:2.3.5")
     implementation("androidx.navigation:navigation-ui-ktx:2.3.5")
     testImplementation("junit:junit:4.13.2")

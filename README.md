@@ -101,6 +101,8 @@ Note when opening the full project with Android Studio, the `local.properties` f
 Build all modules, including android:
 > gradlew build
 
+(Note: Java 16+ may cause build failures)
+
 To skip the tests while Gradle build run:
 > gradlew build -x test
 
