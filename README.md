@@ -1,27 +1,17 @@
 # Cloud Management Tool
 
-Online management tool for files and documents. The project is [hosted online as live demo](https://provider.ddnss.de/cloud-management-tool/).
-
-Releases for self-hosting can be found in [https://github.com/Crusader99/cloud-management-tool/releases/tag/1.0-final](https://github.com/Crusader99/cloud-management-tool/releases/tag/1.0-final)
+Online management tool for end2end encrypted files and documents.
 
 ---
 
-## Conventions:
+## Features
 
-* Logic in code: [Keep it simple, stupid](https://en.wikipedia.org/wiki/KISS_principle)
-* Write everything in english language
-* Commit messages with convention from [Chris Beams](https://chris.beams.io/posts/git-commit/)
-* [Kotlin coding conventions](https://kotlinlang.org/docs/coding-conventions.html)
+* User data is client side encrypted using a private master key
+* Changes are synchronized live between different devices / browser tabs of the same user
+* Backend can be horizontally scaled to multiple container instances
+* Common code is shared between server backend and web frontend
 
-## Build-tool configuration:
-
-* Gradle [multi-project](https://docs.gradle.org/current/userguide/intro_multi_project_builds.html) (all subprojects
-  included in one repo)
-* Automated JUnit-Tests with GitHub Actions
-* Provide docker-compose file for backend setup
-* Documentation with latex template and [plant-uml](https://plantuml.com/)
-
-## Technical background:
+## Technical background
 
 * [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform.html) (share code between frontend and backend)
 * [Ktor](https://ktor.io) (network framework for client & server)
@@ -36,18 +26,21 @@ Releases for self-hosting can be found in [https://github.com/Crusader99/cloud-m
 * [Material UI](https://material-ui.com) + [Muirwik](https://github.com/cfnz/muirwik) (provide react components)
 * [Mockk](https://mockk.io) (Help mocking in test units)
 
-## Databases:
+## Databases
 
 * [PostgreSQL](https://www.postgresql.org) for user management and references / labels
 * [MongoDB](https://www.mongodb.com) for encrypted notes to allow updating only a single line
 * [Minio](https://min.io) Amazon S3 compatible container as storage for encrypted files
 
-## Platforms:
+## Build-tool configuration
 
-* Browser: React-App
-* Smartphone: Native Android-App
+* Gradle [multi-project](https://docs.gradle.org/current/userguide/intro_multi_project_builds.html) (all subprojects
+  included in one repo)
+* Automated JUnit-Tests with GitHub Actions
+* Provide docker-compose file for backend setup
+* Documentation with latex template and [plant-uml](https://plantuml.com/)
 
-## Roadmap:
+## Roadmap
 
 * [x] Make backend technology decisions
 * [x] Create running project for backend
@@ -81,8 +74,6 @@ Releases for self-hosting can be found in [https://github.com/Crusader99/cloud-m
 * [x] Configure Grafana & Prometheus
 * [x] Provide statistics with Ktor: /metrics
 * [x] Multi instance Redis support
-* [x] Select all repository link references for documentation
-* [x] Submit latex documentation until 15.08.2021
 
 ## Build & execute project
 
@@ -95,7 +86,7 @@ sdk.dir=/opt/android
 
 Note when opening the full project with Android Studio, the `local.properties` file will be generated automatically.
 
-### With gradle & docker-compose:
+### With gradle & docker-compose
 
 Build all modules, including android:
 > gradlew build
@@ -115,3 +106,10 @@ Cleanup data and volumes:
 
 Debug web-app (opens dev-server on port 8081):
 > gradle :web-app:browserDevelopmentRun --continuous
+
+## Conventions
+
+* Logic in code: [Keep it simple, stupid](https://en.wikipedia.org/wiki/KISS_principle)
+* Write everything in english language
+* Commit messages with convention from [Chris Beams](https://chris.beams.io/posts/git-commit/)
+* [Kotlin coding conventions](https://kotlinlang.org/docs/coding-conventions.html)
